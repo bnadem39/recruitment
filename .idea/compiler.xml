@@ -3,22 +3,20 @@
   <component name="CompilerConfiguration">
     <annotationProcessing>
       <profile name="Annotation profile for recrutment" enabled="true">
-        <sourceOutputDir name="../generated-sources/annotations" />
-        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-configuration-processor/4.1.0/spring-boot-configuration-processor-4.1.0.jar" />
         </processorPath>
-        <module name="recrutment.main" />
-        <module name="recrutment.test" />
+        <module name="recrutment" />
       </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="recrutment" options="-parameters" />
-      <module name="recrutment.main" options="-parameters" />
-      <module name="recrutment.test" options="-parameters" />
     </option>
   </component>
 </project>
