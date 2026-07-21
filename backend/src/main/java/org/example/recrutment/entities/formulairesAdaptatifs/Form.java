@@ -38,10 +38,6 @@ public class Form {
 
     @Column(nullable = false)
     @Builder.Default
-    private Integer version = 1;
-
-    @Column(nullable = false)
-    @Builder.Default
     private Boolean active = true;
 
     @Column(name = "created_at", nullable = false, updatable = false)
