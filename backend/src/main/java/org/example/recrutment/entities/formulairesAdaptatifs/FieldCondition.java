@@ -1,4 +1,4 @@
-package org.example.recrutement.entities.formulairesAdaptatifs;
+package org.example.recrutment.entities.formulairesAdaptatifs;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
