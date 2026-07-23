@@ -42,7 +42,7 @@ public class JobOffer {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "contract_type", nullable = false)
-    private ContractType contractType;
+    private ContactType contractType;
 
     private String location;
 

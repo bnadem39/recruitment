@@ -1,6 +1,6 @@
 package org.example.recrutment.entities.gestionOffres;
 
-public enum ContractType {
+public enum ContactType {
     CDI,
     CDD,
     STAGE,
