@@ -36,7 +36,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 
-public class Candidates extends User {
+public class Candidates extends Users {
 
     // ===============================
     // INFORMATIONS PERSONNELLES
