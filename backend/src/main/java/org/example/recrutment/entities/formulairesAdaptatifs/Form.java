@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.example.recrutment.entities.gestionOffres.JobOffer;
+
 @Entity
 @Table(name = "forms")
 @Getter
@@ -26,7 +28,7 @@ public class Form {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long form_id;
 
     // ==================== Attributs ====================
 
@@ -47,5 +49,12 @@ public class Form {
     private LocalDateTime updatedAt;
 
     // ==================== Relations ====================
+
+    @OneToMany(mappedBy = "form", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<FormField> fields = new ArrayList<>();
+
+    @OneToMany(mappedBy = "form")
+    private List<JobOffer> jobOffers = new ArrayList<>();
 
 }
