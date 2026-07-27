@@ -5,6 +5,8 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+import org.example.recrutment.entities.candidatures.Application;
+
 @Entity
 @Table(name = "interviews")
 @Getter
@@ -53,5 +55,13 @@ public class Interview {
     private LocalDateTime createdAt;
 
     // ==================== Relations ====================
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "application_id", nullable = false)
+    private Application application;
+
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "evaluation_id")
+    private InterviewEvaluation evaluation;
 
 }

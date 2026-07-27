@@ -10,6 +10,9 @@ import lombok.EqualsAndHashCode;
 import org.example.recrutment.entities.formulairesAdaptatifs.ConditionAction;
 import org.example.recrutment.entities.formulairesAdaptatifs.ConditionOperator;
 import org.example.recrutment.entities.formulairesAdaptatifs.LogicalOperator;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 @Table(name = "field_conditions")
@@ -48,5 +51,13 @@ public class FieldCondition {
     private LogicalOperator logicalOperator;
 
     // ==================== Relations ====================
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "source_field_id", nullable = false)
+    private FormField sourceField;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "target_field_id", nullable = false)
+    private FormField targetField;
 
 }

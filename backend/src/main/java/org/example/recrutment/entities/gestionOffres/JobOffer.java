@@ -8,9 +8,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.recrutment.entities.formulairesAdaptatifs.Form;
+import org.example.recrutment.entities.candidatures.Application;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "job_offers")
@@ -70,5 +73,13 @@ public class JobOffer {
     private LocalDateTime updatedAt;
 
     // ==================== Relations ====================
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "form_id")
+    private Form form;
+
+    @OneToMany(mappedBy = "jobOffer")
+    @Builder.Default
+    private List<Application> applications = new ArrayList<>();
 
 }

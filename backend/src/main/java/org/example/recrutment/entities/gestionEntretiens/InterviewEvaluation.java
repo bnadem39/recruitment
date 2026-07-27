@@ -6,6 +6,10 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+
 @Entity
 @Table(name = "interview_evaluations")
 @Getter
@@ -52,5 +56,8 @@ public class InterviewEvaluation {
     private LocalDateTime createdAt;
 
     // ==================== Relations ====================
+
+    @OneToOne(mappedBy = "evaluation", fetch = FetchType.LAZY)
+    private Interview interview;
 
 }

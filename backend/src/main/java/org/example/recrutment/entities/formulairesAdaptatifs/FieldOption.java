@@ -8,6 +8,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.EqualsAndHashCode;
 
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+
 @Entity
 @Table(name = "field_options")
 @Getter
@@ -36,5 +40,9 @@ public class FieldOption {
     private Integer displayOrder;
 
     // ==================== Relations ====================
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "form_field_id", nullable = false)
+    private FormField formField;
 
 }

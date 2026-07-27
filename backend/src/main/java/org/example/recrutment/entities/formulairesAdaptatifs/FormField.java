@@ -13,6 +13,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.example.recrutment.entities.candidatures.FieldResponse;
+
 @Entity
 @Table(name = "form_fields")
 @Getter
@@ -69,5 +71,23 @@ public class FormField {
     private Integer maximumLength;
 
     // ==================== Relations ====================
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "form_id", nullable = false)
+    private Form form;
+
+    @OneToMany(mappedBy = "formField", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<FieldOption> options = new ArrayList<>();
+
+    @OneToMany(mappedBy = "sourceField")
+    private List<FieldCondition> sourceConditions = new ArrayList<>();
+
+    @OneToMany(mappedBy = "targetField")
+    private List<FieldCondition> targetConditions = new ArrayList<>();
+
+    @OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<FieldResponse> responses = new ArrayList<>();
 
 }

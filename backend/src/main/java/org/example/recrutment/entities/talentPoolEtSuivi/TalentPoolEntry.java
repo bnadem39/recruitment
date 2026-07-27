@@ -2,6 +2,7 @@ package org.example.recrutment.entities.talentPoolEtSuivi;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.example.recrutment.entities.users.Candidates;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -57,5 +58,9 @@ public class TalentPoolEntry {
     private LocalDateTime createdAt;
 
     // ==================== Relations ====================
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "candidate_id", nullable = false)
+    private Candidates candidate;
 
 }

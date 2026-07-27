@@ -2,6 +2,7 @@ package org.example.recrutment.entities.talentPoolEtSuivi;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.example.recrutment.entities.users.Users;
 
 import java.time.LocalDateTime;
 
@@ -48,5 +49,9 @@ public class Notification {
     private LocalDateTime createdAt;
 
     // ==================== Relations ====================
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "recipient_id")
+    private Users recipient;
 
 }
