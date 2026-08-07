@@ -73,7 +73,7 @@ public class FormField {
     // ==================== Relations ====================
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "form_id", nullable = false)
+    @JoinColumn(name = "formId", nullable = false)
     private Form form;
 
     @OneToMany(mappedBy = "formField", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -75,7 +75,7 @@ public class JobOffer {
     // ==================== Relations ====================
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "form_id")
+    @JoinColumn(name = "formId")
     private Form form;
 
     @OneToMany(mappedBy = "jobOffer")
