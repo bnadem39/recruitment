@@ -28,7 +28,7 @@ public class Form {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long form_id;
+    private Long formId;
 
     // ==================== Attributs ====================
 
@@ -56,5 +56,18 @@ public class Form {
 
     @OneToMany(mappedBy = "form")
     private List<JobOffer> jobOffers = new ArrayList<>();
+
+    // ==================== Callbacks JPA ====================
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 
 }
