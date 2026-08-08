@@ -90,4 +90,16 @@ public class FormField {
     @Builder.Default
     private List<FieldResponse> responses = new ArrayList<>();
 
+    // ==================== Méthodes utilitaires ====================
+
+    public void addOption(FieldOption option) {
+        options.add(option);
+        option.setFormField(this);
+    }
+
+    public void removeOption(FieldOption option) {
+        options.remove(option);
+        option.setFormField(null);
+    }
+
 }

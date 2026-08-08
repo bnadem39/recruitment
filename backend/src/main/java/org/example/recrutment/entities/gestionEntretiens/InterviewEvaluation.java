@@ -60,4 +60,11 @@ public class InterviewEvaluation {
     @OneToOne(mappedBy = "evaluation", fetch = FetchType.LAZY)
     private Interview interview;
 
+    // ==================== Callbacks JPA ====================
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
+
 }

@@ -64,4 +64,17 @@ public class Interview {
     @JoinColumn(name = "evaluation_id")
     private InterviewEvaluation evaluation;
 
+    // ==================== Callbacks JPA ====================
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    // ==================== Méthodes utilitaires ====================
+
+    public void addEvaluation(InterviewEvaluation evaluation) {
+        this.evaluation = evaluation;
+    }
+
 }

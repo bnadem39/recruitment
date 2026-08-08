@@ -70,4 +70,20 @@ public class Form {
         this.updatedAt = LocalDateTime.now();
     }
 
+    // ==================== Méthodes utilitaires ====================
+
+    /**
+     * Ajoute un champ au formulaire en maintenant la relation bidirectionnelle
+     * (évite d'oublier field.setForm(this) à chaque ajout).
+     */
+    public void addField(FormField field) {
+        fields.add(field);
+        field.setForm(this);
+    }
+
+    public void removeField(FormField field) {
+        fields.remove(field);
+        field.setForm(null);
+    }
+
 }
