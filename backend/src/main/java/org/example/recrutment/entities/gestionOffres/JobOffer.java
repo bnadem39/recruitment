@@ -82,4 +82,25 @@ public class JobOffer {
     @Builder.Default
     private List<Application> applications = new ArrayList<>();
 
+    // ==================== Callbacks JPA ====================
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    // ==================== Méthodes utilitaires ====================
+
+    /** Vérifie si l'offre est encore ouverte aux candidatures. */
+    public boolean isOpenForApplications() {
+        boolean withinDeadline = deadline == null || !LocalDate.now().isAfter(deadline);
+        return status == OfferStatus.PUBLISHED && withinDeadline;
+    }
+
 }
