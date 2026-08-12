@@ -1,8 +1,8 @@
-package org.example.recrutment.controllers;
+package org.example.recrutment.controllers.candidatures;
 
 import lombok.RequiredArgsConstructor;
 import org.example.recrutment.entities.users.Candidates;
-import org.example.recrutment.services.CandidatesService;
+import org.example.recrutment.services.candidatures.CandidatesService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;

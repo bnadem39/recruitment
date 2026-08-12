@@ -1,23 +1,5 @@
 package org.example.recrutment.services.candidatures;
 
-import org.example.recrutment.dto.candidatures.ApplicationRequestDTO;
-import org.example.recrutment.dto.candidatures.ApplicationResponseDTO;
-
+import org.example.recrutment.entities.application.Application;
 import java.util.List;
-
-public interface ApplicationService {
-
-    ApplicationResponseDTO create(ApplicationRequestDTO request);
-
-    ApplicationResponseDTO getById(Long id);
-
-    List<ApplicationResponseDTO> getAll();
-
-    List<ApplicationResponseDTO> getAllByCandidate(Long candidateId);
-
-    List<ApplicationResponseDTO> getAllByJobOffer(Long jobOfferId);
-
-    ApplicationResponseDTO update(Long id, ApplicationRequestDTO request);
-
-    void delete(Long id);
-}
+public interface ApplicationService { Application create(Application e); Application update(Long id, Application e); Application getById(Long id); List<Application> getAll(); void delete(Long id); }

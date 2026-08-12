@@ -2,8 +2,8 @@ package org.example.recrutment.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.example.recrutment.entities.application.ApplicationDocument;
-import org.example.recrutment.repositories.ApplicationDocumentRepository;
-import org.example.recrutment.services.ApplicationDocumentService;
+import org.example.recrutment.repositories.candidatures.ApplicationDocumentRepository;
+import org.example.recrutment.services.candidatures.ApplicationDocumentService;
 import org.springframework.stereotype.Service;
 import java.util.List;
 @Service @RequiredArgsConstructor

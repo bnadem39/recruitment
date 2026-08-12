@@ -1,4 +1,4 @@
-package org.example.recrutment.repositories;
+package org.example.recrutment.repositories.talentPool;
 
 import org.example.recrutment.entities.talentpool.TalentPoolEntry;
 import org.springframework.data.jpa.repository.JpaRepository;

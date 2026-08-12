@@ -1,4 +1,4 @@
-package org.example.recrutment.services;
+package org.example.recrutment.services.notifications;
 
 import org.example.recrutment.entities.notification.Notification;
 import java.util.List;

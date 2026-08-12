@@ -1,8 +1,8 @@
-package org.example.recrutment.controllers;
+package org.example.recrutment.controllers.notifications;
 
 import lombok.RequiredArgsConstructor;
 import org.example.recrutment.entities.notification.Notification;
-import org.example.recrutment.services.NotificationService;
+import org.example.recrutment.services.notifications.NotificationService;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;

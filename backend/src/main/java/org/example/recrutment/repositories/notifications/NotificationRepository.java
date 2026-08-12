@@ -1,4 +1,4 @@
-package org.example.recrutment.repositories;
+package org.example.recrutment.repositories.notifications;
 
 import org.example.recrutment.entities.notification.Notification;
 import org.springframework.data.jpa.repository.JpaRepository;

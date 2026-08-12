@@ -1,4 +1,4 @@
-package org.example.recrutment.services;
+package org.example.recrutment.services.talentPool;
 
 import org.example.recrutment.entities.talentpool.TalentPoolEntry;
 import java.util.List;

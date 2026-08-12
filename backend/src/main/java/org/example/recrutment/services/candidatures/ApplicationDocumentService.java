@@ -1,4 +1,4 @@
-package org.example.recrutment.services;
+package org.example.recrutment.services.candidatures;
 
 import org.example.recrutment.entities.application.ApplicationDocument;
 import java.util.List;

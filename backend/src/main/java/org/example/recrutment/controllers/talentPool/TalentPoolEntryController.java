@@ -1,8 +1,8 @@
-package org.example.recrutment.controllers;
+package org.example.recrutment.controllers.talentPool;
 
 import lombok.RequiredArgsConstructor;
 import org.example.recrutment.entities.talentpool.TalentPoolEntry;
-import org.example.recrutment.services.TalentPoolEntryService;
+import org.example.recrutment.services.talentPool.TalentPoolEntryService;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;

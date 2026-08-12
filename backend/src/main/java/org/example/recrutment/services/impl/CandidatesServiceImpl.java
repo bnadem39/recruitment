@@ -2,8 +2,8 @@ package org.example.recrutment.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.example.recrutment.entities.users.Candidates;
-import org.example.recrutment.repositories.CandidatesRepository;
-import org.example.recrutment.services.CandidatesService;
+import org.example.recrutment.repositories.candidatures.CandidatesRepository;
+import org.example.recrutment.services.candidatures.CandidatesService;
 import org.example.recrutment.shared.exceptions.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 

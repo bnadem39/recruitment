@@ -2,8 +2,8 @@ package org.example.recrutment.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.example.recrutment.entities.notification.Notification;
-import org.example.recrutment.repositories.NotificationRepository;
-import org.example.recrutment.services.NotificationService;
+import org.example.recrutment.repositories.notifications.NotificationRepository;
+import org.example.recrutment.services.notifications.NotificationService;
 import org.springframework.stereotype.Service;
 import java.util.List;
 @Service @RequiredArgsConstructor

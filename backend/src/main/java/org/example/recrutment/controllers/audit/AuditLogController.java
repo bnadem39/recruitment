@@ -1,8 +1,8 @@
-package org.example.recrutment.controllers;
+package org.example.recrutment.controllers.audit;
 
 import lombok.RequiredArgsConstructor;
 import org.example.recrutment.entities.audit.AuditLog;
-import org.example.recrutment.services.AuditLogService;
+import org.example.recrutment.services.audit.AuditLogService;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;

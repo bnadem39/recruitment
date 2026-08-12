@@ -1,4 +1,4 @@
-package org.example.recrutment.repositories;
+package org.example.recrutment.repositories.candidatures;
 
 import org.example.recrutment.entities.application.FieldResponse;
 import org.springframework.data.jpa.repository.JpaRepository;

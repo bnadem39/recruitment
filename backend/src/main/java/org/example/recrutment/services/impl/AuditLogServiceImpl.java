@@ -2,8 +2,8 @@ package org.example.recrutment.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.example.recrutment.entities.audit.AuditLog;
-import org.example.recrutment.repositories.AuditLogRepository;
-import org.example.recrutment.services.AuditLogService;
+import org.example.recrutment.repositories.audit.AuditLogRepository;
+import org.example.recrutment.services.audit.AuditLogService;
 import org.springframework.stereotype.Service;
 import java.util.List;
 @Service @RequiredArgsConstructor

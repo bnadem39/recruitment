@@ -2,8 +2,8 @@ package org.example.recrutment.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.example.recrutment.entities.application.FieldResponse;
-import org.example.recrutment.repositories.FieldResponseRepository;
-import org.example.recrutment.services.FieldResponseService;
+import org.example.recrutment.repositories.candidatures.FieldResponseRepository;
+import org.example.recrutment.services.candidatures.FieldResponseService;
 import org.springframework.stereotype.Service;
 import java.util.List;
 @Service @RequiredArgsConstructor

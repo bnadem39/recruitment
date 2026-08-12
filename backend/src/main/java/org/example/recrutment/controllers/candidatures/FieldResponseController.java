@@ -1,8 +1,8 @@
-package org.example.recrutment.controllers;
+package org.example.recrutment.controllers.candidatures;
 
 import lombok.RequiredArgsConstructor;
 import org.example.recrutment.entities.application.FieldResponse;
-import org.example.recrutment.services.FieldResponseService;
+import org.example.recrutment.services.candidatures.FieldResponseService;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;

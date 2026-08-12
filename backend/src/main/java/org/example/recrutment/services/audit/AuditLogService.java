@@ -1,4 +1,4 @@
-package org.example.recrutment.services;
+package org.example.recrutment.services.audit;
 
 import org.example.recrutment.entities.audit.AuditLog;
 import java.util.List;

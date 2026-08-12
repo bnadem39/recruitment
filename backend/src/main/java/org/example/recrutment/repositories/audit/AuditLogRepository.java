@@ -1,4 +1,4 @@
-package org.example.recrutment.repositories;
+package org.example.recrutment.repositories.audit;
 
 import org.example.recrutment.entities.audit.AuditLog;
 import org.springframework.data.jpa.repository.JpaRepository;
