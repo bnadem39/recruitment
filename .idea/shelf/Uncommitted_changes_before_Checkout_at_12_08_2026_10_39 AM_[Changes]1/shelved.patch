@@ -1,0 +1,472 @@
+Index: backend/src/main/java/org/example/recrutment/controllers/talentPoolEtSuivi/TalentPoolEntryController.java
+===================================================================
+diff --git a/backend/src/main/java/org/example/recrutment/controllers/talentPoolEtSuivi/TalentPoolEntryController.java b/backend/src/main/java/org/example/recrutment/controllers/talentPoolEtSuivi/TalentPoolEntryController.java
+deleted file mode 100644
+--- a/backend/src/main/java/org/example/recrutment/controllers/talentPoolEtSuivi/TalentPoolEntryController.java	(revision d6f8a929ee3cf1e094a7a94eae756d730e7e4d98)
++++ /dev/null	(revision d6f8a929ee3cf1e094a7a94eae756d730e7e4d98)
+@@ -1,45 +0,0 @@
+-package org.example.recrutment.controllers.talentPoolEtSuivi;
+-
+-import org.example.recrutment.entities.talentPoolEtSuivi.TalentPoolEntry;
+-import org.example.recrutment.services.talentPoolEtSuivi.TalentPoolEntryService;
+-import org.springframework.http.ResponseEntity;
+-import org.springframework.web.bind.annotation.*;
+-
+-import java.util.List;
+-
+-@RestController
+-@RequestMapping("/api/talent-pool-entries")
+-public class TalentPoolEntryController {
+-
+-    private final TalentPoolEntryService service;
+-
+-    public TalentPoolEntryController(TalentPoolEntryService service) {
+-        this.service = service;
+-    }
+-
+-    @PostMapping
+-    public ResponseEntity<TalentPoolEntry> create(@RequestBody TalentPoolEntry entry) {
+-        return ResponseEntity.ok(service.create(entry));
+-    }
+-
+-    @GetMapping("/{id}")
+-    public ResponseEntity<TalentPoolEntry> getById(@PathVariable Long id) {
+-        return ResponseEntity.ok(service.getById(id));
+-    }
+-
+-    @GetMapping
+-    public ResponseEntity<List<TalentPoolEntry>> getAll() {
+-        return ResponseEntity.ok(service.getAll());
+-    }
+-
+-    @PutMapping("/{id}")
+-    public ResponseEntity<TalentPoolEntry> update(@PathVariable Long id, @RequestBody TalentPoolEntry entry) {
+-        return ResponseEntity.ok(service.update(id, entry));
+-    }
+-
+-    @DeleteMapping("/{id}")
+-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+-        service.delete(id);
+-        return ResponseEntity.noContent().build();
+-    }
+-}
+Index: backend/src/main/java/org/example/recrutment/repositories/candidatures/ApplicationRepository.java
+===================================================================
+diff --git a/backend/src/main/java/org/example/recrutment/repositories/candidatures/ApplicationRepository.java b/backend/src/main/java/org/example/recrutment/repositories/candidatures/ApplicationRepository.java
+deleted file mode 100644
+--- a/backend/src/main/java/org/example/recrutment/repositories/candidatures/ApplicationRepository.java	(revision d6f8a929ee3cf1e094a7a94eae756d730e7e4d98)
++++ /dev/null	(revision d6f8a929ee3cf1e094a7a94eae756d730e7e4d98)
+@@ -1,7 +0,0 @@
+-package org.example.recrutment.repositories.candidatures;
+-
+-import org.example.recrutment.entities.candidatures.Application;
+-import org.springframework.data.jpa.repository.JpaRepository;
+-
+-public interface ApplicationRepository extends JpaRepository<Application, Long> {
+-}
+Index: backend/src/main/java/org/example/recrutment/services/users/UsersServiceImpl.java
+===================================================================
+diff --git a/backend/src/main/java/org/example/recrutment/services/users/UsersServiceImpl.java b/backend/src/main/java/org/example/recrutment/services/users/UsersServiceImpl.java
+deleted file mode 100644
+--- a/backend/src/main/java/org/example/recrutment/services/users/UsersServiceImpl.java	(revision d6f8a929ee3cf1e094a7a94eae756d730e7e4d98)
++++ /dev/null	(revision d6f8a929ee3cf1e094a7a94eae756d730e7e4d98)
+@@ -1,56 +0,0 @@
+-package org.example.recrutment.services.users;
+-
+-import org.example.recrutment.entities.users.Users;
+-import org.example.recrutment.repositories.users.UsersRepository;
+-import org.springframework.stereotype.Service;
+-import org.springframework.transaction.annotation.Transactional;
+-
+-import java.util.List;
+-
+-@Service
+-@Transactional
+-public class UsersServiceImpl implements UsersService {
+-
+-    private final UsersRepository usersRepository;
+-
+-    public UsersServiceImpl(UsersRepository usersRepository) {
+-        this.usersRepository = usersRepository;
+-    }
+-
+-    @Override
+-    public Users create(Users users) {
+-        users.setId(null);
+-        return usersRepository.save(users);
+-    }
+-
+-    @Override
+-    public Users update(Long id, Users users) {
+-        Users existing = getById(id);
+-        existing.setFirstName(users.getFirstName());
+-        existing.setLastName(users.getLastName());
+-        existing.setEmail(users.getEmail());
+-        existing.setPassword(users.getPassword());
+-        existing.setPhone(users.getPhone());
+-        existing.setUserRole(users.getUserRole());
+-        existing.setStatus(users.getStatus());
+-        return usersRepository.save(existing);
+-    }
+-
+-    @Override
+-    @Transactional(readOnly = true)
+-    public Users getById(Long id) {
+-        return usersRepository.findById(id)
+-                .orElseThrow(() -> new IllegalArgumentException("User not found with id " + id));
+-    }
+-
+-    @Override
+-    @Transactional(readOnly = true)
+-    public List<Users> getAll() {
+-        return usersRepository.findAll();
+-    }
+-
+-    @Override
+-    public void delete(Long id) {
+-        usersRepository.delete(getById(id));
+-    }
+-}
+Index: backend/src/main/java/org/example/recrutment/repositories/users/UsersRepository.java
+===================================================================
+diff --git a/backend/src/main/java/org/example/recrutment/repositories/users/UsersRepository.java b/backend/src/main/java/org/example/recrutment/repositories/users/UsersRepository.java
+deleted file mode 100644
+--- a/backend/src/main/java/org/example/recrutment/repositories/users/UsersRepository.java	(revision d6f8a929ee3cf1e094a7a94eae756d730e7e4d98)
++++ /dev/null	(revision d6f8a929ee3cf1e094a7a94eae756d730e7e4d98)
+@@ -1,7 +0,0 @@
+-package org.example.recrutment.repositories.users;
+-
+-import org.example.recrutment.entities.users.Users;
+-import org.springframework.data.jpa.repository.JpaRepository;
+-
+-public interface UsersRepository extends JpaRepository<Users, Long> {
+-}
+Index: backend/src/main/java/org/example/recrutment/services/candidatures/ApplicationServiceImpl.java
+===================================================================
+diff --git a/backend/src/main/java/org/example/recrutment/services/candidatures/ApplicationServiceImpl.java b/backend/src/main/java/org/example/recrutment/services/candidatures/ApplicationServiceImpl.java
+deleted file mode 100644
+--- a/backend/src/main/java/org/example/recrutment/services/candidatures/ApplicationServiceImpl.java	(revision d6f8a929ee3cf1e094a7a94eae756d730e7e4d98)
++++ /dev/null	(revision d6f8a929ee3cf1e094a7a94eae756d730e7e4d98)
+@@ -1,59 +0,0 @@
+-package org.example.recrutment.services.candidatures;
+-
+-import org.example.recrutment.entities.candidatures.Application;
+-import org.example.recrutment.repositories.candidatures.ApplicationRepository;
+-import org.springframework.stereotype.Service;
+-import org.springframework.transaction.annotation.Transactional;
+-
+-import java.util.List;
+-
+-@Service
+-@Transactional
+-public class ApplicationServiceImpl implements ApplicationService {
+-
+-    private final ApplicationRepository repository;
+-
+-    public ApplicationServiceImpl(ApplicationRepository repository) {
+-        this.repository = repository;
+-    }
+-
+-    @Override
+-    public Application create(Application application) {
+-        application.setId(null);
+-        return repository.save(application);
+-    }
+-
+-    @Override
+-    public Application update(Long id, Application application) {
+-        Application existing = getById(id);
+-        existing.setStatus(application.getStatus());
+-        existing.setCurrentStage(application.getCurrentStage());
+-        existing.setSubmittedAt(application.getSubmittedAt());
+-        existing.setFinalDecision(application.getFinalDecision());
+-        existing.setRejectionReason(application.getRejectionReason());
+-        existing.setWithdrawalReason(application.getWithdrawalReason());
+-        existing.setCandidate(application.getCandidate());
+-        existing.setJobOffer(application.getJobOffer());
+-        existing.setFieldResponses(application.getFieldResponses());
+-        existing.setDocuments(application.getDocuments());
+-        return repository.save(existing);
+-    }
+-
+-    @Override
+-    @Transactional(readOnly = true)
+-    public Application getById(Long id) {
+-        return repository.findById(id)
+-                .orElseThrow(() -> new IllegalArgumentException("Application not found with id " + id));
+-    }
+-
+-    @Override
+-    @Transactional(readOnly = true)
+-    public List<Application> getAll() {
+-        return repository.findAll();
+-    }
+-
+-    @Override
+-    public void delete(Long id) {
+-        repository.delete(getById(id));
+-    }
+-}
+Index: backend/src/main/java/org/example/recrutment/controllers/candidatures/ApplicationController.java
+===================================================================
+diff --git a/backend/src/main/java/org/example/recrutment/controllers/candidatures/ApplicationController.java b/backend/src/main/java/org/example/recrutment/controllers/candidatures/ApplicationController.java
+deleted file mode 100644
+--- a/backend/src/main/java/org/example/recrutment/controllers/candidatures/ApplicationController.java	(revision d6f8a929ee3cf1e094a7a94eae756d730e7e4d98)
++++ /dev/null	(revision d6f8a929ee3cf1e094a7a94eae756d730e7e4d98)
+@@ -1,45 +0,0 @@
+-package org.example.recrutment.controllers.candidatures;
+-
+-import org.example.recrutment.entities.candidatures.Application;
+-import org.example.recrutment.services.candidatures.ApplicationService;
+-import org.springframework.http.ResponseEntity;
+-import org.springframework.web.bind.annotation.*;
+-
+-import java.util.List;
+-
+-@RestController
+-@RequestMapping("/api/applications")
+-public class ApplicationController {
+-
+-    private final ApplicationService service;
+-
+-    public ApplicationController(ApplicationService service) {
+-        this.service = service;
+-    }
+-
+-    @PostMapping
+-    public ResponseEntity<Application> create(@RequestBody Application application) {
+-        return ResponseEntity.ok(service.create(application));
+-    }
+-
+-    @GetMapping("/{id}")
+-    public ResponseEntity<Application> getById(@PathVariable Long id) {
+-        return ResponseEntity.ok(service.getById(id));
+-    }
+-
+-    @GetMapping
+-    public ResponseEntity<List<Application>> getAll() {
+-        return ResponseEntity.ok(service.getAll());
+-    }
+-
+-    @PutMapping("/{id}")
+-    public ResponseEntity<Application> update(@PathVariable Long id, @RequestBody Application application) {
+-        return ResponseEntity.ok(service.update(id, application));
+-    }
+-
+-    @DeleteMapping("/{id}")
+-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+-        service.delete(id);
+-        return ResponseEntity.noContent().build();
+-    }
+-}
+Index: backend/src/main/java/org/example/recrutment/repositories/talentPoolEtSuivi/TalentPoolEntryRepository.java
+===================================================================
+diff --git a/backend/src/main/java/org/example/recrutment/repositories/talentPoolEtSuivi/TalentPoolEntryRepository.java b/backend/src/main/java/org/example/recrutment/repositories/talentPoolEtSuivi/TalentPoolEntryRepository.java
+deleted file mode 100644
+--- a/backend/src/main/java/org/example/recrutment/repositories/talentPoolEtSuivi/TalentPoolEntryRepository.java	(revision d6f8a929ee3cf1e094a7a94eae756d730e7e4d98)
++++ /dev/null	(revision d6f8a929ee3cf1e094a7a94eae756d730e7e4d98)
+@@ -1,7 +0,0 @@
+-package org.example.recrutment.repositories.talentPoolEtSuivi;
+-
+-import org.example.recrutment.entities.talentPoolEtSuivi.TalentPoolEntry;
+-import org.springframework.data.jpa.repository.JpaRepository;
+-
+-public interface TalentPoolEntryRepository extends JpaRepository<TalentPoolEntry, Long> {
+-}
+Index: backend/src/main/java/org/example/recrutment/services/users/UsersService.java
+===================================================================
+diff --git a/backend/src/main/java/org/example/recrutment/services/users/UsersService.java b/backend/src/main/java/org/example/recrutment/services/users/UsersService.java
+deleted file mode 100644
+--- a/backend/src/main/java/org/example/recrutment/services/users/UsersService.java	(revision d6f8a929ee3cf1e094a7a94eae756d730e7e4d98)
++++ /dev/null	(revision d6f8a929ee3cf1e094a7a94eae756d730e7e4d98)
+@@ -1,13 +0,0 @@
+-package org.example.recrutment.services.users;
+-
+-import org.example.recrutment.entities.users.Users;
+-
+-import java.util.List;
+-
+-public interface UsersService {
+-    Users create(Users users);
+-    Users update(Long id, Users users);
+-    Users getById(Long id);
+-    List<Users> getAll();
+-    void delete(Long id);
+-}
+Index: backend/src/main/java/org/example/recrutment/controllers/users/UsersController.java
+===================================================================
+diff --git a/backend/src/main/java/org/example/recrutment/controllers/users/UsersController.java b/backend/src/main/java/org/example/recrutment/controllers/users/UsersController.java
+deleted file mode 100644
+--- a/backend/src/main/java/org/example/recrutment/controllers/users/UsersController.java	(revision d6f8a929ee3cf1e094a7a94eae756d730e7e4d98)
++++ /dev/null	(revision d6f8a929ee3cf1e094a7a94eae756d730e7e4d98)
+@@ -1,45 +0,0 @@
+-package org.example.recrutment.controllers.users;
+-
+-import org.example.recrutment.entities.users.Users;
+-import org.example.recrutment.services.users.UsersService;
+-import org.springframework.http.ResponseEntity;
+-import org.springframework.web.bind.annotation.*;
+-
+-import java.util.List;
+-
+-@RestController
+-@RequestMapping("/api/users")
+-public class UsersController {
+-
+-    private final UsersService usersService;
+-
+-    public UsersController(UsersService usersService) {
+-        this.usersService = usersService;
+-    }
+-
+-    @PostMapping
+-    public ResponseEntity<Users> create(@RequestBody Users users) {
+-        return ResponseEntity.ok(usersService.create(users));
+-    }
+-
+-    @GetMapping("/{id}")
+-    public ResponseEntity<Users> getById(@PathVariable Long id) {
+-        return ResponseEntity.ok(usersService.getById(id));
+-    }
+-
+-    @GetMapping
+-    public ResponseEntity<List<Users>> getAll() {
+-        return ResponseEntity.ok(usersService.getAll());
+-    }
+-
+-    @PutMapping("/{id}")
+-    public ResponseEntity<Users> update(@PathVariable Long id, @RequestBody Users users) {
+-        return ResponseEntity.ok(usersService.update(id, users));
+-    }
+-
+-    @DeleteMapping("/{id}")
+-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+-        usersService.delete(id);
+-        return ResponseEntity.noContent().build();
+-    }
+-}
+Index: backend/src/main/java/org/example/recrutment/services/talentPoolEtSuivi/TalentPoolEntryService.java
+===================================================================
+diff --git a/backend/src/main/java/org/example/recrutment/services/talentPoolEtSuivi/TalentPoolEntryService.java b/backend/src/main/java/org/example/recrutment/services/talentPoolEtSuivi/TalentPoolEntryService.java
+deleted file mode 100644
+--- a/backend/src/main/java/org/example/recrutment/services/talentPoolEtSuivi/TalentPoolEntryService.java	(revision d6f8a929ee3cf1e094a7a94eae756d730e7e4d98)
++++ /dev/null	(revision d6f8a929ee3cf1e094a7a94eae756d730e7e4d98)
+@@ -1,13 +0,0 @@
+-package org.example.recrutment.services.talentPoolEtSuivi;
+-
+-import org.example.recrutment.entities.talentPoolEtSuivi.TalentPoolEntry;
+-
+-import java.util.List;
+-
+-public interface TalentPoolEntryService {
+-    TalentPoolEntry create(TalentPoolEntry entry);
+-    TalentPoolEntry update(Long id, TalentPoolEntry entry);
+-    TalentPoolEntry getById(Long id);
+-    List<TalentPoolEntry> getAll();
+-    void delete(Long id);
+-}
+Index: backend/src/main/java/org/example/recrutment/services/candidatures/ApplicationService.java
+===================================================================
+diff --git a/backend/src/main/java/org/example/recrutment/services/candidatures/ApplicationService.java b/backend/src/main/java/org/example/recrutment/services/candidatures/ApplicationService.java
+deleted file mode 100644
+--- a/backend/src/main/java/org/example/recrutment/services/candidatures/ApplicationService.java	(revision d6f8a929ee3cf1e094a7a94eae756d730e7e4d98)
++++ /dev/null	(revision d6f8a929ee3cf1e094a7a94eae756d730e7e4d98)
+@@ -1,13 +0,0 @@
+-package org.example.recrutment.services.candidatures;
+-
+-import org.example.recrutment.entities.candidatures.Application;
+-
+-import java.util.List;
+-
+-public interface ApplicationService {
+-    Application create(Application application);
+-    Application update(Long id, Application application);
+-    Application getById(Long id);
+-    List<Application> getAll();
+-    void delete(Long id);
+-}
+Index: backend/src/main/java/org/example/recrutment/services/talentPoolEtSuivi/TalentPoolEntryServiceImpl.java
+===================================================================
+diff --git a/backend/src/main/java/org/example/recrutment/services/talentPoolEtSuivi/TalentPoolEntryServiceImpl.java b/backend/src/main/java/org/example/recrutment/services/talentPoolEtSuivi/TalentPoolEntryServiceImpl.java
+deleted file mode 100644
+--- a/backend/src/main/java/org/example/recrutment/services/talentPoolEtSuivi/TalentPoolEntryServiceImpl.java	(revision d6f8a929ee3cf1e094a7a94eae756d730e7e4d98)
++++ /dev/null	(revision d6f8a929ee3cf1e094a7a94eae756d730e7e4d98)
+@@ -1,61 +0,0 @@
+-package org.example.recrutment.services.talentPoolEtSuivi;
+-
+-import org.example.recrutment.entities.talentPoolEtSuivi.TalentPoolEntry;
+-import org.example.recrutment.repositories.talentPoolEtSuivi.TalentPoolEntryRepository;
+-import org.springframework.stereotype.Service;
+-import org.springframework.transaction.annotation.Transactional;
+-
+-import java.time.LocalDateTime;
+-import java.util.List;
+-
+-@Service
+-@Transactional
+-public class TalentPoolEntryServiceImpl implements TalentPoolEntryService {
+-
+-    private final TalentPoolEntryRepository repository;
+-
+-    public TalentPoolEntryServiceImpl(TalentPoolEntryRepository repository) {
+-        this.repository = repository;
+-    }
+-
+-    @Override
+-    public TalentPoolEntry create(TalentPoolEntry entry) {
+-        entry.setId(null);
+-        if (entry.getCreatedAt() == null) {
+-            entry.setCreatedAt(LocalDateTime.now());
+-        }
+-        return repository.save(entry);
+-    }
+-
+-    @Override
+-    public TalentPoolEntry update(Long id, TalentPoolEntry entry) {
+-        TalentPoolEntry existing = getById(id);
+-        existing.setCategory(entry.getCategory());
+-        existing.setSkills(entry.getSkills());
+-        existing.setConsentGiven(entry.getConsentGiven());
+-        existing.setConsentDate(entry.getConsentDate());
+-        existing.setConsentExpirationDate(entry.getConsentExpirationDate());
+-        existing.setStatus(entry.getStatus());
+-        existing.setNotes(entry.getNotes());
+-        existing.setCandidate(entry.getCandidate());
+-        return repository.save(existing);
+-    }
+-
+-    @Override
+-    @Transactional(readOnly = true)
+-    public TalentPoolEntry getById(Long id) {
+-        return repository.findById(id)
+-                .orElseThrow(() -> new IllegalArgumentException("TalentPoolEntry not found with id " + id));
+-    }
+-
+-    @Override
+-    @Transactional(readOnly = true)
+-    public List<TalentPoolEntry> getAll() {
+-        return repository.findAll();
+-    }
+-
+-    @Override
+-    public void delete(Long id) {
+-        repository.delete(getById(id));
+-    }
+-}
+Index: backend/.gitignore
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>HELP.md\r\ntarget/\r\n.mvn/wrapper/maven-wrapper.jar\r\n!**/src/main/**/target/\r\n!**/src/test/**/target/\r\n\r\n### STS ###\r\n.apt_generated\r\n.classpath\r\n.factorypath\r\n.project\r\n.settings\r\n.springBeans\r\n.sts4-cache\r\n\r\n### IntelliJ IDEA ###\r\n.idea\r\n*.iws\r\n*.iml\r\n*.ipr\r\n\r\n### NetBeans ###\r\n/nbproject/private/\r\n/nbbuild/\r\n/dist/\r\n/nbdist/\r\n/.nb-gradle/\r\nbuild/\r\n!**/src/main/**/build/\r\n!**/src/test/**/build/\r\n\r\n### VS Code ###\r\n.vscode/\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/backend/.gitignore b/backend/.gitignore
+--- a/backend/.gitignore	(revision d6f8a929ee3cf1e094a7a94eae756d730e7e4d98)
++++ b/backend/.gitignore	(date 1785138423725)
+@@ -31,3 +31,6 @@
+ 
+ ### VS Code ###
+ .vscode/
++
++# Local environment files
++.env
