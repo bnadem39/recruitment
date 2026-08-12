@@ -1,0 +1,78 @@
+Index: backend/src/main/java/org/example/recrutment/entities/formulairesAdaptatifs/FormField.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package org.example.recrutment.entities.formulairesAdaptatifs;\r\n\r\nimport jakarta.persistence.*;\r\nimport lombok.AllArgsConstructor;\r\nimport lombok.Builder;\r\nimport lombok.Getter;\r\nimport lombok.NoArgsConstructor;\r\nimport lombok.Setter;\r\nimport lombok.EqualsAndHashCode;\r\nimport org.example.recrutment.entities.formulairesAdaptatifs.FieldType;\r\n\r\nimport java.math.BigDecimal;\r\nimport java.util.ArrayList;\r\nimport java.util.List;\r\n\r\nimport org.example.recrutment.entities.candidatures.FieldResponse;\r\n\r\n@Entity\r\n@Table(name = \"form_fields\")\r\n@Getter\r\n@Setter\r\n@NoArgsConstructor\r\n@AllArgsConstructor\r\n@Builder\r\n@EqualsAndHashCode(of = \"id\")\r\npublic class FormField {\r\n\r\n    // ==================== Identifiant ====================\r\n\r\n    @Id\r\n    @GeneratedValue(strategy = GenerationType.IDENTITY)\r\n    private Long id;\r\n\r\n    // ==================== Attributs de base ====================\r\n\r\n    @Column(nullable = false)\r\n    private String label;\r\n\r\n    @Enumerated(EnumType.STRING)\r\n    @Column(name = \"field_type\", nullable = false)\r\n    private FieldType fieldType;\r\n\r\n    @Column(nullable = false)\r\n    @Builder.Default\r\n    private Boolean required = false;\r\n\r\n    private String placeholder;\r\n\r\n    @Column(name = \"default_visible\", nullable = false)\r\n    @Builder.Default\r\n    private Boolean defaultVisible = true;\r\n\r\n    @Column(name = \"display_order\", nullable = false)\r\n    private Integer displayOrder;\r\n\r\n    // ==================== Règles de validation ====================\r\n\r\n    @Column(name = \"validation_rule\")\r\n    private String validationRule;\r\n\r\n    @Column(name = \"minimum_value\")\r\n    private BigDecimal minimumValue;\r\n\r\n    @Column(name = \"maximum_value\")\r\n    private BigDecimal maximumValue;\r\n\r\n    @Column(name = \"minimum_length\")\r\n    private Integer minimumLength;\r\n\r\n    @Column(name = \"maximum_length\")\r\n    private Integer maximumLength;\r\n\r\n    // ==================== Relations ====================\r\n\r\n\r\n    @ManyToOne(fetch = FetchType.LAZY, optional = false)\r\n    @JoinColumn(name = \"form_id\", nullable = false)\r\n    private Form form;\r\n\r\n    @OneToMany(mappedBy = \"formField\", cascade = CascadeType.ALL, orphanRemoval = true)\r\n    @Builder.Default\r\n    private List<FieldOption> options = new ArrayList<>();\r\n\r\n    @OneToMany(mappedBy = \"sourceField\")\r\n    private List<FieldCondition> sourceConditions = new ArrayList<>();\r\n\r\n    @OneToMany(mappedBy = \"targetField\")\r\n    private List<FieldCondition> targetConditions = new ArrayList<>();\r\n\r\n    @OneToMany(mappedBy = \"field\", cascade = CascadeType.ALL, orphanRemoval = true)\r\n    @Builder.Default\r\n    private List<FieldResponse> responses = new ArrayList<>();\r\n\r\n}\r\n
+===================================================================
+diff --git a/backend/src/main/java/org/example/recrutment/entities/formulairesAdaptatifs/FormField.java b/backend/src/main/java/org/example/recrutment/entities/formulairesAdaptatifs/FormField.java
+--- a/backend/src/main/java/org/example/recrutment/entities/formulairesAdaptatifs/FormField.java	(revision d6f8a929ee3cf1e094a7a94eae756d730e7e4d98)
++++ b/backend/src/main/java/org/example/recrutment/entities/formulairesAdaptatifs/FormField.java	(date 1786527371774)
+@@ -72,7 +72,6 @@
+ 
+     // ==================== Relations ====================
+ 
+-
+     @ManyToOne(fetch = FetchType.LAZY, optional = false)
+     @JoinColumn(name = "form_id", nullable = false)
+     private Form form;
+Index: compose.yaml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>services:\r\n  postgres:\r\n    image: postgres:17\r\n    container_name: postgres-recruitment\r\n    restart: unless-stopped\r\n    env_file:\r\n      - backend/.env\r\n    environment:\r\n      POSTGRES_DB: ${POSTGRES_DB}\r\n      POSTGRES_USER: ${POSTGRES_USER}\r\n      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}\r\n    ports:\r\n      - \"${POSTGRES_PORT}:5432\"\r\n    volumes:\r\n      - postgres_data:/var/lib/postgresql/data\r\n\r\nvolumes:\r\n  postgres_data:\r\n
+===================================================================
+diff --git a/compose.yaml b/compose.yaml
+--- a/compose.yaml	(revision d6f8a929ee3cf1e094a7a94eae756d730e7e4d98)
++++ b/compose.yaml	(date 1786527371774)
+@@ -10,7 +10,7 @@
+       POSTGRES_USER: ${POSTGRES_USER}
+       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+     ports:
+-      - "${POSTGRES_PORT}:5432"
++      - "${POSTGRES_PORT:-5432}:5432"
+     volumes:
+       - postgres_data:/var/lib/postgresql/data
+ 
+Index: .idea/compiler.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"CompilerConfiguration\">\r\n    <annotationProcessing>\r\n      <profile name=\"Annotation profile for recrutment\" enabled=\"true\">\r\n        <sourceOutputDir name=\"../generated-sources/annotations\" />\r\n        <sourceTestOutputDir name=\"../generated-test-sources/test-annotations\" />\r\n        <processorPath useClasspath=\"false\">\r\n          <entry name=\"$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar\" />\r\n          <entry name=\"$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-configuration-processor/4.1.0/spring-boot-configuration-processor-4.1.0.jar\" />\r\n        </processorPath>\r\n        <module name=\"recrutment.main\" />\r\n        <module name=\"recrutment.test\" />\r\n      </profile>\r\n    </annotationProcessing>\r\n  </component>\r\n  <component name=\"JavacSettings\">\r\n    <option name=\"ADDITIONAL_OPTIONS_OVERRIDE\">\r\n      <module name=\"recrutment\" options=\"-parameters\" />\r\n      <module name=\"recrutment.main\" options=\"-parameters\" />\r\n      <module name=\"recrutment.test\" options=\"-parameters\" />\r\n    </option>\r\n  </component>\r\n</project>
+===================================================================
+diff --git a/.idea/compiler.xml b/.idea/compiler.xml
+--- a/.idea/compiler.xml	(revision d6f8a929ee3cf1e094a7a94eae756d730e7e4d98)
++++ b/.idea/compiler.xml	(date 1785139341348)
+@@ -3,12 +3,16 @@
+   <component name="CompilerConfiguration">
+     <annotationProcessing>
+       <profile name="Annotation profile for recrutment" enabled="true">
+-        <sourceOutputDir name="../generated-sources/annotations" />
+-        <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
++        <sourceOutputDir name="target/generated-sources/annotations" />
++        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
++        <outputRelativeToContentRoot value="true" />
+         <processorPath useClasspath="false">
++          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
++          <entry name="$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-configuration-processor/4.1.0/spring-boot-configuration-processor-4.1.0.jar" />
+           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
+           <entry name="$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-configuration-processor/4.1.0/spring-boot-configuration-processor-4.1.0.jar" />
+         </processorPath>
++        <module name="recrutment" />
+         <module name="recrutment.main" />
+         <module name="recrutment.test" />
+       </profile>
+Index: .idea/recruitment.iml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<module type=\"JAVA_MODULE\" version=\"4\">\r\n  <component name=\"NewModuleRootManager\" inherit-compiler-output=\"true\">\r\n    <exclude-output />\r\n    <content url=\"file://$MODULE_DIR$\" />\r\n    <orderEntry type=\"inheritedJdk\" />\r\n    <orderEntry type=\"sourceFolder\" forTests=\"false\" />\r\n  </component>\r\n</module>
+===================================================================
+diff --git a/.idea/recruitment.iml b/.idea/recruitment.iml
+--- a/.idea/recruitment.iml	(revision d6f8a929ee3cf1e094a7a94eae756d730e7e4d98)
++++ b/.idea/recruitment.iml	(date 1784882318730)
+@@ -3,7 +3,7 @@
+   <component name="NewModuleRootManager" inherit-compiler-output="true">
+     <exclude-output />
+     <content url="file://$MODULE_DIR$" />
+-    <orderEntry type="inheritedJdk" />
++    <orderEntry type="jdk" jdkName="temurin-17" jdkType="JavaSDK" />
+     <orderEntry type="sourceFolder" forTests="false" />
+   </component>
+ </module>
+\ No newline at end of file
