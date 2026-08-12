@@ -1,0 +1,26 @@
+services:
+  postgres-recruitment:
+    image: postgres:17
+    container_name: postgres-recruitment
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: recruitment
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin123
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_recruitment_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d recruitment"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+volumes:
+  postgres_recruitment_data:

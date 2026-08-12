@@ -1,0 +1,106 @@
+package org.example.recrutment.entities.gestionOffres;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.example.recrutment.entities.formulairesAdaptatifs.Form;
+import org.example.recrutment.entities.candidatures.Application;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name = "job_offers")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode(of = "id")
+public class JobOffer {
+
+    // ==================== Identifiant ====================
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    // ==================== Attributs ====================
+
+    @Column(nullable = false)
+    private String title;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    /** Département/service demandeur au sein de la BFPME (ex: "Direction Financière"). */
+    @Column(name = "department")
+    private String department;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "contract_type", nullable = false)
+    private ContactType contractType;
+
+    private String location;
+
+    /** Nombre de postes ouverts pour cette offre. */
+    @Column(name = "number_of_positions", nullable = false)
+    @Builder.Default
+    private Integer numberOfPositions = 1;
+
+    @Column(name = "publication_date")
+    private LocalDate publicationDate;
+
+    /** Date limite de dépôt des candidatures. */
+    @Column(name = "deadline")
+    private LocalDate deadline;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private OfferStatus status = OfferStatus.DRAFT;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    // ==================== Relations ====================
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "formId")
+    private Form form;
+
+    @OneToMany(mappedBy = "jobOffer")
+    @Builder.Default
+    private List<Application> applications = new ArrayList<>();
+
+    // ==================== Callbacks JPA ====================
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    // ==================== Méthodes utilitaires ====================
+
+    /** Vérifie si l'offre est encore ouverte aux candidatures. */
+    public boolean isOpenForApplications() {
+        boolean withinDeadline = deadline == null || !LocalDate.now().isAfter(deadline);
+        return status == OfferStatus.PUBLISHED && withinDeadline;
+    }
+
+}

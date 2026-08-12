@@ -6,18 +6,21 @@ package org.example.recrutment.entities.users;
 // ===============================
 
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.Builder;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 import java.util.List;
+
+import org.example.recrutment.entities.candidatures.Application;
+import org.example.recrutment.entities.talentPoolEtSuivi.TalentPoolEntry;
 
 
 // ===============================
@@ -34,7 +37,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 
 public class Candidates extends Users {
 
@@ -83,5 +86,11 @@ public class Candidates extends Users {
     */
 
     private Boolean profileCompleted = false;
+
+    @OneToMany(mappedBy = "candidate")
+    private List<Application> applications;
+
+    @OneToMany(mappedBy = "candidate")
+    private List<TalentPoolEntry> talentPoolEntries;
 
 }
