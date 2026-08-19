@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/admin/admindashboard.tsx","./src/auth/login.tsx","./src/candidate/candidatedashboard.tsx","./src/evaluator/evaluatordashboard.tsx","./src/hr/hrdashboard.tsx","./src/shared/roledashboard.tsx","./src/shared/api.ts","./src/shared/types.ts"],"version":"5.9.3"}

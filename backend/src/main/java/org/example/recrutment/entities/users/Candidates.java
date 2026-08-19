@@ -20,7 +20,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.example.recrutment.entities.candidatures.Application;
-import org.example.recrutment.entities.talentPoolEtSuivi.TalentPoolEntry;
+import org.example.recrutment.entities.talentpool.TalentPoolEntry;
 
 
 // ===============================
