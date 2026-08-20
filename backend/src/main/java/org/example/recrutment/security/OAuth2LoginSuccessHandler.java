@@ -1,6 +1,5 @@
 package org.example.recrutment.security;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -11,20 +10,23 @@ import org.example.recrutment.entities.users.Users;
 import org.example.recrutment.repositories.users.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
-public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
-
+public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler, AuthenticationFailureHandler {
     private final UserRepository users;
     private final PasswordEncoder passwords;
     private final JwtService jwt;
@@ -34,49 +36,78 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-                                        Authentication authentication) throws IOException, ServletException {
-        OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+                                        Authentication authentication) throws IOException {
+        OAuth2User googleUser = (OAuth2User) authentication.getPrincipal();
+        String rawEmail = googleUser.getAttribute("email");
 
-        String rawEmail = oAuth2User.getAttribute("email");
-        String firstName = oAuth2User.getAttribute("given_name");
-        String lastName = oAuth2User.getAttribute("family_name");
-
-        if (rawEmail == null) {
-            response.sendRedirect(frontendRedirectUri + "?error=missing_email");
+        if (rawEmail == null || rawEmail.isBlank()) {
+            redirectWithError(response, "Google did not provide an email address");
             return;
         }
 
-        final String email = rawEmail.trim().toLowerCase(Locale.ROOT);
+        Boolean emailVerified = googleUser.getAttribute("email_verified");
+        if (emailVerified == null) {
+            emailVerified = googleUser.getAttribute("verified_email");
+        }
+        if (Boolean.FALSE.equals(emailVerified)) {
+            redirectWithError(response, "The Google email address is not verified");
+            return;
+        }
 
-        Users user = users.findByEmailIgnoreCase(email).orElseGet(() -> {
-            Candidates candidate = Candidates.builder()
-                    .firstName(firstName != null ? firstName : "Google")
-                    .lastName(lastName != null ? lastName : "User")
-                    .email(email)
-                    .password(passwords.encode(UUID.randomUUID().toString()))
-                    .userRole(UserRole.CANDIDATE)
-                    .status(UserStatus.ACTIVE)
-                    .profileCompleted(false)
-                    .build();
-            return users.save(candidate);
-        });
+        String email = rawEmail.trim().toLowerCase(Locale.ROOT);
+        Users user = users.findByEmailIgnoreCase(email).orElseGet(() -> createCandidate(googleUser, email));
 
         if (user.getStatus() != UserStatus.ACTIVE) {
-            response.sendRedirect(frontendRedirectUri + "?error=account_disabled");
+            redirectWithError(response, "This account is not active");
             return;
         }
 
-        String token = jwt.generateToken(user);
+        String fragment = "oauth=google"
+                + "&accessToken=" + encode(jwt.generateToken(user))
+                + "&userId=" + user.getId()
+                + "&email=" + encode(user.getEmail())
+                + "&role=" + user.getUserRole().name()
+                + "&firstName=" + encode(user.getFirstName())
+                + "&lastName=" + encode(user.getLastName());
+        response.sendRedirect(frontendUrl(fragment));
+    }
 
-        String redirectUrl = UriComponentsBuilder.fromUriString(frontendRedirectUri)
-                .queryParam("token", token)
-                .queryParam("userId", user.getId())
-                .queryParam("email", user.getEmail())
-                .queryParam("role", user.getUserRole())
-                .queryParam("firstName", user.getFirstName())
-                .queryParam("lastName", user.getLastName())
-                .build().toUriString();
+    @Override
+    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
+                                        AuthenticationException exception) throws IOException {
+        redirectWithError(response, "Google authentication failed");
+    }
 
-        response.sendRedirect(redirectUrl);
+    private Candidates createCandidate(OAuth2User googleUser, String email) {
+        String firstName = normalizedName(googleUser.getAttribute("given_name"), "Google");
+        String lastName = normalizedName(googleUser.getAttribute("family_name"), "User");
+        return users.save(Candidates.builder()
+                .firstName(firstName)
+                .lastName(lastName)
+                .email(email)
+                .password(passwords.encode(UUID.randomUUID() + "-" + UUID.randomUUID()))
+                .userRole(UserRole.CANDIDATE)
+                .status(UserStatus.ACTIVE)
+                .profileCompleted(false)
+                .build());
+    }
+
+    private void redirectWithError(HttpServletResponse response, String message) throws IOException {
+        response.sendRedirect(frontendUrl("oauth=google&error=" + encode(message)));
+    }
+
+    private String frontendUrl(String fragment) {
+        return UriComponentsBuilder.fromUriString(frontendRedirectUri)
+                .fragment(fragment)
+                .build(true)
+                .toUriString();
+    }
+
+    private static String normalizedName(String value, String fallback) {
+        return value == null || value.isBlank() ? fallback : value.trim();
+    }
+
+    private static String encode(String value) {
+        return URLEncoder.encode(value == null ? "" : value, StandardCharsets.UTF_8);
     }
 }
