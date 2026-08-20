@@ -15,7 +15,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
 import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -33,16 +32,13 @@ public class SecurityConfig {
                                                   OAuth2AuthorizationRequestResolver authorizationRequestResolver) throws Exception {
         return http.csrf(csrf -> csrf.disable()).cors(cors -> {})
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .exceptionHandling(errors -> errors.authenticationEntryPoint(restAuthenticationEntryPoint()).accessDeniedHandler(restAccessDeniedHandler()))
+                .exceptionHandling(errors -> errors.authenticationEntryPoint(restAuthenticationEntryPoint()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/login", "/api/auth/signup", "/api/auth/verify-email", "/error", "/ws", "/ws/**", "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/oauth2/**", "/login/oauth2/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/hr/**").hasAnyRole("ADMIN", "HR")
                         .requestMatchers("/api/evaluator/**").hasAnyRole("ADMIN", "EVALUATOR")
-                        .requestMatchers("/api/candidate/**").hasRole("CANDIDATE")
-                        .requestMatchers("/api/interview-rooms/**").hasAnyRole("ADMIN", "HR", "EVALUATOR", "CANDIDATE")
-                        .requestMatchers("/api/candidates/**", "/api/application-documents/**", "/api/field-responses/**").hasAnyRole("ADMIN", "HR")
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2
                         .authorizationEndpoint(endpoint -> endpoint
@@ -56,13 +52,10 @@ public class SecurityConfig {
     @Bean AuthenticationEntryPoint restAuthenticationEntryPoint() {
         return (request, response, exception) -> { response.setStatus(401); response.setContentType("application/json"); response.getWriter().write("{\"message\":\"Unauthorized\"}"); };
     }
-    @Bean AccessDeniedHandler restAccessDeniedHandler() {
-        return (request, response, exception) -> { response.setStatus(403); response.setContentType("application/json"); response.getWriter().write("{\"message\":\"Forbidden\"}"); };
-    }
     @Bean CorsConfigurationSource corsConfigurationSource(@Value("${security.cors.allowed-origin-patterns}") String origins) {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOriginPatterns(Arrays.stream(origins.split(",")).map(String::trim).toList());
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(List.of("GET", "POST", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         config.setAllowCredentials(false);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
