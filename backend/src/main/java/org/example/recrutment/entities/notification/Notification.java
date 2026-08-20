@@ -3,6 +3,7 @@ package org.example.recrutment.entities.notification;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.example.recrutment.entities.users.Users;
 
 import java.time.LocalDateTime;
 
@@ -20,12 +21,22 @@ public class Notification {
     private String title;
     @Column(columnDefinition = "TEXT")
     private String message;
+    @Column(name = "notification_type")
+    private String notificationType;
     @Enumerated(EnumType.STRING)
-    private NotificationChannel notificationType;
-    private String channel;
-    private Boolean readStatus;
-    private Boolean sentAt;
+    private NotificationChannel channel;
+    @Column(name = "read_status", nullable = false)
+    @Builder.Default
+    private Boolean readStatus = false;
+    @Column(name = "sent_at")
+    private LocalDateTime sentAt;
+    @Column(name = "action_url")
+    private String actionUrl;
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createdAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "recipient_id")
+    private Users recipient;
 }
