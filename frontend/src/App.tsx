@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Login } from './auth/Login';
+import { EmailVerification } from './auth/EmailVerification';
 import { AdminDashboard } from './admin/AdminDashboard';
 import { HrDashboard } from './hr/HrDashboard';
 import { EvaluatorDashboard } from './evaluator/EvaluatorDashboard';
@@ -63,6 +64,8 @@ function consumeOAuthRedirect(): OAuthResult {
 
 export default function App() {
   const [oauthResult] = useState<OAuthResult>(consumeOAuthRedirect);
+  const [verification, setVerification] = useState<{ email: string; message: string } | null>(null);
+  const [authNotice, setAuthNotice] = useState(oauthResult.error);
   const [session, setSession] = useState<Session | null>(() => {
     if (!oauthResult.session) return readSession();
     clearSession();
@@ -77,7 +80,8 @@ export default function App() {
     (remember ? localStorage : sessionStorage).setItem('session', JSON.stringify(next));
     setSession(next);
   };
-  if (!session) return <Login onLogin={login} initialError={oauthResult.error} />;
+  if (!session && verification) return <EmailVerification email={verification.email} message={verification.message} onBack={() => setVerification(null)} onVerified={message => { setVerification(null); setAuthNotice(message); }} />;
+  if (!session) return <Login onLogin={login} onSignupVerification={(email, message) => { setAuthNotice(''); setVerification({ email, message }); }} initialError={authNotice} />;
   let dashboard;
   switch (session.role) {
     case 'ADMIN': dashboard = <AdminDashboard session={session} logout={logout} />; break;

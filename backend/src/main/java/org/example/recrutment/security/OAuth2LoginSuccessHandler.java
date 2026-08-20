@@ -56,6 +56,10 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler, 
 
         String email = rawEmail.trim().toLowerCase(Locale.ROOT);
         Users user = users.findByEmailIgnoreCase(email).orElseGet(() -> createCandidate(googleUser, email));
+        if (Boolean.FALSE.equals(user.getEmailVerified())) {
+            user.setEmailVerified(true);
+            user = users.save(user);
+        }
 
         if (user.getStatus() != UserStatus.ACTIVE) {
             redirectWithError(response, "This account is not active");
@@ -88,6 +92,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler, 
                 .password(passwords.encode(UUID.randomUUID() + "-" + UUID.randomUUID()))
                 .userRole(UserRole.CANDIDATE)
                 .status(UserStatus.ACTIVE)
+                .emailVerified(true)
                 .profileCompleted(false)
                 .build());
     }
