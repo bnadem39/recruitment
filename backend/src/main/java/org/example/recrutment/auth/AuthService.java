@@ -13,17 +13,20 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Locale;
 @Service @RequiredArgsConstructor
 public class AuthService {
-    private final UserRepository users; private final PasswordEncoder passwords; private final JwtService jwt;
+    private final UserRepository users; private final PasswordEncoder passwords; private final JwtService jwt; private final EmailVerificationService emailVerificationService;
     public AuthResponse login(LoginRequest request) {
         var user = users.findByEmailIgnoreCase(request.email().trim()).orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
-        if (user.getStatus() != UserStatus.ACTIVE || !passwords.matches(request.password(), user.getPassword()))
+        if (user.getStatus() != UserStatus.ACTIVE || Boolean.FALSE.equals(user.getEmailVerified()) || !passwords.matches(request.password(), user.getPassword()))
             throw new BadCredentialsException("Invalid credentials");
         return new AuthResponse(jwt.generateToken(user), "Bearer", user.getId(), user.getEmail(), user.getUserRole(), user.getFirstName(), user.getLastName());
     }
 
     @Transactional
-    public AuthResponse signup(CandidateSignupRequest request) {
+    public SignupResponse signup(CandidateSignupRequest request) {
         String email = request.email().trim().toLowerCase(Locale.ROOT);
+        if (!request.password().equals(request.passwordConfirmation())) {
+            throw new IllegalArgumentException("Password confirmation does not match");
+        }
         if (users.existsByEmailIgnoreCase(email)) {
             throw new DataIntegrityViolationException("An account already uses this email address");
         }
@@ -35,10 +38,15 @@ public class AuthService {
                 .phone(request.phone() == null ? null : request.phone().trim())
                 .userRole(UserRole.CANDIDATE)
                 .status(UserStatus.ACTIVE)
+                .emailVerified(false)
                 .profileCompleted(false)
                 .build();
         var saved = users.save(candidate);
-        return new AuthResponse(jwt.generateToken(saved), "Bearer", saved.getId(), saved.getEmail(),
-                saved.getUserRole(), saved.getFirstName(), saved.getLastName());
+        emailVerificationService.sendVerificationEmail(saved);
+        return new SignupResponse("Account created. Please check your email to confirm your address before signing in.", saved.getEmail());
+    }
+
+    public String verifyEmail(VerifyEmailRequest request) {
+        return emailVerificationService.verify(request.email(), request.code());
     }
 }

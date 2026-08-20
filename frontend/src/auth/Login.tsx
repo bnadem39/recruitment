@@ -4,6 +4,7 @@ import type { Session } from '../shared/types';
 
 type LoginProps = {
   onLogin: (session: Session, remember: boolean) => void;
+  onSignupVerification: (email: string, message: string) => void;
   initialError?: string;
 };
 
@@ -18,10 +19,19 @@ function GoogleLogo() {
   );
 }
 
-export function Login({ onLogin, initialError = '' }: LoginProps) {
+function errorMessage(data: unknown, fallback: string) {
+  if (!data || typeof data !== 'object') return fallback;
+  const body = data as { message?: string; fieldErrors?: Record<string, string> };
+  if (body.message) return body.message;
+  if (body.fieldErrors) return Object.entries(body.fieldErrors).map(([field, message]) => `${field}: ${message}`).join(' ');
+  return fallback;
+}
+
+export function Login({ onLogin, onSignupVerification, initialError = '' }: LoginProps) {
   const [signup, setSignup] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordConfirmation, setPasswordConfirmation] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState('');
@@ -36,7 +46,10 @@ export function Login({ onLogin, initialError = '' }: LoginProps) {
     setBusy(true);
     setError('');
     try {
-      const body = signup ? { firstName, lastName, email, password, phone } : { email, password };
+      if (signup && password !== passwordConfirmation) {
+        throw new Error('Password confirmation does not match.');
+      }
+      const body = signup ? { firstName, lastName, email, password, passwordConfirmation, phone } : { email, password };
       const response = await fetch(`${API}/api/auth/${signup ? 'signup' : 'login'}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -44,9 +57,16 @@ export function Login({ onLogin, initialError = '' }: LoginProps) {
       });
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
-        throw new Error(data.message);
+        throw new Error(errorMessage(data, signup ? 'Unable to create your account.' : 'Invalid credentials.'));
       }
-      onLogin(await response.json(), remember);
+      const data = await response.json();
+      if (signup) {
+        setPassword('');
+        setPasswordConfirmation('');
+        onSignupVerification(data.email || email, data.message || 'Account created. Please check your email to confirm your address before signing in.');
+        return;
+      }
+      onLogin(data, remember);
     } catch (e) {
       setError(e instanceof Error && e.message ? e.message : signup ? 'Unable to create your account.' : 'Invalid credentials.');
     } finally {
@@ -84,6 +104,7 @@ export function Login({ onLogin, initialError = '' }: LoginProps) {
             <input type={show ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} minLength={signup ? 12 : 1} required />
             <button type="button" onClick={() => setShow(!show)}>{show ? 'Hide' : 'Show'}</button>
           </div></label>
+          {signup && <label>Confirm password<input type={show ? 'text' : 'password'} value={passwordConfirmation} onChange={e => setPasswordConfirmation(e.target.value)} minLength={12} required /></label>}
           <div className="form-row">
             <label className="check"><input type="checkbox" checked={remember} onChange={e => setRemember(e.target.checked)} /> Remember me</label>
           </div>

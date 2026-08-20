@@ -91,6 +91,10 @@ public class Users {
     @JsonIgnore
     private String password;
 
+    private Boolean emailVerified;
+
+    private LocalDateTime emailVerifiedAt;
+
 
     // ===============================
     // CONTACT

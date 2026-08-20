@@ -35,7 +35,7 @@ public class SecurityConfig {
                 .exceptionHandling(errors -> errors.authenticationEntryPoint(restAuthenticationEntryPoint()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/auth/login", "/api/auth/signup", "/error", "/ws", "/ws/**", "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/oauth2/**", "/login/oauth2/**").permitAll()
+                        .requestMatchers("/api/auth/login", "/api/auth/signup", "/api/auth/verify-email", "/error", "/ws", "/ws/**", "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/oauth2/**", "/login/oauth2/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/hr/**").hasAnyRole("ADMIN", "HR")
                         .requestMatchers("/api/evaluator/**").hasAnyRole("ADMIN", "EVALUATOR")
