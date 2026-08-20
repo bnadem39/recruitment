@@ -17,6 +17,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 // Type de données Date + Heure
 import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 // ===============================
@@ -87,6 +88,7 @@ public class Users {
         password
     */
     @Column(nullable = false)
+    @JsonIgnore
     private String password;
 
 
