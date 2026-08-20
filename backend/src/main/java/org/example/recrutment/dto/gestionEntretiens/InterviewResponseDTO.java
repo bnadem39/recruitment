@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.recrutment.entities.gestionEntretiens.InterviewStatus;
 import org.example.recrutment.entities.gestionEntretiens.InterviewType;
+import org.example.recrutment.entities.gestionEntretiens.InterviewMode;
 
 import java.time.LocalDateTime;
 
@@ -23,6 +24,8 @@ public class InterviewResponseDTO {
     private Integer durationMinutes;
     private String location;
     private String meetingLink;
+    private InterviewMode mode;
+    private Long assignedEvaluatorId;
     private InterviewStatus status;
     private String notes;
     private Long applicationId;

@@ -11,4 +11,6 @@ public interface InterviewRepository extends JpaRepository<Interview, Long> {
 
     /** Tous les entretiens d'une candidature donnée. */
     List<Interview> findByApplication_Id(Long applicationId);
+    List<Interview> findByApplication_Candidate_Id(Long candidateId);
+    List<Interview> findByAssignedEvaluator_Id(Long evaluatorId);
 }

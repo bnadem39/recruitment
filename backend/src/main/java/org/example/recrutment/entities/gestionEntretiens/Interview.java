@@ -6,6 +6,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 import org.example.recrutment.entities.candidatures.Application;
+import org.example.recrutment.entities.users.Users;
 
 @Entity
 @Table(name = "interviews")
@@ -43,6 +44,13 @@ public class Interview {
     private String meetingLink;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "interview_mode")
+    private InterviewMode mode;
+
+    @Column(name = "room_id", unique = true)
+    private String roomId;
+
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
     private InterviewStatus status = InterviewStatus.SCHEDULED;
@@ -59,6 +67,10 @@ public class Interview {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "application_id", nullable = false)
     private Application application;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "assigned_evaluator_id")
+    private Users assignedEvaluator;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "evaluation_id")
