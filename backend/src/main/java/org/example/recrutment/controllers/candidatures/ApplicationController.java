@@ -7,8 +7,10 @@ import org.example.recrutment.dto.candidatures.ApplicationResponseDTO;
 import org.example.recrutment.services.candidatures.ApplicationService;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 import java.util.List;
 @RestController @RequestMapping("/api/applications") @RequiredArgsConstructor
+@PreAuthorize("hasAnyRole('ADMIN', 'HR')")
 public class ApplicationController {
   private final ApplicationService service;
   @PostMapping public ResponseEntity<ApplicationResponseDTO> create(@Valid @RequestBody ApplicationRequestDTO e){ return new ResponseEntity<>(service.create(e), HttpStatus.CREATED);}

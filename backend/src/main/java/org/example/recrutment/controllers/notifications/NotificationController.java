@@ -1,17 +1,20 @@
 package org.example.recrutment.controllers.notifications;
 
 import lombok.RequiredArgsConstructor;
-import org.example.recrutment.entities.notification.Notification;
+import org.example.recrutment.dto.notifications.NotificationDto;
+import org.example.recrutment.entities.users.Users;
 import org.example.recrutment.services.notifications.NotificationService;
 import org.springframework.http.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 @RestController @RequestMapping("/api/notifications") @RequiredArgsConstructor
 public class NotificationController {
   private final NotificationService service;
-  @PostMapping public ResponseEntity<Notification> create(@RequestBody Notification e){ return new ResponseEntity<>(service.create(e), HttpStatus.CREATED);}
-  @GetMapping public ResponseEntity<List<Notification>> getAll(){ return ResponseEntity.ok(service.getAll());}
-  @GetMapping("/{id}") public ResponseEntity<Notification> getById(@PathVariable Long id){ return ResponseEntity.ok(service.getById(id));}
-  @PutMapping("/{id}") public ResponseEntity<Notification> update(@PathVariable Long id,@RequestBody Notification e){ return ResponseEntity.ok(service.update(id,e));}
-  @DeleteMapping("/{id}") public ResponseEntity<Void> delete(@PathVariable Long id){ service.delete(id); return ResponseEntity.noContent().build();}
+  @GetMapping public List<NotificationDto> getAll(@AuthenticationPrincipal Users user){ return service.getAllFor(user); }
+  @GetMapping("/unread") public List<NotificationDto> getUnread(@AuthenticationPrincipal Users user){ return service.getUnreadFor(user); }
+  @GetMapping("/unread/count") public UnreadCount getUnreadCount(@AuthenticationPrincipal Users user){ return new UnreadCount(service.getUnreadCountFor(user)); }
+  @PatchMapping("/{id}/read") public NotificationDto markRead(@AuthenticationPrincipal Users user, @PathVariable Long id){ return service.markRead(user, id); }
+  @PatchMapping("/read-all") @ResponseStatus(HttpStatus.NO_CONTENT) public void markAllRead(@AuthenticationPrincipal Users user){ service.markAllRead(user); }
+  public record UnreadCount(long count) {}
 }

@@ -1,6 +1,7 @@
 package org.example.recrutment.admin;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
+import org.example.recrutment.auth.EmailVerificationService;
 import org.example.recrutment.entities.users.*;
 import org.example.recrutment.exceptions.ResourceNotFoundException;
 import org.example.recrutment.repositories.users.UserRepository;
@@ -12,14 +13,17 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 @Service @RequiredArgsConstructor @Transactional
 public class AdminUserService {
-    private final UserRepository users; private final PasswordEncoder passwords;
+    private final UserRepository users; private final PasswordEncoder passwords; private final EmailVerificationService emailVerificationService;
     public UserResponse create(CreateInternalUserRequest r) {
         if (r.role() != UserRole.HR && r.role() != UserRole.EVALUATOR) throw new IllegalArgumentException("Only HR or EVALUATOR accounts may be created");
         String email = r.email().trim().toLowerCase(Locale.ROOT);
+        if (!r.password().equals(r.passwordConfirmation())) throw new IllegalArgumentException("Password confirmation does not match");
         if (users.existsByEmailIgnoreCase(email)) throw new DataIntegrityViolationException("Email is already in use");
         var user = Users.builder().firstName(r.firstName().trim()).lastName(r.lastName().trim()).email(email)
-                .password(passwords.encode(r.password())).userRole(r.role()).status(UserStatus.ACTIVE).build();
-        return map(users.save(user));
+                .password(passwords.encode(r.password())).userRole(r.role()).status(UserStatus.ACTIVE).emailVerified(false).build();
+        var saved = users.save(user);
+        emailVerificationService.sendVerificationEmail(saved);
+        return map(saved);
     }
     @Transactional(readOnly=true)
     public List<UserResponse> list(UserRole role, UserStatus status, String email, String name) {

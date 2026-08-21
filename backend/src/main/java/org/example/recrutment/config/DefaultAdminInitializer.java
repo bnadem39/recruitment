@@ -11,6 +11,6 @@ public class DefaultAdminInitializer implements ApplicationRunner {
     private final UserRepository users; private final PasswordEncoder passwords;
     @Override public void run(ApplicationArguments args) {
         if (!users.existsByUserRole(UserRole.ADMIN)) users.save(Users.builder().firstName("System").lastName("Administrator")
-                .email("admin@gmail.com").password(passwords.encode("admin@26")).userRole(UserRole.ADMIN).status(UserStatus.ACTIVE).build());
+                .email("admin@gmail.com").password(passwords.encode("admin@26")).userRole(UserRole.ADMIN).status(UserStatus.ACTIVE).emailVerified(true).build());
     }
 }

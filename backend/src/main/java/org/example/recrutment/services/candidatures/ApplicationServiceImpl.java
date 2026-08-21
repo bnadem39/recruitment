@@ -12,6 +12,7 @@ import org.example.recrutment.exceptions.ResourceNotFoundException;
 import org.example.recrutment.repositories.candidatures.ApplicationRepository;
 import org.example.recrutment.repositories.gestionOffres.JobOfferRepository;
 import org.example.recrutment.repositories.users.CandidateRepository;
+import org.example.recrutment.services.notifications.NotificationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,13 +31,16 @@ public class ApplicationServiceImpl implements ApplicationService {
     private final ApplicationRepository applicationRepository;
     private final CandidateRepository candidateRepository;
     private final JobOfferRepository jobOfferRepository;
+    private final NotificationService notificationService;
 
     public ApplicationServiceImpl(ApplicationRepository applicationRepository,
                                   CandidateRepository candidateRepository,
-                                  JobOfferRepository jobOfferRepository) {
+                                  JobOfferRepository jobOfferRepository,
+                                  NotificationService notificationService) {
         this.applicationRepository = applicationRepository;
         this.candidateRepository = candidateRepository;
         this.jobOfferRepository = jobOfferRepository;
+        this.notificationService = notificationService;
     }
 
     // ==================== Create ====================
@@ -103,6 +107,8 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Transactional
     public ApplicationResponseDTO update(Long id, ApplicationRequestDTO request) {
         Application application = findApplicationOrThrow(id);
+        RecruitmentStage previousStage = application.getCurrentStage();
+        FinalDecision previousDecision = application.getFinalDecision();
         Candidates candidate = findCandidateOrThrow(request.getCandidateId());
         JobOffer jobOffer = findJobOfferOrThrow(request.getJobOfferId());
 
@@ -127,6 +133,18 @@ public class ApplicationServiceImpl implements ApplicationService {
         application.setJobOffer(jobOffer);
 
         Application updated = applicationRepository.save(application);
+        if (request.getCurrentStage() != null && request.getCurrentStage() != previousStage) {
+            notificationService.notify(updated.getCandidate(), "Application updated",
+                    "Your application for " + updated.getJobOffer().getTitle() + " has moved to "
+                            + humanize(request.getCurrentStage().name()) + ".",
+                    "APPLICATION_STAGE_CHANGED", "/applications/" + updated.getId());
+        }
+        if (request.getFinalDecision() != null && request.getFinalDecision() != previousDecision
+                && request.getFinalDecision() != FinalDecision.PENDING) {
+            notificationService.notify(updated.getCandidate(), "Application decision updated",
+                    "A final decision is available for your application to " + updated.getJobOffer().getTitle() + ".",
+                    "FINAL_DECISION", "/applications/" + updated.getId());
+        }
         return toResponseDTO(updated);
     }
 
@@ -154,6 +172,11 @@ public class ApplicationServiceImpl implements ApplicationService {
     private JobOffer findJobOfferOrThrow(Long jobOfferId) {
         return jobOfferRepository.findById(jobOfferId)
                 .orElseThrow(() -> new ResourceNotFoundException("Offre introuvable avec l'id : " + jobOfferId));
+    }
+
+    private String humanize(String value) {
+        String lower = value.toLowerCase().replace('_', ' ');
+        return Character.toUpperCase(lower.charAt(0)) + lower.substring(1);
     }
 
     private ApplicationResponseDTO toResponseDTO(Application application) {
