@@ -49,8 +49,17 @@ public class InterviewEvaluation {
     @Enumerated(EnumType.STRING)
     private Recommendation recommendation;
 
-    @Column(columnDefinition = "TEXT")
-    private String comment;
+    /** Justification interne visible uniquement par l'evaluateur et l'equipe RH. */
+    @Column(name = "hr_comment", columnDefinition = "TEXT")
+    private String hrComment;
+
+    /** Retour partage avec le candidat lorsque l'evaluation est soumise. */
+    @Column(name = "candidate_comment", columnDefinition = "TEXT")
+    private String candidateComment;
+
+    /** Ancienne colonne conservee pour relire les evaluations creees avant la separation des commentaires. */
+    @Column(name = "comment", columnDefinition = "TEXT")
+    private String legacyComment;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

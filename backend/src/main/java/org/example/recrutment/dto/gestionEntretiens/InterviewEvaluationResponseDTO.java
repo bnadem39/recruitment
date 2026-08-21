@@ -25,6 +25,7 @@ public class InterviewEvaluationResponseDTO {
     private BigDecimal professionalismScore;
     private BigDecimal overallScore;
     private Recommendation recommendation;
-    private String comment;
+    private String hrComment;
+    private String candidateComment;
     private LocalDateTime createdAt;
 }

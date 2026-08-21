@@ -23,7 +23,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 @RestController
 @RequestMapping("/api/interviews/{interviewId}/evaluation")
 @Tag(name = "Évaluations d'entretien", description = "Notation détaillée et recommandation suite à un entretien")
-@PreAuthorize("hasAnyRole('ADMIN', 'EVALUATOR')")
+@PreAuthorize("hasAnyRole('ADMIN', 'HR', 'EVALUATOR')")
 public class InterviewEvaluationController {
 
     private final InterviewEvaluationService interviewEvaluationService;
@@ -36,6 +36,7 @@ public class InterviewEvaluationController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'EVALUATOR')")
     @Operation(summary = "Créer l'évaluation d'un entretien", description = "Échoue avec 409 si une évaluation existe déjà -- utiliser PUT pour la modifier")
     public ResponseEntity<InterviewEvaluationResponseDTO> create(
             @AuthenticationPrincipal Users user,
@@ -54,6 +55,7 @@ public class InterviewEvaluationController {
     }
 
     @PutMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'EVALUATOR')")
     @Operation(summary = "Modifier l'évaluation existante d'un entretien")
     public ResponseEntity<InterviewEvaluationResponseDTO> update(
             @AuthenticationPrincipal Users user,
@@ -64,6 +66,7 @@ public class InterviewEvaluationController {
     }
 
     @DeleteMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'EVALUATOR')")
     @Operation(summary = "Supprimer l'évaluation d'un entretien")
     public ResponseEntity<Void> delete(@AuthenticationPrincipal Users user, @PathVariable Long interviewId) {
         authorizationService.requireEvaluationAccess(user, interviewId);

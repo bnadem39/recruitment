@@ -9,7 +9,8 @@ import java.util.List;
 
 public record InterviewRoomDto(Long id, String jobTitle, InterviewType interviewType, InterviewMode mode,
                                InterviewStatus status, LocalDateTime scheduledAt, Integer durationMinutes,
-                               boolean joinAvailable) {
+                               boolean joinAvailable, Long applicationId, String candidateName,
+                               String location, Long evaluationId) {
     public record JoinResponse(Long interviewId, String roomId, String role, List<IceServer> iceServers) {}
     public record IceServer(List<String> urls, String username, String credential) {}
 }

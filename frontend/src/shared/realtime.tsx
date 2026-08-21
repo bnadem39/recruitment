@@ -157,13 +157,20 @@ export function useRealtime() {
 function NotificationBell() {
   const { connected, notifications, unreadCount, markRead, markAllRead } = useRealtime();
   const [open, setOpen] = useState(false);
+  const openNotification = async (item: NotificationItem) => {
+    if (!item.read) await markRead(item.id).catch(() => undefined);
+    if (item.actionUrl) {
+      window.dispatchEvent(new CustomEvent('app:navigate', { detail: item.actionUrl }));
+      setOpen(false);
+    }
+  };
   return <div className="notification-center">
     <button className="notification-bell" title="Notifications" aria-label="Notifications" onClick={() => setOpen(value => !value)}>
       <span aria-hidden="true">&#128276;</span>{unreadCount > 0 && <b>{unreadCount > 99 ? '99+' : unreadCount}</b>}
     </button>
     {open && <section className="notification-panel">
       <header><div><strong>Notifications</strong><small>{connected ? 'Live' : 'Reconnecting'}</small></div>{unreadCount > 0 && <button onClick={() => void markAllRead()}>Mark all read</button>}</header>
-      <div className="notification-list">{notifications.map(item => <button key={item.id} className={item.read ? '' : 'unread'} onClick={() => !item.read && void markRead(item.id)}><strong>{item.title}</strong><span>{item.message}</span><small>{new Date(item.createdAt).toLocaleString()}</small></button>)}{!notifications.length && <p>No notifications yet.</p>}</div>
+      <div className="notification-list">{notifications.map(item => <button key={item.id} className={item.read ? '' : 'unread'} onClick={() => void openNotification(item)}><strong>{item.title}</strong><span>{item.message}</span><small>{new Date(item.createdAt).toLocaleString()}</small>{item.actionUrl && <em>View details</em>}</button>)}{!notifications.length && <p>No notifications yet.</p>}</div>
     </section>}
   </div>;
 }

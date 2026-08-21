@@ -44,7 +44,8 @@ public class InterviewAuthorizationService {
 
     public Interview requireEvaluationAccess(Users user, Long interviewId) {
         Interview interview = findInterview(interviewId);
-        if (user.getUserRole() == UserRole.ADMIN || isAssignedEvaluator(user, interview)) return interview;
+        if (user.getUserRole() == UserRole.ADMIN || user.getUserRole() == UserRole.HR
+                || isAssignedEvaluator(user, interview)) return interview;
         throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not assigned to evaluate this interview");
     }
 
