@@ -7,6 +7,27 @@ import { EvaluatorDashboard } from './evaluator/EvaluatorDashboard';
 import { CandidateDashboard } from './candidate/CandidateDashboard';
 import type { Session } from './shared/types';
 
+function clearSession() {
+  localStorage.removeItem('session');
+  sessionStorage.removeItem('session');
+}
+
+type SessionInput = {
+  accessToken?: string | null; userId?: number | null; email?: string | null;
+  role?: string | null; firstName?: string | null; lastName?: string | null;
+};
+
+function normalizeSession(value: SessionInput | null | undefined): Session | null {
+  if (!value || typeof value.accessToken !== 'string' || !value.accessToken.trim()) return null;
+  if (!Number.isFinite(Number(value.userId))) return null;
+  if (!value.email || !value.firstName || !value.lastName) return null;
+  if (!value.role || !['ADMIN', 'HR', 'EVALUATOR', 'CANDIDATE'].includes(value.role)) return null;
+  return {
+    accessToken: value.accessToken.trim(), userId: Number(value.userId), email: value.email,
+    role: value.role as Session['role'], firstName: value.firstName, lastName: value.lastName,
+  };
+}
+
 function readSession(): Session | null {
   try { return JSON.parse(localStorage.getItem('session') || sessionStorage.getItem('session') || 'null'); }
   catch { return null; }
