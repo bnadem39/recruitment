@@ -34,8 +34,7 @@ export async function saveDraftToBackend(draft: BuilderDraft, token: string): Pr
     ? await json<SavedForm>(`/api/forms/${draft.backendId}`, token, { method: 'PUT', body: JSON.stringify(formPayload) })
     : await json<SavedForm>('/api/forms', token, { method: 'POST', body: JSON.stringify(formPayload) });
 
-  const elements = draft.steps.flatMap(step => step.elements).filter(element => !['heading', 'paragraph', 'divider', 'image'].includes(element.kind));
-  const remoteFields = draft.backendId ? await json<SavedField[]>(`/api/forms/${form.id}/fields`, token) : [];
+  const elements = draft.steps.flatMap(step => step.elements).filter(element => !['heading', 'paragraph', 'divider', 'image', 'button'].includes(element.kind));  const remoteFields = draft.backendId ? await json<SavedField[]>(`/api/forms/${form.id}/fields`, token) : [];
   const retainedIds = new Set(elements.flatMap(element => element.backendId ? [element.backendId] : []));
   for (const remote of remoteFields) {
     if (!retainedIds.has(remote.id)) await json<void>(`/api/forms/${form.id}/fields/${remote.id}`, token, { method: 'DELETE' });

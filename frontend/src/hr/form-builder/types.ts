@@ -1,5 +1,7 @@
 export type BackendFieldType = 'TEXT' | 'TEXTAREA' | 'NUMBER' | 'DATE' | 'EMAIL' | 'PHONE' | 'RADIO' | 'CHECKBOX' | 'SELECT' | 'MULTI_SELECT' | 'FILE' | 'BOOLEAN';
 
+export type ButtonRole = 'next' | 'back' | 'submit' | 'custom';
+
 export type BuilderElement = {
   id: string;
   backendId?: number;
@@ -14,6 +16,8 @@ export type BuilderElement = {
   width: '100' | '50' | '33';
   x?: number;
   y?: number;
+  pixelWidth?: number;
+  pixelHeight?: number;
   align: 'left' | 'center' | 'right';
   radius: number;
   spacing: number;
@@ -27,6 +31,10 @@ export type BuilderElement = {
   acceptedFormats?: string;
   maxFileSize?: number;
   multiple?: boolean;
+  // Élément "bouton" (Suivant / Précédent / Envoyer / lien personnalisé)
+  buttonRole?: ButtonRole;
+  buttonText?: string;
+  buttonLink?: string;
   logic?: {
     sourceId: string;
     operator: 'EQUALS' | 'NOT_EQUALS' | 'CONTAINS';

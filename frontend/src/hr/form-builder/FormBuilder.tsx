@@ -5,9 +5,9 @@ import { ComponentLibrary } from './ComponentLibrary';
 import { FormCanvas } from './FormCanvas';
 import { PropertiesPanel } from './PropertiesPanel';
 import { PreviewMode, PublishDialog, SaveTemplateDialog, SettingsDialog, TemplateSelector } from './BuilderDialogs';
-import { CATALOG, createElement, createStandardDraft, INITIAL_DRAFT, TEMPLATES, uid } from './catalog';
+import { CATALOG, createElement, defaultButtonProps, INITIAL_DRAFT, TEMPLATES, uid } from './catalog';
 import { getJobOffers, saveDraftToBackend } from './api';
-import type { BuilderDraft, BuilderElement, CatalogItem, FormStep, FormTemplate, JobOffer } from './types';
+import type { BuilderDraft, BuilderElement, CatalogItem, FormTemplate, JobOffer } from './types';
 import './form-builder.css';
 
 type History = { past: BuilderDraft[]; present: BuilderDraft; future: BuilderDraft[] };
@@ -17,30 +17,15 @@ type CanvasPoint = { x: number; y: number };
 const GRID_SIZE = 8;
 const DEFAULT_ELEMENT_GAP = 112;
 const snap = (value: number) => Math.max(0, Math.round(value / GRID_SIZE) * GRID_SIZE);
-const estimateElementHeight = (element: BuilderElement) => element.kind === 'cv' ? 230 : element.kind === 'heading' ? 82 : element.kind === 'paragraph' ? 68 : element.kind === 'divider' ? 34 : element.kind === 'image' ? 150 : element.fieldType === 'TEXTAREA' ? 126 : 94;
+const estimateElementHeight = (element: BuilderElement) => element.pixelHeight || (element.kind === 'upload' ? 92 : element.kind === 'button' ? 56 : element.fieldType === 'TEXTAREA' ? 126 : 94);
 const nextFreePoint = (elements: BuilderElement[]): CanvasPoint => ({ x: 0, y: snap(elements.reduce((max, element, index) => Math.max(max, (element.y ?? index * DEFAULT_ELEMENT_GAP) + estimateElementHeight(element)), 0) + 16) });
 
 function positionNewElements(sources: string[], anchor: CanvasPoint) {
   let cursorY = anchor.y;
-  let halfRowOpen = false;
   return sources.map(source => {
     const element = createElement(source);
-    if (halfRowOpen && element.width === '50') {
-      halfRowOpen = false;
-      const placed = { ...element, x: snap(anchor.x + 368), y: snap(cursorY) };
-      cursorY += Math.max(DEFAULT_ELEMENT_GAP, estimateElementHeight(element) + 16);
-      return placed;
-    }
-    if (halfRowOpen) {
-      cursorY += DEFAULT_ELEMENT_GAP;
-      halfRowOpen = false;
-    }
     const placed = { ...element, x: snap(anchor.x), y: snap(cursorY) };
-    if (element.width === '50') {
-      halfRowOpen = true;
-    } else {
-      cursorY += estimateElementHeight(element) + 16;
-    }
+    cursorY += estimateElementHeight(element) + 16;
     return placed;
   });
 }
@@ -48,12 +33,8 @@ function positionNewElements(sources: string[], anchor: CanvasPoint) {
 function loadDraft(): BuilderDraft {
   try {
     const stored = localStorage.getItem('visual-form-builder-draft');
-    if (stored) {
-      const parsed = JSON.parse(stored) as BuilderDraft;
-      const oldStarter = !parsed.backendId && parsed.name === 'Software Engineer Application' && parsed.steps.length >= 3 && parsed.steps[0]?.title === 'Personal information';
-      if (!oldStarter) return parsed;
-    }
-  } catch { /* use polished starter template */ }
+    if (stored) return JSON.parse(stored) as BuilderDraft;
+  } catch { /* start fresh */ }
   return cloneDraft(INITIAL_DRAFT);
 }
 
@@ -67,34 +48,17 @@ function loadTemplates(): FormTemplate[] {
 }
 
 function resetElementForReuse(element: BuilderElement): BuilderElement {
-  return {
-    ...element,
-    id: uid(),
-    backendId: undefined,
-    logic: element.logic ? { ...element.logic, sourceId: '' } : undefined,
-  };
-}
-
-function resetStepForReuse(step: FormStep, index: number): FormStep {
-  return {
-    ...step,
-    id: uid(),
-    eyebrow: `Step ${index + 1}`,
-    elements: step.elements.map(resetElementForReuse),
-  };
+  return { ...element, id: uid(), backendId: undefined, logic: element.logic ? { ...element.logic, sourceId: '' } : undefined };
 }
 
 function draftFromTemplate(template: FormTemplate): BuilderDraft {
-  const source = template.draft || (template.id === 'blank' ? INITIAL_DRAFT : createStandardDraft());
+  const source = template.draft || INITIAL_DRAFT;
   const next = cloneDraft(source);
-  if (template.id === 'internship') next.name = 'Internship Application';
-  if (template.id === 'software') next.name = 'Software Engineer Application';
-  if (template.id === 'banking') next.name = 'Banking Recruitment Application';
   return {
     ...next,
     backendId: undefined,
     status: 'DRAFT',
-    steps: next.steps.map(resetStepForReuse),
+    steps: next.steps.map((step, index) => ({ ...step, id: uid(), eyebrow: `Page ${index + 1}`, elements: step.elements.map(resetElementForReuse) })),
   };
 }
 
@@ -104,15 +68,13 @@ function templateDraftSnapshot(draft: BuilderDraft): BuilderDraft {
     backendId: undefined,
     status: 'DRAFT',
     steps: draft.steps.map((step, index) => ({
-      ...step,
-      id: uid(),
-      eyebrow: `Step ${index + 1}`,
+      ...step, id: uid(), eyebrow: `Page ${index + 1}`,
       elements: step.elements.map(element => ({ ...element, id: uid(), backendId: undefined })),
     })),
   };
 }
 
-export function FormBuilder({ session, logout }: { session: Session; logout: () => void }) {
+export function FormBuilder({ session, onExit }: { session: Session; onExit: () => void }) {
   const [history, setHistory] = useState<History>(() => ({ past: [], present: loadDraft(), future: [] }));
   const draft = history.present;
   const [activeStep, setActiveStep] = useState(0);
@@ -164,16 +126,23 @@ export function FormBuilder({ session, logout }: { session: Session; logout: () 
 
   const updateElement = (id: string, patch: Partial<BuilderElement>) => commit(current => ({ ...current, steps: current.steps.map(item => ({ ...item, elements: item.elements.map(element => element.id === id ? { ...element, ...patch } : element) })) }));
 
-  const addCatalogItem = (item: CatalogItem, index = step.elements.length, point?: CanvasPoint) => {
+  const addCatalogItem = (item: CatalogItem, index?: number, point?: CanvasPoint) => {
+    if (!step) { setToast('Add a page first'); return; }
+    const targetIndex = index ?? step.elements.length;
     const sources = item.block || [item.id];
     const anchor = point || nextFreePoint(step.elements);
-    const newElements = positionNewElements(sources, anchor);
-    commit(current => ({ ...current, steps: current.steps.map((itemStep, itemIndex) => itemIndex === activeStep ? { ...itemStep, elements: [...itemStep.elements.slice(0, index), ...newElements, ...itemStep.elements.slice(index)] } : itemStep) }));
+    let newElements = positionNewElements(sources, anchor);
+    if (item.id === 'button') {
+      const { buttonRole, buttonText } = defaultButtonProps(activeStep, draft.steps.length);
+      newElements = newElements.map(element => ({ ...element, buttonRole, buttonText, label: buttonText }));
+    }
+    commit(current => ({ ...current, steps: current.steps.map((itemStep, itemIndex) => itemIndex === activeStep ? { ...itemStep, elements: [...itemStep.elements.slice(0, targetIndex), ...newElements, ...itemStep.elements.slice(targetIndex)] } : itemStep) }));
     setSelectedId(newElements[0]?.id);
-    setToast(sources.length > 1 ? `${item.name} section added` : `${item.name} added`);
+    setToast(`${item.name} added`);
   };
 
   const duplicateElement = (id: string) => {
+    if (!step) return;
     const index = step.elements.findIndex(element => element.id === id);
     if (index < 0) return;
     const source = step.elements[index];
@@ -184,11 +153,12 @@ export function FormBuilder({ session, logout }: { session: Session; logout: () 
 
   const deleteElement = (id: string) => {
     commit(current => ({ ...current, steps: current.steps.map(item => ({ ...item, elements: item.elements.filter(element => element.id !== id) })) }));
-    setSelectedId(undefined); setToast('Field removed · Undo available');
+    setSelectedId(undefined); setToast('Field removed');
   };
 
   const handleDrop = (event: React.DragEvent, point: CanvasPoint) => {
     event.preventDefault(); event.stopPropagation();
+    if (!step) return;
     const targetPoint = { x: snap(point.x - dragOffset.x / zoomScale), y: snap(point.y - dragOffset.y / zoomScale) };
     const source = event.dataTransfer.getData('application/x-builder-component');
     if (source) {
@@ -213,33 +183,33 @@ export function FormBuilder({ session, logout }: { session: Session; logout: () 
       setHistory(current => ({ ...current, present: saved }));
       localStorage.setItem('visual-form-builder-draft', JSON.stringify(saved));
       setSaveState('Saved');
-      setToast(publishStatus ? 'Form published successfully' : 'Draft synced with recruitment platform');
+      setToast(publishStatus ? 'Form published' : 'Draft saved');
       setDialog(null);
     } catch {
       localStorage.setItem('visual-form-builder-draft', JSON.stringify(target));
       setHistory(current => ({ ...current, present: target }));
       setSaveState('Save failed');
-      setToast('Saved locally · Backend is currently unavailable');
+      setToast('Saved locally · Backend unavailable');
       if (publishStatus) setDialog(null);
     }
   };
 
   const addStep = () => {
     const nextIndex = draft.steps.length;
-    commit(current => ({ ...current, steps: [...current.steps, { id: uid(), eyebrow: `Step ${nextIndex + 1}`, title: 'Additional questions', elements: [] }] }));
-    setActiveStep(nextIndex); setSelectedId(undefined); setToast('New step added');
+    commit(current => ({ ...current, steps: [...current.steps, { id: uid(), eyebrow: `Page ${nextIndex + 1}`, title: `Page ${nextIndex + 1}`, elements: [] }] }));
+    setActiveStep(nextIndex); setSelectedId(undefined); setToast('New page added');
   };
 
   const stepAction = (index: number, action: 'rename' | 'duplicate' | 'delete') => {
     if (action === 'duplicate') {
       const copied = cloneDraft(draft.steps[index]); copied.id = uid(); copied.title = `${copied.title} copy`; copied.elements = copied.elements.map(element => ({ ...element, id: uid(), backendId: undefined }));
-      commit(current => ({ ...current, steps: [...current.steps.slice(0, index + 1), copied, ...current.steps.slice(index + 1)].map((item, i) => ({ ...item, eyebrow: `Step ${i + 1}` })) }));
-      setActiveStep(index + 1); setToast('Step duplicated');
-    } else if (action === 'delete' && draft.steps.length > 1) {
-      commit(current => ({ ...current, steps: current.steps.filter((_, i) => i !== index).map((item, i) => ({ ...item, eyebrow: `Step ${i + 1}` })) }));
-      setActiveStep(Math.max(0, Math.min(index - 1, draft.steps.length - 2))); setSelectedId(undefined);
+      commit(current => ({ ...current, steps: [...current.steps.slice(0, index + 1), copied, ...current.steps.slice(index + 1)].map((item, i) => ({ ...item, eyebrow: `Page ${i + 1}` })) }));
+      setActiveStep(index + 1); setToast('Page duplicated');
+    } else if (action === 'delete') {
+      commit(current => ({ ...current, steps: current.steps.filter((_, i) => i !== index).map((item, i) => ({ ...item, eyebrow: `Page ${i + 1}` })) }));
+      setActiveStep(Math.max(0, index - 1)); setSelectedId(undefined);
     } else if (action === 'rename') {
-      const title = window.prompt('Rename this step', draft.steps[index].title);
+      const title = window.prompt('Rename this page', draft.steps[index].title);
       if (title?.trim()) commit(current => ({ ...current, steps: current.steps.map((item, i) => i === index ? { ...item, title: title.trim() } : item) }));
     }
   };
@@ -273,11 +243,22 @@ export function FormBuilder({ session, logout }: { session: Session; logout: () 
   if (preview) return <PreviewMode draft={draft} stepIndex={activeStep} device={device} onDevice={setDevice} onStep={setActiveStep} onClose={() => setPreview(false)} />;
 
   return <div className={`form-builder ${dark ? 'fb-dark' : 'fb-light'} ${leftCollapsed ? 'left-closed' : ''} ${rightCollapsed ? 'right-closed' : ''}`}>
-    <BuilderToolbar name={draft.name} saveState={saveState} status={draft.status} dark={dark} zoom={zoom} device={device} canUndo={history.past.length > 0} canRedo={history.future.length > 0} onUndo={undo} onRedo={redo} onZoom={setZoom} onDevice={setDevice} onPreview={() => setPreview(true)} onSave={() => save()} onSaveTemplate={() => setDialog('save-template')} onPublish={() => setDialog('publish')} onToggleTheme={() => setDark(value => !value)} onExit={logout}/>
+    <BuilderToolbar name={draft.name} saveState={saveState} status={draft.status} dark={dark} zoom={zoom} device={device} canUndo={history.past.length > 0} canRedo={history.future.length > 0} onUndo={undo} onRedo={redo} onZoom={setZoom} onDevice={setDevice} onPreview={() => setPreview(true)} onSave={() => save()} onSaveTemplate={() => setDialog('save-template')} onPublish={() => setDialog('publish')} onToggleTheme={() => setDark(value => !value)} onExit={onExit}/>
     <ComponentLibrary collapsed={leftCollapsed} search={search} onSearch={setSearch} onToggle={() => setLeftCollapsed(value => !value)} onAdd={addCatalogItem} onDragStart={() => { setDragOffset({ x: 24, y: 24 }); setDraggedElementId(undefined); setDragging(true); }} onOpenTemplates={() => setDialog('templates')}/>
-    <FormCanvas step={step} stepIndex={activeStep} steps={draft.steps} selectedId={selectedId} dragging={dragging} dropPoint={dropPoint} zoom={zoom} device={device} onCanvasClick={() => setSelectedId(undefined)} onSelect={setSelectedId} onDuplicate={duplicateElement} onDelete={deleteElement} onChange={updateElement} onDragStart={(event, id) => { const rect = (event.currentTarget as HTMLElement).getBoundingClientRect(); event.dataTransfer.effectAllowed = 'move'; event.dataTransfer.setData('application/x-builder-element', id); setDragOffset({ x: event.clientX - rect.left, y: event.clientY - rect.top }); setDraggedElementId(id); setDragging(true); }} onDragEnd={() => { setDragging(false); setDropPoint(null); }} onDragOver={(event, point) => { event.preventDefault(); event.stopPropagation(); event.dataTransfer.dropEffect = draggedElementId ? 'move' : 'copy'; setDragging(true); setDropPoint({ x: snap(point.x - dragOffset.x / zoomScale), y: snap(point.y - dragOffset.y / zoomScale) }); }} onDrop={handleDrop} onStepChange={index => { setActiveStep(index); setSelectedId(undefined); }} onAddStep={addStep} onStepMenu={stepAction}/>
+    {step ? (
+      <FormCanvas step={step} stepIndex={activeStep} steps={draft.steps} selectedId={selectedId} dragging={dragging} dropPoint={dropPoint} zoom={zoom} device={device} onCanvasClick={() => setSelectedId(undefined)} onSelect={setSelectedId} onDuplicate={duplicateElement} onDelete={deleteElement} onChange={updateElement} onDragStart={(event, id) => { const rect = (event.currentTarget as HTMLElement).getBoundingClientRect(); event.dataTransfer.effectAllowed = 'move'; event.dataTransfer.setData('application/x-builder-element', id); setDragOffset({ x: event.clientX - rect.left, y: event.clientY - rect.top }); setDraggedElementId(id); setDragging(true); }} onDragEnd={() => { setDragging(false); setDropPoint(null); }} onDragOver={(event, point) => { event.preventDefault(); event.stopPropagation(); event.dataTransfer.dropEffect = draggedElementId ? 'move' : 'copy'; setDragging(true); setDropPoint({ x: snap(point.x - dragOffset.x / zoomScale), y: snap(point.y - dragOffset.y / zoomScale) }); }} onDrop={handleDrop} onStepChange={index => { setActiveStep(index); setSelectedId(undefined); }} onAddStep={addStep} onStepMenu={stepAction}/>
+    ) : (
+      <main className="fb-workspace">
+        <div className="fb-canvas-empty ready" style={{ margin: '80px auto', maxWidth: 420 }}>
+          <span>+</span>
+          <h3>No pages yet</h3>
+          <p>Add your first page to start building the form.</p>
+          <div><button className="fb-add-step" style={{ padding: '0 16px' }} onClick={addStep}>+ Add page</button></div>
+        </div>
+      </main>
+    )}
     <PropertiesPanel element={selected} elements={allElements} offers={offers} collapsed={rightCollapsed} onToggle={() => setRightCollapsed(value => !value)} onChange={patch => selectedId && updateElement(selectedId, patch)} onOpenSettings={() => setDialog('settings')}/>
-    <footer className="fb-statusbar"><span><i className="online"/> Editor online</span><span>Snap to grid <b>ON</b></span><span>12 columns · 8px grid</span><span className="push">{allElements.length} fields · {allElements.filter(field => field.required).length} required</span><span>Last saved just now</span></footer>
+    <footer className="fb-statusbar"><span><i className="online"/> Editor online</span><span>Snap to grid <b>ON</b></span><span className="push">{allElements.length} fields · {allElements.filter(field => field.required).length} required</span></footer>
     {dialog === 'templates' && <TemplateSelector templates={[...TEMPLATES, ...customTemplates]} onClose={() => setDialog(null)} onSelect={applyTemplate} onDelete={deleteTemplate}/>} 
     {dialog === 'save-template' && <SaveTemplateDialog draft={draft} onClose={() => setDialog(null)} onSave={saveTemplate}/>} 
     {dialog === 'settings' && <SettingsDialog draft={draft} offers={offers} onChange={patch => commit(current => ({ ...current, ...patch }))} onClose={() => setDialog(null)}/>} 
