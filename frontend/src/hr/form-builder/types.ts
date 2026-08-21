@@ -23,6 +23,7 @@ export type BuilderElement = {
   maxLength?: number;
   validationMessage?: string;
   options?: string[];
+  imageSrc?: string;
   acceptedFormats?: string;
   maxFileSize?: number;
   multiple?: boolean;
