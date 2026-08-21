@@ -29,9 +29,9 @@ function widthStyle(width: BuilderElement['width']) {
   return '100%';
 }
 
-export function FormCanvas({ step, stepIndex, steps, selectedId, dragging, dropPoint, zoom, device, onCanvasClick, onSelect, onDuplicate, onDelete, onDragStart, onDragEnd, onDragOver, onDrop, onStepChange, onAddStep, onStepMenu }: {
+export function FormCanvas({ step, stepIndex, steps, selectedId, dragging, dropPoint, zoom, device, onCanvasClick, onSelect, onDuplicate, onDelete, onChange, onDragStart, onDragEnd, onDragOver, onDrop, onStepChange, onAddStep, onStepMenu }: {
   step: FormStep; stepIndex: number; steps: FormStep[]; selectedId?: string; dragging: boolean; dropPoint: CanvasPoint | null; zoom: number; device: string;
-  onCanvasClick: () => void; onSelect: (id: string) => void; onDuplicate: (id: string) => void; onDelete: (id: string) => void;
+  onCanvasClick: () => void; onSelect: (id: string) => void; onDuplicate: (id: string) => void; onDelete: (id: string) => void; onChange: (id: string, patch: Partial<BuilderElement>) => void;
   onDragStart: (event: React.DragEvent, id: string) => void; onDragEnd: () => void; onDragOver: (event: React.DragEvent, point: CanvasPoint) => void; onDrop: (event: React.DragEvent, point: CanvasPoint) => void;
   onStepChange: (index: number) => void; onAddStep: () => void; onStepMenu: (index: number, action: 'rename' | 'duplicate' | 'delete') => void;
 }) {
@@ -77,7 +77,7 @@ export function FormCanvas({ step, stepIndex, steps, selectedId, dragging, dropP
                 style={{ left: point.x, top: point.y, width: widthStyle(element.width) }}
                 key={element.id}
               >
-                <FormElement element={element} selected={selectedId === element.id} onSelect={() => onSelect(element.id)} onDuplicate={() => onDuplicate(element.id)} onDelete={() => onDelete(element.id)} onDragStart={event => onDragStart(event, element.id)} onDragEnd={onDragEnd}/>
+                <FormElement element={element} selected={selectedId === element.id} onSelect={() => onSelect(element.id)} onDuplicate={() => onDuplicate(element.id)} onDelete={() => onDelete(element.id)} onChange={patch => onChange(element.id, patch)} onDragStart={event => onDragStart(event, element.id)} onDragEnd={onDragEnd}/>
               </div>)}
             </div>
             {step.elements.length > 0 && <div className="fb-candidate-actions"><button className="ghost" disabled={stepIndex === 0}>← Back</button><button>{stepIndex === steps.length - 1 ? 'Submit application' : 'Continue'} <span>→</span></button></div>}

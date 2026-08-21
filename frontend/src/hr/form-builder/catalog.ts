@@ -23,6 +23,7 @@ export const CATALOG: { category: string; items: CatalogItem[] }[] = [
     { id: 'radio', name: 'Radio group', glyph: '◉', hint: 'Visible options', fieldType: 'RADIO' },
     { id: 'checkbox', name: 'Checkbox', glyph: '✓', hint: 'Consent or yes/no', fieldType: 'CHECKBOX' },
     { id: 'checkbox-group', name: 'Checkbox group', glyph: '☷', hint: 'Choose many', fieldType: 'MULTI_SELECT' },
+    { id: 'boolean', name: 'Yes / No', glyph: 'YN', hint: 'Boolean answer', fieldType: 'BOOLEAN' },
   ]},
   { category: 'Recruitment', items: [
     { id: 'cv', name: 'CV upload', glyph: '↑', hint: 'PDF · DOCX', fieldType: 'FILE' },
@@ -59,6 +60,7 @@ const defaults: Record<string, Partial<BuilderElement>> = {
   radio: { label: 'Choose one', options: ['Yes', 'No'] },
   checkbox: { label: 'I agree', options: ['Yes'] },
   'checkbox-group': { label: 'Choose all that apply', options: ['Option one', 'Option two', 'Option three'] },
+  boolean: { label: 'Yes or no', options: ['Yes'] },
   cv: { label: 'Upload your CV', kind: 'cv', help: 'PDF, DOCX · Max 10 MB', acceptedFormats: 'PDF, DOCX', maxFileSize: 10 },
   cover: { label: 'Cover letter', placeholder: 'What makes you a great fit for this role?' },
   portfolio: { label: 'Portfolio URL', placeholder: 'https://portfolio.com' },

@@ -5,26 +5,10 @@ import { AdminDashboard } from './admin/AdminDashboard';
 import { HrDashboard } from './hr/HrDashboard';
 import { EvaluatorDashboard } from './evaluator/EvaluatorDashboard';
 import { CandidateDashboard } from './candidate/CandidateDashboard';
-import type { Session } from './shared/types';
+import type { Role, Session } from './shared/types';
 import { RealtimeProvider } from './shared/realtime';
 
-const roles = new Set<string>(['ADMIN', 'HR', 'EVALUATOR', 'CANDIDATE']);
-const clearSession = () => { localStorage.removeItem('session'); sessionStorage.removeItem('session'); };
-
-function normalizeSession(value: unknown): Session | null {
-  if (!value || typeof value !== 'object') return null;
-  const candidate = value as Partial<Session> & { token?: string };
-  const accessToken = typeof candidate.accessToken === 'string' ? candidate.accessToken.trim() : candidate.token?.trim();
-  if (!accessToken || !candidate.userId || !candidate.email || !candidate.role || !roles.has(candidate.role)) return null;
-  return {
-    accessToken,
-    userId: candidate.userId,
-    email: candidate.email,
-    role: candidate.role,
-    firstName: candidate.firstName || '',
-    lastName: candidate.lastName || '',
-  };
-}
+const roles = new Set<Role>(['ADMIN', 'HR', 'EVALUATOR', 'CANDIDATE']);
 
 function clearSession() {
   localStorage.removeItem('session');
@@ -32,18 +16,18 @@ function clearSession() {
 }
 
 type SessionInput = {
-  accessToken?: string | null; userId?: number | null; email?: string | null;
+  accessToken?: string | null; token?: string | null; userId?: number | null; email?: string | null;
   role?: string | null; firstName?: string | null; lastName?: string | null;
 };
 
 function normalizeSession(value: SessionInput | null | undefined): Session | null {
-  if (!value || typeof value.accessToken !== 'string' || !value.accessToken.trim()) return null;
+  const accessToken = typeof value?.accessToken === 'string' ? value.accessToken.trim() : typeof value?.token === 'string' ? value.token.trim() : '';
+  if (!value || !accessToken) return null;
   if (!Number.isFinite(Number(value.userId))) return null;
-  if (!value.email || !value.firstName || !value.lastName) return null;
-  if (!value.role || !['ADMIN', 'HR', 'EVALUATOR', 'CANDIDATE'].includes(value.role)) return null;
+  if (!value.email || !value.role || !roles.has(value.role as Role)) return null;
   return {
-    accessToken: value.accessToken.trim(), userId: Number(value.userId), email: value.email,
-    role: value.role as Session['role'], firstName: value.firstName, lastName: value.lastName,
+    accessToken, userId: Number(value.userId), email: value.email,
+    role: value.role as Role, firstName: value.firstName || '', lastName: value.lastName || '',
   };
 }
 
