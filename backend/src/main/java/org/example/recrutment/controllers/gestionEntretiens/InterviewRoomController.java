@@ -82,6 +82,9 @@ public class InterviewRoomController {
                 && (interview.getStatus() == InterviewStatus.SCHEDULED || interview.getStatus() == InterviewStatus.IN_PROGRESS);
         return new InterviewRoomDto(interview.getId(), interview.getApplication().getJobOffer().getTitle(),
                 interview.getInterviewType(), interview.getMode(), interview.getStatus(), interview.getScheduledAt(),
-                interview.getDurationMinutes(), joinable);
+                interview.getDurationMinutes(), joinable, interview.getApplication().getId(),
+                interview.getApplication().getCandidate().getFirstName() + " "
+                        + interview.getApplication().getCandidate().getLastName(),
+                interview.getLocation(), interview.getEvaluation() != null ? interview.getEvaluation().getId() : null);
     }
 }

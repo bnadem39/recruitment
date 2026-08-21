@@ -27,13 +27,13 @@ public class Notification {
     private NotificationChannel channel;
     @Column(name = "read_status", nullable = false)
     @Builder.Default
-    private Boolean readStatus = false;
+    private boolean readStatus = false;
     @Column(name = "sent_at")
     private LocalDateTime sentAt;
     @Column(name = "action_url")
     private String actionUrl;
     @CreationTimestamp
-    @Column(updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -6,6 +6,7 @@ import org.example.recrutment.entities.gestionEntretiens.Interview;
 import org.example.recrutment.entities.gestionEntretiens.InterviewEvaluation;
 import org.example.recrutment.exceptions.ResourceNotFoundException;
 import org.example.recrutment.repositories.gestionEntretiens.InterviewRepository;
+import org.example.recrutment.services.notifications.NotificationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -16,9 +17,12 @@ import org.springframework.http.HttpStatus;
 public class InterviewEvaluationServiceImpl implements InterviewEvaluationService {
 
     private final InterviewRepository interviewRepository;
+    private final NotificationService notificationService;
 
-    public InterviewEvaluationServiceImpl(InterviewRepository interviewRepository) {
+    public InterviewEvaluationServiceImpl(InterviewRepository interviewRepository,
+                                          NotificationService notificationService) {
         this.interviewRepository = interviewRepository;
+        this.notificationService = notificationService;
     }
 
     // ==================== Create ====================
@@ -40,12 +44,14 @@ public class InterviewEvaluationServiceImpl implements InterviewEvaluationServic
                 .professionalismScore(request.getProfessionalismScore())
                 .overallScore(request.getOverallScore())
                 .recommendation(request.getRecommendation())
-                .comment(request.getComment())
+                .hrComment(request.getHrComment().trim())
+                .candidateComment(request.getCandidateComment().trim())
                 .build();
 
         interview.setEvaluation(evaluation);
         Interview savedInterview = interviewRepository.save(interview);
 
+        notifyCandidate(savedInterview, false);
         return toResponseDTO(savedInterview.getId(), savedInterview.getEvaluation());
     }
 
@@ -72,9 +78,11 @@ public class InterviewEvaluationServiceImpl implements InterviewEvaluationServic
         evaluation.setProfessionalismScore(request.getProfessionalismScore());
         evaluation.setOverallScore(request.getOverallScore());
         evaluation.setRecommendation(request.getRecommendation());
-        evaluation.setComment(request.getComment());
+        evaluation.setHrComment(request.getHrComment().trim());
+        evaluation.setCandidateComment(request.getCandidateComment().trim());
 
         Interview savedInterview = interviewRepository.save(interview);
+        notifyCandidate(savedInterview, true);
         return toResponseDTO(savedInterview.getId(), savedInterview.getEvaluation());
     }
 
@@ -114,8 +122,21 @@ public class InterviewEvaluationServiceImpl implements InterviewEvaluationServic
                 .professionalismScore(evaluation.getProfessionalismScore())
                 .overallScore(evaluation.getOverallScore())
                 .recommendation(evaluation.getRecommendation())
-                .comment(evaluation.getComment())
+                .hrComment(evaluation.getHrComment() != null ? evaluation.getHrComment() : evaluation.getLegacyComment())
+                .candidateComment(evaluation.getCandidateComment())
                 .createdAt(evaluation.getCreatedAt())
                 .build();
+    }
+
+    private void notifyCandidate(Interview interview, boolean updated) {
+        InterviewEvaluation evaluation = interview.getEvaluation();
+        String jobTitle = interview.getApplication().getJobOffer().getTitle();
+        notificationService.notify(
+                interview.getApplication().getCandidate(),
+                updated ? "Evaluation mise a jour" : "Resultat de votre entretien disponible",
+                "Votre note pour " + jobTitle + " est " + evaluation.getOverallScore()
+                        + "/20. Recommandation : " + evaluation.getRecommendation() + ".",
+                updated ? "INTERVIEW_EVALUATION_UPDATED" : "INTERVIEW_EVALUATION_SUBMITTED",
+                "/candidate/interviews/" + interview.getId());
     }
 }

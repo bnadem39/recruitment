@@ -82,7 +82,7 @@ public class NotificationServiceImpl implements NotificationService {
 
   private NotificationDto toDto(Notification notification) {
       return new NotificationDto(notification.getId(), notification.getTitle(), notification.getMessage(),
-              Boolean.TRUE.equals(notification.getReadStatus()), notification.getCreatedAt(),
+              notification.isReadStatus(), notification.getCreatedAt(),
               notification.getNotificationType(), notification.getActionUrl());
   }
 }

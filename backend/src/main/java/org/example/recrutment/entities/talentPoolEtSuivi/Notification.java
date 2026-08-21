@@ -40,10 +40,13 @@ public class Notification {
 
     @Column(name = "read_status", nullable = false)
     @Builder.Default
-    private Boolean readStatus = false;
+    private boolean readStatus = false;
 
     @Column(name = "sent_at")
     private LocalDateTime sentAt;
+
+    @Column(name = "action_url")
+    private String actionUrl;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

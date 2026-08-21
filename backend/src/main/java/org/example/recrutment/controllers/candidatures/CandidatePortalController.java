@@ -12,6 +12,8 @@ import org.example.recrutment.entities.formulairesAdaptatifs.FieldType;
 import org.example.recrutment.entities.gestionEntretiens.InterviewStatus;
 import org.example.recrutment.entities.gestionEntretiens.InterviewType;
 import org.example.recrutment.entities.gestionEntretiens.InterviewMode;
+import org.example.recrutment.entities.gestionEntretiens.InterviewEvaluation;
+import org.example.recrutment.entities.gestionEntretiens.Recommendation;
 import org.example.recrutment.entities.gestionOffres.ContactType;
 import org.example.recrutment.entities.gestionOffres.JobOffer;
 import org.example.recrutment.entities.gestionOffres.OfferStatus;
@@ -210,8 +212,19 @@ public class CandidatePortalController {
                         interview.getMode(),
                         interview.getStatus(),
                         interview.getApplication().getId(),
-                        interview.getApplication().getJobOffer().getTitle()))
+                        interview.getApplication().getJobOffer().getTitle(),
+                        toCandidateEvaluation(interview.getEvaluation())))
                 .toList();
+    }
+
+    private InterviewEvaluationCandidateResponse toCandidateEvaluation(InterviewEvaluation evaluation) {
+        if (evaluation == null) return null;
+        return new InterviewEvaluationCandidateResponse(
+                evaluation.getId(),
+                evaluation.getOverallScore(),
+                evaluation.getRecommendation(),
+                evaluation.getCandidateComment(),
+                evaluation.getCreatedAt());
     }
 
     private Candidates candidate(Users user) {
@@ -268,5 +281,6 @@ public class CandidatePortalController {
     public record FieldResponseRequest(Long fieldId, String textValue, BigDecimal numberValue, LocalDate dateValue, Boolean booleanValue) {}
     public record SubmitApplicationRequest(List<FieldResponseRequest> responses) {}
     public record ApplicationSubmissionResponse(Long applicationId, String jobTitle, LocalDateTime submittedAt, String reference) {}
-    public record InterviewCandidateResponse(Long id, InterviewType interviewType, LocalDateTime scheduledAt, Integer durationMinutes, String location, String meetingLink, InterviewMode mode, InterviewStatus status, Long applicationId, String jobTitle) {}
+    public record InterviewCandidateResponse(Long id, InterviewType interviewType, LocalDateTime scheduledAt, Integer durationMinutes, String location, String meetingLink, InterviewMode mode, InterviewStatus status, Long applicationId, String jobTitle, InterviewEvaluationCandidateResponse evaluation) {}
+    public record InterviewEvaluationCandidateResponse(Long id, BigDecimal overallScore, Recommendation recommendation, String candidateComment, LocalDateTime createdAt) {}
 }

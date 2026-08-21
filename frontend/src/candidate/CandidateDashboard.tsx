@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { API, authHeaders } from '../shared/api';
 import type { Session } from '../shared/types';
 import { InterviewRoom } from '../shared/InterviewRoom';
+import './candidate-evaluation.css';
 
 type View = 'dashboard' | 'jobs' | 'offer' | 'apply' | 'applications' | 'application' | 'interviews' | 'interview-room' | 'profile';
 type FieldType = 'TEXT' | 'TEXTAREA' | 'NUMBER' | 'DATE' | 'EMAIL' | 'PHONE' | 'RADIO' | 'CHECKBOX' | 'SELECT' | 'MULTI_SELECT' | 'FILE' | 'BOOLEAN';
@@ -13,7 +14,8 @@ type Field = { id: number; label: string; fieldType: FieldType; required: boolea
 type Condition = { id: number; sourceFieldId: number; targetFieldId: number; operator: string; expectedValue?: string; action: string };
 type FormBundle = { formId: number; title: string; description?: string; fields: Field[]; conditions: Condition[] };
 type Profile = { id: number; firstName: string; lastName: string; email: string; phone?: string; birthDate?: string; address?: string; postalCode?: string; nationality?: string; gender?: string; linkedinUrl?: string; portfolioUrl?: string };
-type Interview = { id: number; interviewType: string; scheduledAt?: string; durationMinutes?: number; location?: string; meetingLink?: string; mode?: string; status: string; applicationId: number; jobTitle: string };
+type InterviewEvaluation = { id: number; overallScore: number; recommendation: string; candidateComment: string; createdAt?: string };
+type Interview = { id: number; interviewType: string; scheduledAt?: string; durationMinutes?: number; location?: string; meetingLink?: string; mode?: string; status: string; applicationId: number; jobTitle: string; evaluation?: InterviewEvaluation | null };
 type FieldResponse = { fieldId: number; fieldLabel: string; textValue?: string; numberValue?: number; dateValue?: string; booleanValue?: boolean };
 
 const stages: Stage[] = ['SUBMISSION', 'HR_REVIEW', 'PRESELECTION', 'HR_INTERVIEW', 'TECHNICAL_INTERVIEW', 'FINAL_VALIDATION', 'FINAL_DECISION'];
@@ -41,6 +43,7 @@ export function CandidateDashboard({ session, logout }: { session: Session; logo
   const [selectedOfferId, setSelectedOfferId] = useState<number | null>(null);
   const [selectedApplicationId, setSelectedApplicationId] = useState<number | null>(null);
   const [selectedInterviewId, setSelectedInterviewId] = useState<number | null>(null);
+  const [focusedInterviewId, setFocusedInterviewId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -66,6 +69,24 @@ export function CandidateDashboard({ session, logout }: { session: Session; logo
   };
 
   useEffect(() => { void load(); }, []);
+  useEffect(() => {
+    const handleNavigation = (event: Event) => {
+      const actionUrl = (event as CustomEvent<string>).detail || '';
+      const match = actionUrl.match(/\/interviews\/(\d+)/);
+      if (!match) return;
+      const interviewId = Number(match[1]);
+      setFocusedInterviewId(interviewId);
+      setView('interviews');
+      request<Interview[]>('/api/candidate/interviews', session.accessToken).then(setInterviews).catch(err => setError(err instanceof Error ? err.message : 'Unable to refresh interviews'));
+    };
+    window.addEventListener('app:navigate', handleNavigation);
+    return () => window.removeEventListener('app:navigate', handleNavigation);
+  }, [session.accessToken]);
+  useEffect(() => {
+    if (view !== 'interviews' || !focusedInterviewId) return;
+    const timer = window.setTimeout(() => document.getElementById(`candidate-interview-${focusedInterviewId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
+    return () => window.clearTimeout(timer);
+  }, [focusedInterviewId, interviews, view]);
   const openOffer = (id: number) => { setSelectedOfferId(id); setView('offer'); };
   const openApplication = (id: number) => { setSelectedApplicationId(id); setView('application'); };
   const navigate = (next: View) => { setView(next); setError(''); };
@@ -78,7 +99,7 @@ export function CandidateDashboard({ session, logout }: { session: Session; logo
         <button className={view === 'dashboard' ? 'active' : ''} onClick={() => navigate('dashboard')}>Dashboard</button>
         <button className={view === 'jobs' || view === 'offer' || view === 'apply' ? 'active' : ''} onClick={() => navigate('jobs')}>Job Offers</button>
         <button className={view === 'applications' || view === 'application' ? 'active' : ''} onClick={() => navigate('applications')}>My Applications</button>
-        <button className={view === 'interviews' || view === 'interview-room' ? 'active' : ''} onClick={() => navigate('interviews')}>Interviews</button>
+        <button className={view === 'interviews' || view === 'interview-room' ? 'active' : ''} onClick={() => navigate('interviews')}>Interviews & Results</button>
         <button className={view === 'profile' ? 'active' : ''} onClick={() => navigate('profile')}>My Profile</button>
         <button onClick={logout}>Logout</button>
       </nav>
@@ -93,7 +114,7 @@ export function CandidateDashboard({ session, logout }: { session: Session; logo
         {view === 'apply' && selectedOfferId && <ApplicationForm offerId={selectedOfferId} token={session.accessToken} onSubmitted={(id) => { void load(); setSelectedApplicationId(id); setView('application'); }} />}
         {view === 'applications' && <Applications applications={applications} openApplication={openApplication} />}
         {view === 'application' && selectedApplicationId && <ApplicationDetail id={selectedApplicationId} token={session.accessToken} applications={applications} />}
-        {view === 'interviews' && <Interviews interviews={interviews} join={(id) => { setSelectedInterviewId(id); setView('interview-room'); }} />}
+        {view === 'interviews' && <Interviews interviews={interviews} focusedId={focusedInterviewId} join={(id) => { setSelectedInterviewId(id); setView('interview-room'); }} />}
         {view === 'interview-room' && selectedInterviewId && <InterviewRoom interview={interviews.find(item => item.id === selectedInterviewId)!} token={session.accessToken} onLeave={() => navigate('interviews')} onAuthExpired={logout} />}
         {view === 'profile' && profile && <CandidateProfile profile={profile} token={session.accessToken} onSaved={setProfile} />}
       </>}
@@ -160,9 +181,9 @@ function ApplicationDetail({ id, token, applications }: { id: number; token: str
   return <section><PageHeader label="Application Tracking" title={app.jobTitle} body={`${nice(app.status)} - Current stage: ${nice(app.currentStage)}`} /><div className="candidate-grid"><Panel title="Recruitment Timeline"><Timeline current={app.currentStage} /></Panel><Panel title="Application Answers">{responses.length ? responses.map(item => <div className="review-row" key={item.fieldId}><strong>{item.fieldLabel}</strong><span>{text(item.textValue || item.numberValue || item.dateValue || item.booleanValue)}</span></div>) : <EmptyState title="No responses" body="Responses will appear after submission." />}</Panel></div></section>;
 }
 
-function Interviews({ interviews, join }: { interviews: Interview[]; join: (id: number) => void }) {
+function Interviews({ interviews, focusedId, join }: { interviews: Interview[]; focusedId: number | null; join: (id: number) => void }) {
   const now = Date.now(), upcoming = interviews.filter(item => item.scheduledAt && Date.parse(item.scheduledAt) >= now), past = interviews.filter(item => !item.scheduledAt || Date.parse(item.scheduledAt) < now);
-  return <section><PageHeader label="Interviews" title="Your scheduled interviews" body="Internal notes and evaluations are not shown." /><Panel title="Upcoming Interviews"><InterviewList interviews={upcoming} join={join} /></Panel><Panel title="Past Interviews"><InterviewList interviews={past} join={join} /></Panel></section>;
+  return <section><PageHeader label="Interviews & Results" title="Your interviews and evaluator feedback" body="Your final score, recommendation and personal feedback appear here as soon as the evaluator submits them." /><Panel title="Upcoming Interviews"><InterviewList interviews={upcoming} focusedId={focusedId} join={join} /></Panel><Panel title="Past Interviews & Results"><InterviewList interviews={past} focusedId={focusedId} join={join} /></Panel></section>;
 }
 
 function CandidateProfile({ profile, token, onSaved }: { profile: Profile; token: string; onSaved: (profile: Profile) => void }) {
@@ -173,7 +194,7 @@ function CandidateProfile({ profile, token, onSaved }: { profile: Profile; token
 
 function OfferCard({ offer, onOpen }: { offer: Offer; onOpen: () => void }) { return <article className="candidate-card"><small>{text(offer.department)} - {text(offer.location)}</small><h3>{offer.title}</h3><p>{text(offer.description).slice(0, 150)}</p><div><span>{nice(offer.contractType)}</span><span>Deadline {date(offer.deadline)}</span></div><button onClick={onOpen}>View Details</button></article>; }
 function ApplicationCard({ app, onOpen }: { app: Application; onOpen: () => void }) { return <article className="candidate-card"><small>{text(app.department)} - {text(app.location)}</small><h3>{app.jobTitle}</h3><div><span>{nice(app.status)}</span><span>{nice(app.currentStage)}</span></div><Progress current={app.currentStage} /><button onClick={onOpen}>View Application</button></article>; }
-function InterviewList({ interviews, join }: { interviews: Interview[]; join: (id: number) => void }) { return <div className="candidate-card-list">{interviews.map(item => <article className="candidate-card" key={item.id}><small>{item.jobTitle}</small><h3>{nice(item.interviewType)}</h3><p>{datetime(item.scheduledAt)} {item.durationMinutes ? `- ${item.durationMinutes} min` : ''}</p><div><span>{text(item.location || item.meetingLink || item.mode)}</span><span>{nice(item.status)}</span></div>{item.mode === 'ONLINE' && item.status === 'SCHEDULED' && <button onClick={() => join(item.id)}>Join Interview</button>}</article>)}{!interviews.length && <EmptyState title="No interviews" body="Scheduled interviews will appear here." />}</div>; }
+function InterviewList({ interviews, focusedId, join }: { interviews: Interview[]; focusedId: number | null; join: (id: number) => void }) { return <div className="candidate-card-list">{interviews.map(item => <article id={`candidate-interview-${item.id}`} className={`candidate-card candidate-interview-card ${focusedId === item.id ? 'notification-focus' : ''}`} key={item.id}><small>{item.jobTitle}</small><h3>{nice(item.interviewType)}</h3><p>{datetime(item.scheduledAt)} {item.durationMinutes ? `- ${item.durationMinutes} min` : ''}</p><div><span>{text(item.location || item.meetingLink || item.mode)}</span><span>{nice(item.status)}</span></div>{item.evaluation ? <section className="candidate-evaluation-result"><div className="candidate-result-head"><span><small>INTERVIEW RESULT</small><strong>{item.evaluation.overallScore}<em>/20</em></strong></span><b className={`candidate-recommendation ${item.evaluation.recommendation.toLowerCase()}`}>{nice(item.evaluation.recommendation)}</b></div><blockquote>{item.evaluation.candidateComment}</blockquote><small>Feedback submitted {datetime(item.evaluation.createdAt)}</small></section> : <div className="candidate-result-pending">The evaluator has not submitted a result yet.</div>}{item.mode === 'ONLINE' && item.status === 'SCHEDULED' && <button onClick={() => join(item.id)}>Join Interview</button>}</article>)}{!interviews.length && <EmptyState title="No interviews" body="Scheduled interviews will appear here." />}</div>; }
 function Timeline({ current }: { current: Stage }) { const index = stages.indexOf(current); return <ol className="timeline">{stages.map((stage, itemIndex) => <li key={stage} className={itemIndex < index ? 'done' : itemIndex === index ? 'current' : ''}><span />{stageLabels[stage]}</li>)}</ol>; }
 function Progress({ current }: { current: Stage }) { return <div className="progress"><i style={{ width: `${((stages.indexOf(current) + 1) / stages.length) * 100}%` }} /></div>; }
 function Metric({ label, value }: { label: string; value: number }) { return <article><span>{label}</span><b>{value}</b></article>; }
