@@ -148,7 +148,7 @@ Each finding includes the requested title, description, importance, evidence, se
 - **Why it matters:** Credentials persist in history and vendor/build files enlarge diffs, conceal dependency provenance, and make review/release unreliable.
 - **Evidence:** `.env` from `git ls-files`; `compose.yaml:8-10`; `.gitignore:1`; tracked `frontend/node_modules/**` and `frontend/dist/**`.
 - **Severity:** High.
-- **Suggested solution:** Rotate exposed credentials; untrack secrets/vendor/output; add `.env.example`, comprehensive ignores, secret scanning, and CI installs from lockfiles.
+- **Suggested solution:** Rotate exposed credentials; untrack secrets/vendor/output; add `.env`, comprehensive ignores, secret scanning, and CI installs from lockfiles.
 - **Effort:** <1 day (history cleanup/rotation may take longer).
 - **Expected impact:** Reduces credential and supply-chain/repository risk.
 

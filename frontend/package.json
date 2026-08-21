@@ -10,10 +10,13 @@
   },
   "dependencies": {
     "@stomp/stompjs": "^7.3.0",
+    "leaflet": "^1.9.4",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "react-leaflet": "^5.0.0"
   },
   "devDependencies": {
+    "@types/leaflet": "^1.9.22",
     "@types/node": "^26.2.0",
     "@types/react": "^19.1.11",
     "@types/react-dom": "^19.1.7",

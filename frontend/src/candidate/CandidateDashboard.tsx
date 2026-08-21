@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { API, authHeaders } from '../shared/api';
 import type { Session } from '../shared/types';
 import { InterviewRoom } from '../shared/InterviewRoom';
+import { LocationMap } from '../shared/LocationMap';
 import './candidate-evaluation.css';
 
 type View = 'dashboard' | 'jobs' | 'offer' | 'apply' | 'applications' | 'application' | 'interviews' | 'interview-room' | 'profile';
@@ -24,6 +25,13 @@ const text = (value?: string | number | boolean | null) => value === undefined |
 const nice = (value?: string) => text(value).replaceAll('_', ' ').replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
 const date = (value?: string) => value ? new Date(value).toLocaleDateString() : 'Not set';
 const datetime = (value?: string) => value ? new Date(value).toLocaleString() : 'Not scheduled';
+const BFPME_LOCATION = {
+  latitude: 36.8470625,
+  longitude: 10.1911875,
+  name: 'BFPME',
+  address: '34, Rue Hédi Karray, Centre Urbain Nord, El Menzah IV - 1004 Tunis',
+} as const;
+const BFPME_DIRECTIONS_URL = `https://www.google.com/maps/dir/?api=1&destination=${BFPME_LOCATION.latitude},${BFPME_LOCATION.longitude}`;
 
 async function request<T>(path: string, token: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API}${path}`, { ...init, headers: { ...authHeaders(token), ...(init?.headers || {}) } });
@@ -130,6 +138,7 @@ function Dashboard({ profile, offers, applications, interviews, openOffer, openA
     <div className="candidate-hero"><small>Candidate Portal</small><h1>Welcome back, {profile?.firstName || 'Candidate'}</h1><p>Track your applications and discover new opportunities.</p></div>
     <div className="candidate-stats"><Metric label="Applications Submitted" value={applications.length} /><Metric label="Applications In Progress" value={inProgress.length} /><Metric label="Upcoming Interviews" value={upcoming.length} /></div>
     <div className="candidate-grid"><Panel title="Recent Application">{recent ? <ApplicationCard app={recent} onOpen={() => openApplication(recent.id)} /> : <EmptyState title="No applications yet" body="Published opportunities will appear in Job Offers." />}</Panel><Panel title="Available Job Offers"><div className="candidate-card-list">{offers.slice(0, 3).map(offer => <OfferCard key={offer.id} offer={offer} onOpen={() => openOffer(offer.id)} />)}</div>{!offers.length && <EmptyState title="No open offers" body="Please check again later." />}</Panel></div>
+    <Panel title="BFPME Location"><BfpmeLocation headingId="dashboard-bfpme-location" dashboard /></Panel>
   </section>;
 }
 
@@ -194,7 +203,42 @@ function CandidateProfile({ profile, token, onSaved }: { profile: Profile; token
 
 function OfferCard({ offer, onOpen }: { offer: Offer; onOpen: () => void }) { return <article className="candidate-card"><small>{text(offer.department)} - {text(offer.location)}</small><h3>{offer.title}</h3><p>{text(offer.description).slice(0, 150)}</p><div><span>{nice(offer.contractType)}</span><span>Deadline {date(offer.deadline)}</span></div><button onClick={onOpen}>View Details</button></article>; }
 function ApplicationCard({ app, onOpen }: { app: Application; onOpen: () => void }) { return <article className="candidate-card"><small>{text(app.department)} - {text(app.location)}</small><h3>{app.jobTitle}</h3><div><span>{nice(app.status)}</span><span>{nice(app.currentStage)}</span></div><Progress current={app.currentStage} /><button onClick={onOpen}>View Application</button></article>; }
-function InterviewList({ interviews, focusedId, join }: { interviews: Interview[]; focusedId: number | null; join: (id: number) => void }) { return <div className="candidate-card-list">{interviews.map(item => <article id={`candidate-interview-${item.id}`} className={`candidate-card candidate-interview-card ${focusedId === item.id ? 'notification-focus' : ''}`} key={item.id}><small>{item.jobTitle}</small><h3>{nice(item.interviewType)}</h3><p>{datetime(item.scheduledAt)} {item.durationMinutes ? `- ${item.durationMinutes} min` : ''}</p><div><span>{text(item.location || item.meetingLink || item.mode)}</span><span>{nice(item.status)}</span></div>{item.evaluation ? <section className="candidate-evaluation-result"><div className="candidate-result-head"><span><small>INTERVIEW RESULT</small><strong>{item.evaluation.overallScore}<em>/20</em></strong></span><b className={`candidate-recommendation ${item.evaluation.recommendation.toLowerCase()}`}>{nice(item.evaluation.recommendation)}</b></div><blockquote>{item.evaluation.candidateComment}</blockquote><small>Feedback submitted {datetime(item.evaluation.createdAt)}</small></section> : <div className="candidate-result-pending">The evaluator has not submitted a result yet.</div>}{item.mode === 'ONLINE' && item.status === 'SCHEDULED' && <button onClick={() => join(item.id)}>Join Interview</button>}</article>)}{!interviews.length && <EmptyState title="No interviews" body="Scheduled interviews will appear here." />}</div>; }
+function BfpmeLocation({ headingId, dashboard = false }: { headingId: string; dashboard?: boolean }) {
+  return <section className={`candidate-location ${dashboard ? 'candidate-dashboard-location' : ''}`} aria-labelledby={headingId}>
+    <h4 id={headingId}>{dashboard ? 'Head office' : 'Location'}</h4>
+    <address>
+      <strong>{BFPME_LOCATION.name}</strong>
+      <span>34, Rue Hédi Karray</span>
+      <span>Centre Urbain Nord</span>
+      <span>El Menzah IV - 1004 Tunis</span>
+    </address>
+    <LocationMap
+      latitude={BFPME_LOCATION.latitude}
+      longitude={BFPME_LOCATION.longitude}
+      locationName={BFPME_LOCATION.name}
+      address={BFPME_LOCATION.address}
+    />
+    <a className="candidate-directions" href={BFPME_DIRECTIONS_URL} target="_blank" rel="noopener noreferrer" aria-label="Open directions to BFPME in a new tab">
+      Open directions <span aria-hidden="true">↗</span>
+    </a>
+  </section>;
+}
+function InterviewList({ interviews, focusedId, join }: { interviews: Interview[]; focusedId: number | null; join: (id: number) => void }) {
+  return <div className="candidate-card-list">{interviews.map(item => {
+    const isOnsite = item.mode === 'ONSITE';
+
+    return <article id={`candidate-interview-${item.id}`} className={`candidate-card candidate-interview-card ${focusedId === item.id ? 'notification-focus' : ''}`} key={item.id}>
+      <small>{item.jobTitle}</small>
+      <h3>{nice(item.interviewType)}</h3>
+      <p>{datetime(item.scheduledAt)} {item.durationMinutes ? `- ${item.durationMinutes} min` : ''}</p>
+      <div className="candidate-interview-meta"><span>{nice(item.mode)}</span><span>{nice(item.status)}</span></div>
+      {isOnsite && <BfpmeLocation headingId={`candidate-location-${item.id}`} />}
+      {!isOnsite && <div className="candidate-interview-destination"><span>{text(item.meetingLink || item.location || item.mode)}</span></div>}
+      {item.evaluation ? <section className="candidate-evaluation-result"><div className="candidate-result-head"><span><small>INTERVIEW RESULT</small><strong>{item.evaluation.overallScore}<em>/20</em></strong></span><b className={`candidate-recommendation ${item.evaluation.recommendation.toLowerCase()}`}>{nice(item.evaluation.recommendation)}</b></div><blockquote>{item.evaluation.candidateComment}</blockquote><small>Feedback submitted {datetime(item.evaluation.createdAt)}</small></section> : <div className="candidate-result-pending">The evaluator has not submitted a result yet.</div>}
+      {item.mode === 'ONLINE' && item.status === 'SCHEDULED' && <button onClick={() => join(item.id)}>Join Interview</button>}
+    </article>;
+  })}{!interviews.length && <EmptyState title="No interviews" body="Scheduled interviews will appear here." />}</div>;
+}
 function Timeline({ current }: { current: Stage }) { const index = stages.indexOf(current); return <ol className="timeline">{stages.map((stage, itemIndex) => <li key={stage} className={itemIndex < index ? 'done' : itemIndex === index ? 'current' : ''}><span />{stageLabels[stage]}</li>)}</ol>; }
 function Progress({ current }: { current: Stage }) { return <div className="progress"><i style={{ width: `${((stages.indexOf(current) + 1) / stages.length) * 100}%` }} /></div>; }
 function Metric({ label, value }: { label: string; value: number }) { return <article><span>{label}</span><b>{value}</b></article>; }
