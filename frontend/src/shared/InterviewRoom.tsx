@@ -5,7 +5,18 @@ import { useRealtime } from './realtime';
 type IceServer = { urls: string[]; username?: string; credential?: string };
 type JoinResponse = { interviewId: number; roomId: string; role: 'CANDIDATE' | 'EVALUATOR'; iceServers: IceServer[] };
 type Signal = { type: 'READY' | 'OFFER' | 'ANSWER' | 'ICE_CANDIDATE' | 'LEAVE'; payload?: RTCSessionDescriptionInit | RTCIceCandidateInit };
-export type InterviewSummary = { id: number; jobTitle: string; interviewType: string; mode?: string; status: string; scheduledAt?: string; durationMinutes?: number; joinAvailable?: boolean };
+export type InterviewSummary = {
+  id: number;
+  jobTitle: string;
+  interviewType: string;
+  mode?: string;
+  status: string;
+  scheduledAt?: string;
+  durationMinutes?: number;
+  joinAvailable?: boolean;
+  joinWindowStartsAt?: string;
+  joinWindowEndsAt?: string;
+};
 
 class AuthenticationExpiredError extends Error {}
 class AuthenticatedRequestError extends Error {

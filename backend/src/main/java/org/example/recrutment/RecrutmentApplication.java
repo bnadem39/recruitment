@@ -13,7 +13,8 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
         "org.example.recrutment.entities.formulairesAdaptatifs",
         "org.example.recrutment.entities.audit",
         "org.example.recrutment.entities.notification",
-        "org.example.recrutment.entities.talentpool"
+        "org.example.recrutment.entities.talentpool",
+        "org.example.recrutment.hr"
 })
 public class RecrutmentApplication {
 
