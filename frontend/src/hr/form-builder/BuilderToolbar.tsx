@@ -20,7 +20,7 @@ export function BuilderToolbar({ name, saveState, status, dark, zoom, device, ca
 }) {
   return <header className="fb-toolbar">
     <div className="fb-toolbar-brand">
-      <button className="fb-logo" onClick={onExit}>BF<span>Recruit</span></button>
+      <button className="fb-logo" onClick={onExit}>BFPME<span>Recruit</span></button>
       <div className="fb-breadcrumb"><span>Recruitment</span><i>/</i><span>Forms</span><i>/</i><b>{name}</b></div>
       <em className={`fb-status ${status.toLowerCase()}`}>{status}</em>
     </div>

@@ -1,0 +1,919 @@
+/* =========================================================
+   HR DASHBOARD
+   File: src/hr/HR.css
+   ========================================================= */
+
+/* ========== HR SHELL ========== */
+.hr-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  background: #f7f9fc;
+}
+
+.hr-shell > aside {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 260px;
+  overflow-y: auto;
+  background: #fff;
+  border-right: 1px solid #eef1f5;
+  padding: 24px 0;
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+}
+
+.hr-shell .side-logo {
+  padding: 0 24px 32px;
+  color: #17243e;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.hr-shell .side-logo span {
+  margin-left: 2px;
+  color: #128c78;
+}
+
+.hr-shell nav {
+  flex: 1;
+  padding: 0 16px;
+}
+
+.hr-shell nav b {
+  display: block;
+  margin-bottom: 16px;
+  padding-left: 12px;
+  color: #718096;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.hr-shell nav button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 12px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #17243e;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.hr-shell nav button:hover {
+  background: #f0f9f8;
+  color: #128c78;
+}
+
+.hr-shell nav button.active {
+  background: #e8f7f3;
+  color: #128c78;
+  font-weight: 700;
+}
+
+.hr-shell .profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: auto;
+  padding: 16px 24px;
+  border-top: 1px solid #eef1f5;
+}
+
+.hr-shell .profile > span {
+  display: flex;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--role-color, #128c78);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.hr-shell .profile > div {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
+.hr-shell .profile > div b {
+  display: block;
+  overflow: hidden;
+  color: #17243e;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hr-shell .profile > div small {
+  display: block;
+  overflow: hidden;
+  margin-top: 2px;
+  color: #718096;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hr-shell .profile > button {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: #718096;
+  cursor: pointer;
+  font-size: 18px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.hr-shell .profile > button:hover {
+  background: #f1f5f9;
+  color: #17243e;
+}
+
+/* ========== HR MAIN CONTENT ========== */
+.hr-shell main.content {
+  min-width: 0;
+  min-height: 100vh;
+  margin-left: 260px;
+  padding: 32px 40px;
+}
+
+.hr-shell main.content header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.hr-shell main.content header > div {
+  min-width: 0;
+}
+
+.hr-shell main.content header > div small {
+  display: block;
+  margin-bottom: 10px;
+  color: #128c78;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.hr-shell main.content header > div h1 {
+  margin: 0 0 10px;
+  color: #17243e;
+  font-family: Manrope, sans-serif;
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.7px;
+  line-height: 1.2;
+}
+
+.hr-shell main.content header > div p {
+  max-width: 680px;
+  margin: 0;
+  color: #718096;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* ========== ALERTS / LOADING ========== */
+.hr-alert,
+.alert {
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  border: 1px solid #fecaca;
+  border-radius: 9px;
+  background: #fef2f2;
+  color: #b4232d;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.loading {
+  padding: 48px 28px;
+  color: #718096;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* ========== HR STATS ========== */
+.hr-stats,
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  margin: 0 0 32px;
+}
+
+.hr-stats article,
+.stats article {
+  padding: 24px 26px;
+  border: 1px solid #e7edf3;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(23, 36, 62, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hr-stats article:hover,
+.stats article:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(23, 36, 62, 0.08);
+}
+
+.hr-stats article span,
+.stats article span {
+  display: block;
+  margin-bottom: 10px;
+  color: #718096;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.hr-stats article b,
+.stats article b {
+  display: block;
+  margin-bottom: 8px;
+  color: #17243e;
+  font-family: Manrope, sans-serif;
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.hr-stats article i,
+.stats article i {
+  color: #718096;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+}
+
+.hr-stats article i.green,
+.stats article i.green {
+  color: #128c78;
+}
+
+/* ========== TABLE CARD ========== */
+.hr-table-card,
+.table-card {
+  margin-bottom: 24px;
+  overflow: hidden;
+  border: 1px solid #e5ebf1;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(23, 36, 62, 0.05);
+}
+
+.hr-table,
+.table {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.hr-table .tr,
+.hr-shell .table .tr {
+  display: grid;
+  align-items: center;
+  gap: 16px;
+  min-width: 760px;
+  padding: 18px 24px;
+  border-bottom: 1px solid #eef2f6;
+  color: #334155;
+  font-size: 14px;
+  transition: background 0.2s ease;
+}
+
+.hr-table .tr:hover,
+.hr-shell .table .tr:hover {
+  background: #f9fbfc;
+}
+
+.hr-table .tr.head,
+.hr-shell .table .tr.head {
+  border-bottom: 1px solid #e5ebf1;
+  background: #f7f9fc;
+  color: #718096;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.hr-table .tr:last-child,
+.hr-shell .table .tr:last-child {
+  border-bottom: 0;
+}
+
+.hr-table .actions,
+.hr-shell .table .actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ========== HR BUTTONS ========== */
+.hr-btn-primary {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #128c78;
+  border-radius: 8px;
+  background: #128c78;
+  box-shadow: 0 2px 5px rgba(18, 140, 120, 0.2);
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0 18px;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.hr-btn-primary:hover {
+  border-color: #0f7665;
+  background: #0f7665;
+  transform: translateY(-1px);
+}
+
+.hr-btn-primary:disabled {
+  border-color: #9ca3af;
+  background: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.75;
+  transform: none;
+}
+
+.hr-btn-secondary {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #d7e0e8;
+  border-radius: 7px;
+  background: #fff;
+  color: #24344d;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0 11px;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.hr-btn-secondary:hover {
+  border-color: #aebdca;
+  background: #f7f9fc;
+  color: #128c78;
+}
+
+.hr-btn-danger {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #f0c8cc;
+  border-radius: 7px;
+  background: #fff;
+  color: #a8323e;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0 11px;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.hr-btn-danger:hover {
+  border-color: #e99fa8;
+  background: #fff3f4;
+}
+
+.hr-btn-danger:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+/* ========== FORMS TABS ========== */
+.hr-tabs,
+.candidate-tabs {
+  display: inline-flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  padding: 5px;
+  border-radius: 10px;
+  background: #edf2f5;
+}
+
+.hr-tabs button,
+.candidate-tabs button {
+  min-height: 40px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #718096;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 0 20px;
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hr-tabs button:hover:not(.active),
+.candidate-tabs button:hover:not(.active) {
+  background: #dff3ed;
+  color: #128c78;
+}
+
+.hr-tabs button.active,
+.candidate-tabs button.active {
+  background: #128c78;
+  box-shadow: 0 2px 5px rgba(18, 140, 120, 0.22);
+  color: #fff;
+}
+
+/* ========== QUICK ACCESS ========== */
+.hr-quick-access {
+  padding: 28px;
+  border: 1px solid #e5ebf1;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(23, 36, 62, 0.05);
+}
+
+.hr-quick-access h3 {
+  margin: 0 0 20px;
+  color: #17243e;
+  font-family: Manrope, sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.hr-quick-access-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.hr-quick-access-card {
+  min-height: 116px;
+  padding: 20px;
+  border: 1px solid #e5ebf1;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #17243e;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.hr-quick-access-card:hover {
+  border-color: #92cdbf;
+  background: #effaf7;
+  transform: translateY(-2px);
+}
+
+.hr-quick-access-card strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #17243e;
+  font-size: 15px;
+}
+
+.hr-quick-access-card small {
+  color: #718096;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* ========== JOB OFFERS TABLE ========== */
+.job-offers-table .tr {
+  grid-template-columns:
+    minmax(180px, 1.4fr)
+    minmax(115px, 0.8fr)
+    minmax(105px, 0.7fr)
+    minmax(210px, 1.5fr)
+    minmax(230px, auto);
+}
+
+.job-offer-title {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+}
+
+.job-offer-title b {
+  overflow: hidden;
+  color: #17243e;
+  font-size: 15px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.job-offer-title small {
+  overflow: hidden;
+  color: #718096;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.job-offer-date {
+  color: #718096;
+  font-size: 13px;
+}
+
+.job-offer-link {
+  overflow: hidden;
+  padding: 8px 10px;
+  border: 1px solid #e5ebf1;
+  border-radius: 7px;
+  background: #f7f9fc;
+  color: #64748b;
+  font-family: Consolas, 'Courier New', monospace;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.job-offers-table em {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  width: max-content;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.job-offers-table em i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.job-offers-table em.active {
+  background: #e7f8f3;
+  color: #128c78;
+}
+
+.job-offers-table em.disabled {
+  background: #f1f4f7;
+  color: #7c8999;
+}
+
+.job-offer-actions {
+  flex-wrap: nowrap;
+}
+
+.job-offer-actions .hr-btn-secondary,
+.job-offer-actions .hr-btn-danger {
+  padding: 0 10px;
+}
+
+/* ========== MODAL COMMON ========== */
+.overlay {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(7, 20, 38, 0.6);
+}
+
+.modal {
+  position: relative;
+  width: min(560px, 100%);
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  padding: 30px;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 30px 70px rgba(7, 20, 38, 0.35);
+}
+
+.modal .close,
+.close {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #718096;
+  cursor: pointer;
+  font-size: 26px;
+  line-height: 1;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.modal .close:hover,
+.close:hover {
+  background: #f1f5f9;
+  color: #17243e;
+}
+
+.modal > small {
+  display: block;
+  margin-bottom: 9px;
+  color: #128c78;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.modal h2 {
+  margin: 0 0 20px;
+  color: #17243e;
+  font-family: Manrope, sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+}
+
+.modal label {
+  display: grid;
+  gap: 7px;
+  margin-top: 15px;
+  color: #26364d;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.modal label small {
+  color: #8490a3;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.modal input,
+.modal select,
+.modal textarea {
+  width: 100%;
+  border: 1px solid #dce2ea;
+  border-radius: 8px;
+  background: #fff;
+  color: #17243e;
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.modal input,
+.modal select {
+  height: 42px;
+  padding: 0 12px;
+}
+
+.modal textarea {
+  min-height: 110px;
+  padding: 12px;
+  resize: vertical;
+}
+
+.modal input:focus,
+.modal select:focus,
+.modal textarea:focus {
+  border-color: #128c78;
+  box-shadow: 0 0 0 3px rgba(18, 140, 120, 0.12);
+}
+
+.modal .two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 26px;
+}
+
+.modal-actions > button {
+  min-height: 40px;
+  border: 1px solid #dce2ea;
+  border-radius: 8px;
+  background: #fff;
+  color: #17243e;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 0 18px;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.modal-actions > button:hover:not(:disabled) {
+  border-color: #bac7d3;
+  background: #f7f9fc;
+}
+
+.modal-actions > button.primary {
+  border-color: #128c78;
+  background: #128c78;
+  color: #fff;
+}
+
+.modal-actions > button.primary:hover:not(:disabled) {
+  border-color: #0f7665;
+  background: #0f7665;
+}
+
+.modal-actions > button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+/* Modal specifically used by JobOffersPanel */
+.hr-offer-modal {
+  width: min(660px, 100%);
+}
+
+/* ========== EVALUATORS PAGE ========== */
+.hr-evaluator-list {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding: 16px;
+  border-radius: 10px;
+  background: #f7f9fc;
+}
+
+.hr-evaluator-item,
+.check {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 14px;
+  border: 1px solid #e5ebf1;
+  border-radius: 8px;
+  background: #fff;
+  color: #17243e;
+  cursor: pointer;
+  font-size: 14px;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.hr-evaluator-item:hover,
+.check:hover {
+  border-color: #8fcebf;
+  background: #f0faf7;
+}
+
+.hr-evaluator-item input[type='checkbox'],
+.check input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  accent-color: #128c78;
+  cursor: pointer;
+}
+
+.hr-evaluator-item small,
+.check small {
+  color: #8490a3;
+  font-size: 12px;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 1100px) {
+  .hr-shell main.content {
+    padding: 28px 28px;
+  }
+
+  .hr-stats,
+  .stats {
+    gap: 16px;
+  }
+
+  .hr-stats article,
+  .stats article {
+    padding: 20px;
+  }
+
+  .job-offers-table .tr {
+    min-width: 980px;
+  }
+}
+
+@media (max-width: 980px) {
+  .hr-shell {
+    display: block;
+  }
+
+  .hr-shell > aside {
+    display: none;
+  }
+
+  .hr-shell main.content {
+    margin-left: 0;
+    padding: 24px 16px;
+  }
+
+  .hr-stats,
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .hr-quick-access-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .hr-shell main.content header {
+    align-items: flex-start;
+    flex-direction: column;
+    margin-bottom: 24px;
+  }
+
+  .hr-shell main.content header > div h1 {
+    font-size: 26px;
+  }
+
+  .hr-shell main.content header > .hr-btn-primary {
+    width: 100%;
+  }
+
+  .hr-table .tr,
+  .hr-shell .table .tr {
+    min-width: 680px;
+  }
+
+  .job-offers-table .tr {
+    min-width: 980px;
+  }
+
+  .modal {
+    padding: 26px 20px;
+  }
+
+  .modal .two {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .modal-actions > button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 500px) {
+  .hr-tabs,
+  .candidate-tabs {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .hr-tabs button,
+  .candidate-tabs button {
+    width: 100%;
+  }
+
+  .hr-shell main.content {
+    padding: 20px 12px;
+  }
+
+  .hr-quick-access {
+    padding: 20px;
+  }
+}

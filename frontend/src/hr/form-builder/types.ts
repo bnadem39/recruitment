@@ -66,7 +66,27 @@ export type CatalogItem = {
   block?: string[];
 };
 
-export type JobOffer = { id: number; title: string; department?: string; formId?: number };
+export type JobOffer = {
+  id: number;
+  title: string;
+
+  description?: string;
+  department?: string;
+  contractType?: string;
+  location?: string;
+
+  numberOfPositions?: number;
+
+  publicationDate?: string;
+  deadline?: string;
+
+  status?: 'DRAFT' | 'PUBLISHED' | 'CLOSED' | 'ARCHIVED' | string;
+
+  formId?: number | null;
+
+  createdAt?: string;
+  updatedAt?: string;
+};
 
 export type FormTemplate = {
   id: string;

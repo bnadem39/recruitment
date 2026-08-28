@@ -3,7 +3,8 @@ import { API, authHeaders } from '../shared/api';
 import type { Session } from '../shared/types';
 import { InterviewRoom } from '../shared/InterviewRoom';
 import { LocationMap } from '../shared/LocationMap';
-import './candidate-evaluation.css';
+import './Candidate.css';
+import { ROLE_THEME } from '../shared/roleTheme';
 
 type View = 'dashboard' | 'jobs' | 'offer' | 'apply' | 'applications' | 'application' | 'interviews' | 'interview-room' | 'profile';
 type FieldType = 'TEXT' | 'TEXTAREA' | 'NUMBER' | 'DATE' | 'EMAIL' | 'PHONE' | 'RADIO' | 'CHECKBOX' | 'SELECT' | 'MULTI_SELECT' | 'FILE' | 'BOOLEAN';
@@ -42,7 +43,7 @@ async function request<T>(path: string, token: string, init?: RequestInit): Prom
   return res.json();
 }
 
-export function CandidateDashboard({ session, logout }: { session: Session; logout: () => void }) {
+export function CandidateDashboard({ session, logout, initialOfferId }: { session: Session; logout: () => void; initialOfferId?: number }) {
   const [view, setView] = useState<View>('dashboard');
   const [offers, setOffers] = useState<Offer[]>([]);
   const [applications, setApplications] = useState<Application[]>([]);
@@ -77,6 +78,14 @@ export function CandidateDashboard({ session, logout }: { session: Session; logo
   };
 
   useEffect(() => { void load(); }, []);
+
+  useEffect(() => {
+    if (!initialOfferId) return;
+    sessionStorage.removeItem('pendingOfferId');
+    setSelectedOfferId(initialOfferId);
+    setView('offer');
+  }, [initialOfferId]);
+
   useEffect(() => {
     const handleNavigation = (event: Event) => {
       const actionUrl = (event as CustomEvent<string>).detail || '';
@@ -102,16 +111,19 @@ export function CandidateDashboard({ session, logout }: { session: Session; logo
   return <div className="candidate-shell">
     <aside className="candidate-side">
       <div className="side-logo">BFPME<span>Recruit</span></div>
-      <nav>
+            <nav>
         <b>CANDIDATE</b>
         <button className={view === 'dashboard' ? 'active' : ''} onClick={() => navigate('dashboard')}>Dashboard</button>
         <button className={view === 'jobs' || view === 'offer' || view === 'apply' ? 'active' : ''} onClick={() => navigate('jobs')}>Job Offers</button>
         <button className={view === 'applications' || view === 'application' ? 'active' : ''} onClick={() => navigate('applications')}>My Applications</button>
         <button className={view === 'interviews' || view === 'interview-room' ? 'active' : ''} onClick={() => navigate('interviews')}>Interviews & Results</button>
         <button className={view === 'profile' ? 'active' : ''} onClick={() => navigate('profile')}>My Profile</button>
-        <button onClick={logout}>Logout</button>
       </nav>
-      <div className="profile"><span>{session.firstName[0]}{session.lastName[0]}</span><div><strong>{session.firstName} {session.lastName}</strong><small>{session.email}</small></div></div>
+      <div className="profile" style={{ '--role-color': ROLE_THEME.USER.color } as React.CSSProperties}>
+        <span>{session.firstName[0]}{session.lastName[0]}</span>
+        <div><b>{session.firstName} {session.lastName}</b><small>{session.email}</small></div>
+        <button onClick={logout} aria-label="Log out">↗</button>
+      </div>
     </aside>
     <main className="candidate-main">
       {error && <div className="candidate-alert">{error}</div>}

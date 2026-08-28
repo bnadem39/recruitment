@@ -5,7 +5,7 @@ import { ComponentLibrary } from './ComponentLibrary';
 import { FormCanvas } from './FormCanvas';
 import { PropertiesPanel } from './PropertiesPanel';
 import { PreviewMode, PublishDialog, SaveTemplateDialog, SettingsDialog, TemplateSelector } from './BuilderDialogs';
-import { CATALOG, createElement, defaultButtonProps, INITIAL_DRAFT, TEMPLATES, uid } from './catalog';
+import { CATALOG, createElement, INITIAL_DRAFT, TEMPLATES, uid } from './catalog';
 import { getJobOffers, saveDraftToBackend } from './api';
 import type { BuilderDraft, BuilderElement, CatalogItem, FormTemplate, JobOffer } from './types';
 import './form-builder.css';
@@ -17,7 +17,7 @@ type CanvasPoint = { x: number; y: number };
 const GRID_SIZE = 8;
 const DEFAULT_ELEMENT_GAP = 112;
 const snap = (value: number) => Math.max(0, Math.round(value / GRID_SIZE) * GRID_SIZE);
-const estimateElementHeight = (element: BuilderElement) => element.pixelHeight || (element.kind === 'upload' ? 92 : element.kind === 'button' ? 56 : element.fieldType === 'TEXTAREA' ? 126 : 94);
+const estimateElementHeight = (element: BuilderElement) => element.pixelHeight || (element.kind === 'upload' ? 180 : element.fieldType === 'TEXTAREA' ? 126 : 94);
 const nextFreePoint = (elements: BuilderElement[]): CanvasPoint => ({ x: 0, y: snap(elements.reduce((max, element, index) => Math.max(max, (element.y ?? index * DEFAULT_ELEMENT_GAP) + estimateElementHeight(element)), 0) + 16) });
 
 function positionNewElements(sources: string[], anchor: CanvasPoint) {
@@ -131,11 +131,7 @@ export function FormBuilder({ session, onExit }: { session: Session; onExit: () 
     const targetIndex = index ?? step.elements.length;
     const sources = item.block || [item.id];
     const anchor = point || nextFreePoint(step.elements);
-    let newElements = positionNewElements(sources, anchor);
-    if (item.id === 'button') {
-      const { buttonRole, buttonText } = defaultButtonProps(activeStep, draft.steps.length);
-      newElements = newElements.map(element => ({ ...element, buttonRole, buttonText, label: buttonText }));
-    }
+    const newElements = positionNewElements(sources, anchor);
     commit(current => ({ ...current, steps: current.steps.map((itemStep, itemIndex) => itemIndex === activeStep ? { ...itemStep, elements: [...itemStep.elements.slice(0, targetIndex), ...newElements, ...itemStep.elements.slice(targetIndex)] } : itemStep) }));
     setSelectedId(newElements[0]?.id);
     setToast(`${item.name} added`);
