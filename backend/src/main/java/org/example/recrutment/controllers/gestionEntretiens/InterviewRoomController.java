@@ -9,15 +9,16 @@ import org.example.recrutment.entities.users.UserRole;
 import org.example.recrutment.entities.users.Users;
 import org.example.recrutment.repositories.gestionEntretiens.InterviewRepository;
 import org.example.recrutment.services.gestionEntretiens.InterviewAuthorizationService;
+import org.example.recrutment.services.gestionEntretiens.InterviewJoinWindowService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 @RestController
@@ -26,13 +27,12 @@ import java.util.List;
 public class InterviewRoomController {
     private final InterviewRepository interviewRepository;
     private final InterviewAuthorizationService authorizationService;
+    private final InterviewJoinWindowService joinWindowService;
 
     @Value("${webrtc.stun-urls:stun:stun.l.google.com:19302}") private String stunUrls;
     @Value("${webrtc.turn-url:}") private String turnUrl;
     @Value("${webrtc.turn-username:}") private String turnUsername;
     @Value("${webrtc.turn-credential:}") private String turnCredential;
-    @Value("${webrtc.join-window-before-minutes:30}") private long joinBeforeMinutes;
-    @Value("${webrtc.join-window-after-minutes:60}") private long joinAfterMinutes;
 
     @GetMapping("/my")
     public List<InterviewRoomDto> mine(@AuthenticationPrincipal Users user) {
@@ -41,7 +41,10 @@ public class InterviewRoomController {
             case EVALUATOR -> interviewRepository.findByAssignedEvaluator_Id(user.getId());
             case ADMIN, HR -> interviewRepository.findAll();
         };
-        return interviews.stream().map(this::toDto).toList();
+        return interviews.stream()
+                .sorted(Comparator.comparing(Interview::getScheduledAt, Comparator.nullsLast(Comparator.naturalOrder())))
+                .map(this::toDto)
+                .toList();
     }
 
     @GetMapping("/{id}")
@@ -62,27 +65,24 @@ public class InterviewRoomController {
     }
 
     private void validateJoin(Interview interview) {
-        if (interview.getMode() != InterviewMode.ONLINE || interview.getRoomId() == null) {
+        if (!joinWindowService.supportsOnlineRoom(interview)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Interview is not an online room");
         }
-        if (interview.getStatus() != InterviewStatus.SCHEDULED && interview.getStatus() != InterviewStatus.IN_PROGRESS) {
+        if (!joinWindowService.hasJoinableStatus(interview)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Interview is not joinable in its current status");
         }
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime earliest = interview.getScheduledAt().minusMinutes(joinBeforeMinutes);
-        LocalDateTime latest = interview.getScheduledAt().plusMinutes(
-                (interview.getDurationMinutes() == null ? 60 : interview.getDurationMinutes()) + joinAfterMinutes);
-        if (now.isBefore(earliest) || now.isAfter(latest)) {
+        InterviewRoomDto.JoinWindow joinWindow = joinWindowService.joinWindow(interview);
+        if (!joinWindow.available()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Interview room is outside its join window");
         }
     }
 
     private InterviewRoomDto toDto(Interview interview) {
-        boolean joinable = interview.getMode() == InterviewMode.ONLINE
-                && (interview.getStatus() == InterviewStatus.SCHEDULED || interview.getStatus() == InterviewStatus.IN_PROGRESS);
+        InterviewRoomDto.JoinWindow joinWindow = joinWindowService.joinWindow(interview);
         return new InterviewRoomDto(interview.getId(), interview.getApplication().getJobOffer().getTitle(),
                 interview.getInterviewType(), interview.getMode(), interview.getStatus(), interview.getScheduledAt(),
-                interview.getDurationMinutes(), joinable, interview.getApplication().getId(),
+                interview.getDurationMinutes(), joinWindow.available(), joinWindow.startsAt(), joinWindow.endsAt(),
+                interview.getApplication().getId(),
                 interview.getApplication().getCandidate().getFirstName() + " "
                         + interview.getApplication().getCandidate().getLastName(),
                 interview.getLocation(), interview.getEvaluation() != null ? interview.getEvaluation().getId() : null);

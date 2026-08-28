@@ -14,9 +14,9 @@ import org.example.recrutment.entities.gestionOffres.OfferStatus;
 import java.time.LocalDate;
 
 /**
- * Données envoyées par l'admin RH pour créer ou modifier une offre.
- * formId référence le template de formulaire à utiliser pour cette offre
- * (le service vérifie que ce Form existe avant de créer l'offre).
+ * Donnees envoyees par l'admin RH pour creer ou modifier une offre.
+ * formId reference le template de formulaire a utiliser pour cette offre.
+ * Une offre peut exister sans formulaire tant qu'elle n'est pas encore configuree.
  */
 @Getter
 @Setter
@@ -37,7 +37,7 @@ public class JobOfferRequestDTO {
 
     private String location;
 
-    @Positive(message = "Le nombre de postes doit être positif")
+    @Positive(message = "Le nombre de postes doit etre positif")
     private Integer numberOfPositions;
 
     private LocalDate publicationDate;
@@ -46,6 +46,5 @@ public class JobOfferRequestDTO {
 
     private OfferStatus status;
 
-    @NotNull(message = "Le formulaire associé est obligatoire")
     private Long formId;
 }

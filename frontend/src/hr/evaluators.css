@@ -1,0 +1,26 @@
+.evaluator-offers-table .tr{grid-template-columns:minmax(240px,1.5fr) minmax(180px,1fr) minmax(150px,.7fr) minmax(180px,.8fr)}
+.evaluator-directory-card{margin-bottom:18px;padding:20px;overflow:visible}
+.evaluator-directory-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:17px;border-bottom:1px solid #e8edf2}
+.evaluator-directory-head small{color:#128c78;font-size:10px;font-weight:800;letter-spacing:.14em}.evaluator-directory-head h2{margin:5px 0 0;font:800 21px Manrope;color:#17243e}
+.evaluator-directory-head>span{padding:7px 11px;border-radius:999px;background:#eef3f7;color:#637187;font-size:12px;font-weight:800}
+.evaluator-directory-list{display:grid}.evaluator-directory-row{display:grid;grid-template-columns:minmax(210px,1fr) auto minmax(260px,1.2fr);align-items:center;gap:16px;padding:15px 4px;border-bottom:1px solid #edf1f5}.evaluator-directory-row:last-child{border-bottom:0}.evaluator-directory-row.inactive{background:#fbfcfd;color:#7a8595}
+.evaluator-offers-table .tr.selected{background:#eef9f6;box-shadow:inset 3px 0 #128c78}
+.evaluator-assignment-card{margin-top:18px;padding:20px;overflow:visible}
+.evaluator-assignment-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:17px;border-bottom:1px solid #e8edf2}
+.evaluator-assignment-head small{color:#128c78;font-size:10px;font-weight:800;letter-spacing:.14em}
+.evaluator-assignment-head h3{margin:5px 0 0;font:800 21px Manrope;color:#17243e}
+.evaluator-assignment-head>span{padding:7px 11px;border-radius:999px;background:#eef3f7;color:#637187;font-size:12px;font-weight:800}
+.evaluator-list{display:grid}
+.evaluator-row{display:grid!important;grid-template-columns:auto minmax(190px,1fr) auto minmax(230px,1.1fr);align-items:center;gap:14px;margin:0!important;padding:15px 4px;border-bottom:1px solid #edf1f5;font-weight:500!important}
+.evaluator-row>input{width:18px;height:18px;accent-color:#128c78}
+.evaluator-row.inactive{background:#fbfcfd;color:#7a8595}
+.evaluator-row.inactive>input:disabled{cursor:not-allowed}
+.evaluator-person,.evaluator-availability{display:grid;gap:4px}
+.evaluator-person b{color:#1b2940;font-size:14px}.evaluator-person small,.evaluator-availability small{color:#7c8899;font-size:11px;line-height:1.35}
+.evaluator-status{font-style:normal;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:800}
+.evaluator-status.active{background:#e6f7f3;color:#13836f}.evaluator-status.inactive{background:#fff0f1;color:#9a3c46}
+.evaluator-availability{border-left:3px solid #d4dde6;padding-left:11px}.evaluator-availability b{font-size:12px;color:#526176}
+.evaluator-availability.free{border-color:#38b89f}.evaluator-availability.free b{color:#13836f}.evaluator-availability.busy{border-color:#dda84a}
+.evaluator-actions{padding-top:18px}.evaluator-empty{padding:28px;text-align:center;color:#8490a3}
+.evaluator-notice{padding:12px 14px;border:1px solid #a9dccf;border-radius:9px;color:#146c5d;background:#edfaf6;margin:14px 0}
+@media(max-width:850px){.evaluator-directory-row{grid-template-columns:1fr auto}.evaluator-directory-row .evaluator-availability{grid-column:1/-1}.evaluator-row{grid-template-columns:auto 1fr auto}.evaluator-row .evaluator-availability{grid-column:2/-1}.evaluator-assignment-head{align-items:flex-start}.evaluator-offers-table .tr{min-width:760px}}

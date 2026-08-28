@@ -10,6 +10,7 @@ type EvaluatorView = 'calendar' | 'evaluations' | 'comments' | 'recommendations'
 type Filter = 'all' | 'todo' | 'done' | 'upcoming';
 type EvaluatorInterview = InterviewSummary & { applicationId?: number; candidateName?: string; location?: string; evaluationId?: number };
 type Evaluation = { id?: number; interviewId?: number; technicalScore: number | ''; communicationScore: number | ''; motivationScore: number | ''; professionalismScore: number | ''; overallScore: number | ''; recommendation: Recommendation | ''; hrComment: string; candidateComment: string; createdAt?: string };
+type JoinAction = { disabled: boolean; label: string; detail: string };
 
 const emptyEvaluation: Evaluation = { technicalScore: '', communicationScore: '', motivationScore: '', professionalismScore: '', overallScore: '', recommendation: '', hrComment: '', candidateComment: '' };
 
@@ -32,19 +33,52 @@ async function loadEvaluation(interviewId: number, token: string): Promise<Evalu
 }
 
 function evaluationPayload(value: Evaluation) {
-  return { technicalScore: Number(value.technicalScore), communicationScore: Number(value.communicationScore), motivationScore: Number(value.motivationScore), professionalismScore: Number(value.professionalismScore), overallScore: Number(value.overallScore), recommendation: value.recommendation, hrComment: value.hrComment.trim(), candidateComment: value.candidateComment.trim() };
+  return {
+    technicalScore: Number(value.technicalScore),
+    communicationScore: Number(value.communicationScore),
+    motivationScore: Number(value.motivationScore),
+    professionalismScore: Number(value.professionalismScore),
+    overallScore: Number(value.overallScore),
+    recommendation: value.recommendation,
+    hrComment: value.hrComment.trim(),
+    candidateComment: value.candidateComment.trim(),
+  };
 }
 
 const nice = (value?: string) => value ? value.replaceAll('_', ' ').toLowerCase().replace(/\b\w/g, letter => letter.toUpperCase()) : '-';
 const dateTime = (value?: string) => value ? new Date(value).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }) : 'Not scheduled';
 const isUpcoming = (interview: InterviewSummary) => !!interview.scheduledAt && Date.parse(interview.scheduledAt) >= Date.now();
 function localDateKey(value: Date | string) { const date = typeof value === 'string' ? new Date(value) : value; return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`; }
+function sortBySchedule(left: InterviewSummary, right: InterviewSummary) { return Date.parse(left.scheduledAt || '') - Date.parse(right.scheduledAt || ''); }
+function formatRange(interview: InterviewSummary) {
+  if (!interview.scheduledAt) return 'Horaire a definir';
+  const start = new Date(interview.scheduledAt);
+  const end = new Date(start.getTime() + ((interview.durationMinutes || 60) * 60000));
+  return `${timeOnly(interview.scheduledAt)} - ${timeOnly(end.toISOString())}`;
+}
+
+function joinAction(interview: EvaluatorInterview): JoinAction {
+  if (interview.mode !== 'ONLINE') return { disabled: true, label: 'Entretien sur site', detail: interview.location || 'Rejoignez cet entretien sur place.' };
+  if (interview.status === 'CANCELLED') return { disabled: true, label: 'Entretien annule', detail: 'Cet entretien ne peut plus etre rejoint.' };
+  if (interview.status === 'COMPLETED' || interview.status === 'NO_SHOW') return { disabled: true, label: 'Entretien termine', detail: 'La session est deja terminee.' };
+  if (interview.status === 'POSTPONED') return { disabled: true, label: 'Entretien reporte', detail: 'Attendez la nouvelle planification communiquee par les RH.' };
+  if (!interview.scheduledAt) return { disabled: true, label: 'Horaire manquant', detail: 'Les RH doivent encore planifier cet entretien.' };
+  if (interview.joinAvailable) return { disabled: false, label: 'Rejoindre l entretien', detail: 'La salle de cet entretien est actuellement accessible.' };
+  if (interview.joinWindowStartsAt && Date.now() < Date.parse(interview.joinWindowStartsAt)) {
+    return { disabled: true, label: `Disponible a ${timeOnly(interview.joinWindowStartsAt)}`, detail: `La salle ouvrira le ${dateTime(interview.joinWindowStartsAt)}.` };
+  }
+  if (interview.joinWindowEndsAt && Date.now() > Date.parse(interview.joinWindowEndsAt)) {
+    return { disabled: true, label: 'Fenetre terminee', detail: 'La fenetre de connexion a expire pour cet entretien.' };
+  }
+  return { disabled: true, label: 'Indisponible', detail: 'Cet entretien ne peut pas etre rejoint dans son etat actuel.' };
+}
 
 export function EvaluatorDashboard({ session, logout }: { session: Session; logout: () => void }) {
   const [view, setView] = useState<EvaluatorView>('calendar');
   const [interviews, setInterviews] = useState<EvaluatorInterview[]>([]);
   const [evaluations, setEvaluations] = useState<Record<number, Evaluation>>({});
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [detailsId, setDetailsId] = useState<number | null>(null);
   const [room, setRoom] = useState<InterviewSummary | null>(null);
   const [evaluation, setEvaluation] = useState<Evaluation>(emptyEvaluation);
   const [filter, setFilter] = useState<Filter>('all');
@@ -54,9 +88,14 @@ export function EvaluatorDashboard({ session, logout }: { session: Session; logo
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const selected = interviews.find(item => item.id === selectedId) || interviews[0] || null;
+  const detailedInterview = interviews.find(item => item.id === detailsId) || null;
   const hasEvaluation = Boolean(evaluation.id || selected?.evaluationId);
 
-  const stats = useMemo(() => { const upcoming = interviews.filter(isUpcoming).length; const done = interviews.filter(item => Boolean(item.evaluationId)).length; return { total: interviews.length, upcoming, done, todo: Math.max(0, interviews.length - done) }; }, [interviews]);
+  const stats = useMemo(() => {
+    const upcoming = interviews.filter(isUpcoming).length;
+    const done = interviews.filter(item => Boolean(item.evaluationId)).length;
+    return { total: interviews.length, upcoming, done, todo: Math.max(0, interviews.length - done) };
+  }, [interviews]);
   const filtered = useMemo(() => interviews.filter(interview => filter === 'todo' ? !interview.evaluationId : filter === 'done' ? Boolean(interview.evaluationId) : filter === 'upcoming' ? isUpcoming(interview) : true), [filter, interviews]);
 
   useEffect(() => {
@@ -64,7 +103,9 @@ export function EvaluatorDashboard({ session, logout }: { session: Session; logo
     setLoading(true);
     request<EvaluatorInterview[]>('/api/interview-rooms/my', session.accessToken).then(async items => {
       if (!active) return;
-      setInterviews(items); setSelectedId(current => current ?? items[0]?.id ?? null); setError('');
+      setInterviews(items);
+      setSelectedId(current => current ?? items[0]?.id ?? null);
+      setError('');
       const loaded = await Promise.all(items.filter(item => item.evaluationId).map(async item => [item.id, await loadEvaluation(item.id, session.accessToken)] as const));
       if (active) setEvaluations(Object.fromEntries(loaded.filter((entry): entry is readonly [number, Evaluation] => Boolean(entry[1]))));
     }).catch(caught => active && setError(caught instanceof Error ? caught.message : 'Could not load assigned interviews')).finally(() => active && setLoading(false));
@@ -75,7 +116,8 @@ export function EvaluatorDashboard({ session, logout }: { session: Session; logo
     if (!selected?.id) { setEvaluation(emptyEvaluation); return; }
     const cached = evaluations[selected.id];
     if (cached) { setEvaluation(cached); return; }
-    let active = true; setNotice('');
+    let active = true;
+    setNotice('');
     loadEvaluation(selected.id, session.accessToken).then(value => {
       if (!active) return;
       setEvaluation(value || emptyEvaluation);
@@ -83,15 +125,36 @@ export function EvaluatorDashboard({ session, logout }: { session: Session; logo
       setInterviews(current => current.map(item => item.id === selected.id ? { ...item, evaluationId: value?.id } : item));
     }).catch(() => active && setEvaluation(emptyEvaluation));
     return () => { active = false; };
-  }, [selected?.id, session.accessToken]);
+  }, [selected?.id, session.accessToken, evaluations]);
 
-  function openEvaluation(interview: EvaluatorInterview) { setSelectedId(interview.id); setView('evaluations'); setFilter('all'); setNotice(''); }
+  function openEvaluation(interview: EvaluatorInterview) {
+    setSelectedId(interview.id);
+    setDetailsId(null);
+    setView('evaluations');
+    setFilter('all');
+    setNotice('');
+  }
+
+  function openInterviewDetails(interview: EvaluatorInterview) {
+    setSelectedId(interview.id);
+    setDetailsId(interview.id);
+    setNotice('');
+  }
+
+  function joinInterview(interview: EvaluatorInterview) {
+    setDetailsId(null);
+    setRoom(interview);
+  }
+
   async function saveEvaluation() {
     if (!selected) return;
-    setSaving(true); setError(''); setNotice('');
+    setSaving(true);
+    setError('');
+    setNotice('');
     try {
       const saved = await request<Evaluation>(`/api/interviews/${selected.id}/evaluation`, session.accessToken, { method: hasEvaluation ? 'PUT' : 'POST', body: JSON.stringify(evaluationPayload(evaluation)) });
-      setEvaluation(saved); setEvaluations(current => ({ ...current, [selected.id]: saved }));
+      setEvaluation(saved);
+      setEvaluations(current => ({ ...current, [selected.id]: saved }));
       setInterviews(current => current.map(item => item.id === selected.id ? { ...item, evaluationId: saved.id } : item));
       setNotice(hasEvaluation ? 'Evaluation updated. The candidate has been notified.' : 'Evaluation submitted. The candidate has been notified of their result.');
     } catch (caught) { setError(caught instanceof Error ? caught.message : 'Could not save the evaluation'); } finally { setSaving(false); }
@@ -118,10 +181,11 @@ export function EvaluatorDashboard({ session, logout }: { session: Session; logo
       <header><div><small>EVALUATOR PORTAL</small><h1>{viewTitle(view)}</h1><p>{viewDescription(view)}</p></div>{selected?.joinAvailable && <button className="primary add" onClick={() => setRoom(selected)}>Join interview</button>}</header>
       <section className="stats evaluator-stats"><Metric label="Assigned interviews" value={stats.total} detail={`${stats.upcoming} upcoming`} /><Metric label="To evaluate" value={stats.todo} detail="Action required" tone="warning" /><Metric label="Completed" value={stats.done} detail="Evaluations submitted" /></section>
       {error && <div className="candidate-alert">{error}</div>}{notice && <div className="candidate-success">{notice}</div>}
-      {view === 'calendar' && <InterviewCalendar month={calendarMonth} interviews={interviews} loading={loading} onMonth={setCalendarMonth} onOpen={openEvaluation} />}
+      {view === 'calendar' && <InterviewCalendar month={calendarMonth} interviews={interviews} loading={loading} onMonth={setCalendarMonth} onOpen={openInterviewDetails} />}
       {view === 'evaluations' && <EvaluationWorkspace loading={loading} interviews={filtered} selected={selected} filter={filter} evaluation={evaluation} saving={saving} hasEvaluation={hasEvaluation} setFilter={setFilter} select={setSelectedId} setEvaluation={setEvaluation} save={saveEvaluation} />}
       {view === 'comments' && <CommentsView interviews={interviews} evaluations={evaluations} onOpen={openEvaluation} />}
       {view === 'recommendations' && <RecommendationsView interviews={interviews} evaluations={evaluations} onOpen={openEvaluation} />}
+      {detailedInterview && <InterviewDetailsModal interview={detailedInterview} onClose={() => setDetailsId(null)} onJoin={joinInterview} onOpenEvaluation={openEvaluation} />}
     </main>
   </div>;
 }
@@ -132,10 +196,15 @@ function viewTitle(view: EvaluatorView) { return view === 'calendar' ? 'Intervie
 function viewDescription(view: EvaluatorView) { return view === 'calendar' ? 'View all your scheduled interviews and open an evaluation directly from the calendar.' : view === 'comments' ? 'Find the internal HR comment and the feedback shared with each candidate.' : view === 'recommendations' ? 'View the final scores and recommendations you have already submitted.' : 'Assign scores, justify your decision for HR, and prepare candidate feedback.'; }
 
 function InterviewCalendar({ month, interviews, loading, onMonth, onOpen }: { month: Date; interviews: EvaluatorInterview[]; loading: boolean; onMonth: (date: Date) => void; onOpen: (interview: EvaluatorInterview) => void }) {
-  const start = new Date(month.getFullYear(), month.getMonth(), 1), mondayOffset = (start.getDay() + 6) % 7;
+  const start = new Date(month.getFullYear(), month.getMonth(), 1);
+  const mondayOffset = (start.getDay() + 6) % 7;
   const cells = Array.from({ length: 42 }, (_, index) => new Date(month.getFullYear(), month.getMonth(), index - mondayOffset + 1));
-  const byDay = interviews.reduce<Record<string, EvaluatorInterview[]>>((result, interview) => { if (interview.scheduledAt) (result[localDateKey(interview.scheduledAt)] ||= []).push(interview); return result; }, {});
-  const upcoming = interviews.filter(isUpcoming).sort((a, b) => Date.parse(a.scheduledAt || '') - Date.parse(b.scheduledAt || '')).slice(0, 6);
+  const byDay = interviews.reduce<Record<string, EvaluatorInterview[]>>((result, interview) => {
+    if (interview.scheduledAt) (result[localDateKey(interview.scheduledAt)] ||= []).push(interview);
+    return result;
+  }, {});
+  Object.values(byDay).forEach(items => items.sort(sortBySchedule));
+  const upcoming = interviews.filter(isUpcoming).sort(sortBySchedule).slice(0, 6);
   const move = (offset: number) => onMonth(new Date(month.getFullYear(), month.getMonth() + offset, 1));
   return <section className="calendar-layout"><article className="calendar-card"><div className="calendar-toolbar"><div><small>MONTHLY PLANNING</small><h2>{month.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</h2></div><div><button onClick={() => move(-1)} aria-label="Previous month">‹</button><button onClick={() => onMonth(new Date(new Date().getFullYear(), new Date().getMonth(), 1))}>Today</button><button onClick={() => move(1)} aria-label="Next month">›</button></div></div><div className="calendar-weekdays">{['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => <b key={day}>{day}</b>)}</div><div className="calendar-grid">{cells.map(day => { const events = byDay[localDateKey(day)] || [], outside = day.getMonth() !== month.getMonth(), today = localDateKey(day) === localDateKey(new Date()); return <div className={`${outside ? 'outside ' : ''}${today ? 'today' : ''}`} key={day.toISOString()}><span>{day.getDate()}</span>{events.map(event => <button key={event.id} className={event.evaluationId ? 'evaluated' : ''} title={`${event.candidateName || 'Candidate'} - ${dateTime(event.scheduledAt)}`} onClick={() => onOpen(event)}><time>{new Date(event.scheduledAt!).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</time><strong>{event.candidateName || event.jobTitle}</strong></button>)}</div>; })}</div></article><aside className="calendar-agenda"><div><small>UPCOMING APPOINTMENTS</small><h2>Agenda</h2></div>{loading ? <div className="loading">Loading...</div> : upcoming.map(interview => <button key={interview.id} onClick={() => onOpen(interview)}><time>{dateTime(interview.scheduledAt)}</time><b>{interview.candidateName || 'Candidate'}</b><span>{interview.jobTitle}</span><em>{interview.evaluationId ? 'Evaluated' : 'To evaluate'}</em></button>)}{!loading && !upcoming.length && <div className="candidate-empty"><strong>No upcoming interviews</strong><span>New appointments will appear here.</span></div>}</aside></section>;
 }

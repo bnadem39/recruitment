@@ -1,9 +1,19 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { API, authHeaders } from '../shared/api';
 import type { Session } from '../shared/types';
 import type { JobOffer } from './form-builder/types';
+import './evaluators.css';
 
-type Evaluator = { id: number; firstName: string; lastName: string; email: string };
+type UserStatus = 'ACTIVE' | 'DISABLED' | 'BLOCKED';
+type AssignedOffer = { id: number; title: string };
+type Evaluator = {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  status: UserStatus;
+  assignedOffers: AssignedOffer[];
+};
 
 async function request<T>(path: string, token: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API}${path}`, { ...init, headers: { ...authHeaders(token), ...(init?.headers || {}) } });
@@ -50,9 +60,11 @@ export function EvaluatorsPanel({ session, offers, loadingOffers }: {
   const [evaluators, setEvaluators] = useState<Evaluator[]>([]);
   const [selectedOffer, setSelectedOffer] = useState<JobOffer | null>(null);
   const [assigned, setAssigned] = useState<number[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingEvaluators, setLoadingEvaluators] = useState(true);
+  const [loadingAssignments, setLoadingAssignments] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
 
   useEffect(() => {
     request<Evaluator[]>('/api/admin/users?role=EVALUATOR', session.accessToken)
@@ -61,12 +73,21 @@ export function EvaluatorsPanel({ session, offers, loadingOffers }: {
       .finally(() => setLoading(false));
   }, [session.accessToken]);
 
-  const openOffer = (offer: JobOffer) => {
+  useEffect(() => { void loadEvaluators(true); }, [loadEvaluators]);
+
+  const openOffer = async (offer: JobOffer) => {
     setSelectedOffer(offer);
+    setAssigned([]);
     setError('');
-    request<number[]>(`/api/offers/${offer.id}/evaluators`, session.accessToken)
-      .then(setAssigned)
-      .catch(() => setAssigned([]));
+    setNotice('');
+    setLoadingAssignments(true);
+    try {
+      setAssigned(await request<number[]>(`/api/hr/offers/${offer.id}/evaluators`, session.accessToken));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Impossible de charger les affectations de cette offre.');
+    } finally {
+      setLoadingAssignments(false);
+    }
   };
 
   const toggleEvaluator = (id: number) => 
@@ -75,6 +96,8 @@ export function EvaluatorsPanel({ session, offers, loadingOffers }: {
   const save = async () => {
     if (!selectedOffer) return;
     setSaving(true);
+    setError('');
+    setNotice('');
     try {
       await request(`/api/offers/${selectedOffer.id}/evaluators`, session.accessToken, { 
         method: 'PUT', 

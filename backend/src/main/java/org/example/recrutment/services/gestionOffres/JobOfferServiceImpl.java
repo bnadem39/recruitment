@@ -35,7 +35,7 @@ public class JobOfferServiceImpl implements JobOfferService {
     @Override
     @Transactional
     public JobOfferResponseDTO create(JobOfferRequestDTO request) {
-        Form form = findFormOrThrow(request.getFormId());
+        Form form = resolveForm(request.getFormId());
 
         JobOffer offer = JobOffer.builder()
                 .title(request.getTitle())
@@ -83,7 +83,7 @@ public class JobOfferServiceImpl implements JobOfferService {
     @Transactional
     public JobOfferResponseDTO update(Long id, JobOfferRequestDTO request) {
         JobOffer offer = findOfferOrThrow(id);
-        Form form = findFormOrThrow(request.getFormId());
+        Form form = resolveForm(request.getFormId());
 
         offer.setTitle(request.getTitle());
         offer.setDescription(request.getDescription());
@@ -125,6 +125,13 @@ public class JobOfferServiceImpl implements JobOfferService {
                 .orElseThrow(() -> new ResourceNotFoundException("Formulaire introuvable avec l'id : " + formId));
     }
 
+    private Form resolveForm(Long formId) {
+        if (formId == null) {
+            return null;
+        }
+        return findFormOrThrow(formId);
+    }
+
     private JobOfferResponseDTO toResponseDTO(JobOffer offer) {
         return JobOfferResponseDTO.builder()
                 .id(offer.getId())
@@ -137,7 +144,7 @@ public class JobOfferServiceImpl implements JobOfferService {
                 .publicationDate(offer.getPublicationDate())
                 .deadline(offer.getDeadline())
                 .status(offer.getStatus())
-                .formId(offer.getForm().getFormId())
+                .formId(offer.getForm() != null ? offer.getForm().getFormId() : null)
                 .openForApplications(offer.isOpenForApplications())
                 .createdAt(offer.getCreatedAt())
                 .updatedAt(offer.getUpdatedAt())
