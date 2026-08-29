@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Login } from './auth/Login';
+import { EmailVerification } from './auth/EmailVerification';
+import { ResetPassword } from './auth/ResetPassword';
 import { AdminDashboard } from './admin/AdminDashboard';
 import { HrDashboard } from './hr/HrDashboard';
 import { EvaluatorDashboard } from './evaluator/EvaluatorDashboard';
@@ -81,9 +83,7 @@ function readSession(): Session | null {
       return null;
     }
 
-    const raw = JSON.parse(savedSession) as RawSession;
-
-    return normalizeSession(raw);
+    return normalizeSession(JSON.parse(savedSession) as RawSession);
   } catch {
     clearSession();
     return null;
@@ -237,28 +237,64 @@ export default function App() {
     });
   };
 
+  const resetToken = new URLSearchParams(
+    window.location.search
+  ).get('token');
+
+  if (window.location.pathname === '/reset-password') {
+    if (!resetToken) {
+      return (
+        <main className="center">
+          <section className="empty">
+            <b>Invalid reset link</b>
+
+            <p>
+              The reset token is missing. Please request a new password reset
+              link.
+            </p>
+
+            <button
+              type="button"
+              onClick={() => {
+                window.history.replaceState({}, '', '/');
+                window.location.reload();
+              }}
+            >
+              Back to sign in
+            </button>
+          </section>
+        </main>
+      );
+    }
+
+    return (
+      <ResetPassword
+        token={resetToken}
+        onBackToLogin={() => {
+          window.history.replaceState({}, '', '/');
+          window.location.reload();
+        }}
+      />
+    );
+  }
+
+  /*
+   * THIS IS THE IMPORTANT PART:
+   * After signup, show EmailVerification.tsx instead of
+   * the old "Check your email" page.
+   */
   if (!session && signupVerification) {
     return (
-      <main className="center">
-        <section className="empty">
-          <b>Check your email</b>
-
-          <p>{signupVerification.message}</p>
-
-          <p>
-            Verification email sent to:
-            <br />
-            <strong>{signupVerification.email}</strong>
-          </p>
-
-          <button
-            type="button"
-            onClick={() => setSignupVerification(null)}
-          >
-            Back to sign in
-          </button>
-        </section>
-      </main>
+      <EmailVerification
+        email={signupVerification.email}
+        message={signupVerification.message}
+        onVerified={() => {
+          setSignupVerification(null);
+        }}
+        onBack={() => {
+          setSignupVerification(null);
+        }}
+      />
     );
   }
 
@@ -274,28 +310,13 @@ export default function App() {
 
   switch (session.role) {
     case 'ADMIN':
-      return (
-        <AdminDashboard
-          session={session}
-          logout={logout}
-        />
-      );
+      return <AdminDashboard session={session} logout={logout} />;
 
     case 'HR':
-      return (
-        <HrDashboard
-          session={session}
-          logout={logout}
-        />
-      );
+      return <HrDashboard session={session} logout={logout} />;
 
     case 'EVALUATOR':
-      return (
-        <EvaluatorDashboard
-          session={session}
-          logout={logout}
-        />
-      );
+      return <EvaluatorDashboard session={session} logout={logout} />;
 
     case 'CANDIDATE':
       return (
