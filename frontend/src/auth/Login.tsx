@@ -115,8 +115,12 @@ export function Login({
   initialError = '',
 }: LoginProps) {
   const [signup, setSignup] = useState(false);
+  const [forgotPassword, setForgotPassword] = useState(false);
+  const [forgotPasswordSent, setForgotPasswordSent] = useState(false);
 
   const [email, setEmail] = useState('');
+  const [forgotEmail, setForgotEmail] = useState('');
+
   const [password, setPassword] = useState('');
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
 
@@ -147,6 +151,19 @@ export function Login({
   const toggleSignup = () => {
     resetFieldsForModeChange();
     setSignup(current => !current);
+  };
+
+  const openForgotPassword = () => {
+    setError('');
+    setForgotEmail(email.trim());
+    setForgotPasswordSent(false);
+    setForgotPassword(true);
+  };
+
+  const closeForgotPassword = () => {
+    setError('');
+    setForgotPasswordSent(false);
+    setForgotPassword(false);
   };
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -238,6 +255,49 @@ export function Login({
     }
   }
 
+  async function submitForgotPassword(
+    event: FormEvent<HTMLFormElement>
+  ) {
+    event.preventDefault();
+
+    setBusy(true);
+    setError('');
+    setForgotPasswordSent(false);
+
+    try {
+      const response = await fetch(`${API}/api/auth/forgot-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: forgotEmail.trim(),
+        }),
+      });
+
+      const data: unknown = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(
+          errorMessage(
+            data,
+            'Unable to process the password reset request.'
+          )
+        );
+      }
+
+      setForgotPasswordSent(true);
+    } catch (caughtError) {
+      setError(
+        caughtError instanceof Error && caughtError.message
+          ? caughtError.message
+          : 'Unable to process the password reset request.'
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <main className={dark ? 'login dark' : 'login'}>
       <section className="login-art">
@@ -249,15 +309,19 @@ export function Login({
           <span className="pill">SECURE TALENT OPERATIONS</span>
 
           <h1>
-            {signup
-              ? 'Your next opportunity starts here.'
-              : 'Build the team that builds the future.'}
+            {forgotPassword
+              ? 'Securely recover your access.'
+              : signup
+                ? 'Your next opportunity starts here.'
+                : 'Build the team that builds the future.'}
           </h1>
 
           <p>
-            {signup
-              ? 'Create your candidate account, discover opportunities, and follow your applications.'
-              : 'A focused workspace for hiring teams, evaluators, and recruitment leaders.'}
+            {forgotPassword
+              ? 'Request a password reset link using the email address associated with your account.'
+              : signup
+                ? 'Create your candidate account, discover opportunities, and follow your applications.'
+                : 'A focused workspace for hiring teams, evaluators, and recruitment leaders.'}
           </p>
         </div>
 
@@ -276,181 +340,262 @@ export function Login({
           {dark ? '☀' : '☾'}
         </button>
 
-        <form onSubmit={submit}>
-          <div className="mini-logo">BF</div>
+        <form onSubmit={forgotPassword ? submitForgotPassword : submit}>
+          {forgotPassword ? (
+            <>
+              <div className="mini-logo">BF</div>
 
-          <h2>{signup ? 'Create your account' : 'Welcome back'}</h2>
+              <h2>Reset your password</h2>
 
-          <p>
-            {signup
-              ? 'Register as a candidate.'
-              : 'Sign in to your recruitment workspace.'}
-          </p>
+              <p>
+                Enter your email address and we will send you a password
+                reset link.
+              </p>
 
-          {error && <div className="alert">{error}</div>}
+              {error && <div className="alert">{error}</div>}
 
-          {signup && (
-            <div className="two">
-              <label>
-                First name
-                <input
-                  value={firstName}
-                  onChange={event => setFirstName(event.target.value)}
-                  required
-                  autoComplete="given-name"
-                />
-              </label>
+              {forgotPasswordSent ? (
+                <div className="forgot-success">
+                  <strong>Check your email</strong>
 
-              <label>
-                Last name
-                <input
-                  value={lastName}
-                  onChange={event => setLastName(event.target.value)}
-                  required
-                  autoComplete="family-name"
-                />
-              </label>
-            </div>
-          )}
+                  <p>
+                    If an account exists for this email address, you will
+                    receive a password reset link shortly.
+                  </p>
 
-          {signup ? (
-            <div className="two">
-              <label>
-                Email address
-                <input
-                  type="email"
-                  value={email}
-                  onChange={event => setEmail(event.target.value)}
-                  required
-                  autoComplete="email"
-                />
-              </label>
+                  <p className="forgot-email">{forgotEmail}</p>
+                </div>
+              ) : (
+                <label>
+                  Email address
 
-              <label>
-                Phone{' '}
-                <small
-                  style={{
-                    marginLeft: 4,
-                    color: '#8591a3',
-                    fontWeight: 400,
-                  }}
-                >
-                  (optional)
-                </small>
+                  <input
+                    type="email"
+                    value={forgotEmail}
+                    onChange={event => setForgotEmail(event.target.value)}
+                    required
+                    autoComplete="email"
+                    placeholder="name@example.com"
+                  />
+                </label>
+              )}
 
-                <input
-                  type="tel"
-                  value={phone}
-                  onChange={event => setPhone(event.target.value)}
-                  autoComplete="tel"
-                />
-              </label>
-            </div>
-          ) : (
-            <label>
-              Email address
-              <input
-                type="email"
-                value={email}
-                onChange={event => setEmail(event.target.value)}
-                required
-                autoComplete="email"
-              />
-            </label>
-          )}
-
-          <label>
-            Password
-
-            <div className="password">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={event => setPassword(event.target.value)}
-                minLength={signup ? 12 : 1}
-                required
-                autoComplete={signup ? 'new-password' : 'current-password'}
-              />
+              {!forgotPasswordSent && (
+                <button className="primary" disabled={busy}>
+                  {busy ? 'Sending...' : 'Send reset link'}
+                </button>
+              )}
 
               <button
+                className="auth-toggle"
                 type="button"
-                onClick={() => setShowPassword(current => !current)}
+                disabled={busy}
+                onClick={closeForgotPassword}
               >
-                {showPassword ? 'Hide' : 'Show'}
+                ← Back to sign in
               </button>
-            </div>
-          </label>
 
-          {signup && (
-            <label>
-              Confirm password
+              <small className="security">
+                For security, we do not confirm whether an email address has
+                an account.
+              </small>
+            </>
+          ) : (
+            <>
+              <div className="mini-logo">BF</div>
 
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={passwordConfirmation}
-                onChange={event =>
-                  setPasswordConfirmation(event.target.value)
+              <h2>{signup ? 'Create your account' : 'Welcome back'}</h2>
+
+              <p>
+                {signup
+                  ? 'Register as a candidate.'
+                  : 'Sign in to your recruitment workspace.'}
+              </p>
+
+              {error && <div className="alert">{error}</div>}
+
+              {signup && (
+                <div className="two">
+                  <label>
+                    First name
+
+                    <input
+                      value={firstName}
+                      onChange={event => setFirstName(event.target.value)}
+                      required
+                      autoComplete="given-name"
+                    />
+                  </label>
+
+                  <label>
+                    Last name
+
+                    <input
+                      value={lastName}
+                      onChange={event => setLastName(event.target.value)}
+                      required
+                      autoComplete="family-name"
+                    />
+                  </label>
+                </div>
+              )}
+
+              {signup ? (
+                <div className="two signup-contact-fields">
+                  <label className="signup-email-field">
+                    Email address
+
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={event => setEmail(event.target.value)}
+                      required
+                      autoComplete="email"
+                      placeholder="name@example.com"
+                    />
+                  </label>
+
+                  <label className="signup-phone-field">
+                    <span className="field-label">
+                      Phone
+                      <small className="optional-label">
+                        (optional)
+                      </small>
+                    </span>
+
+                    <input
+                      type="tel"
+                      value={phone}
+                      onChange={event => setPhone(event.target.value)}
+                      autoComplete="tel"
+                      placeholder="+216..."
+                    />
+                  </label>
+                </div>
+              ) : (
+                <label>
+                  Email address
+
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={event => setEmail(event.target.value)}
+                    required
+                    autoComplete="email"
+                  />
+                </label>
+              )}
+
+              <label>
+                Password
+
+                <div className="password">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={event => setPassword(event.target.value)}
+                    minLength={signup ? 12 : 1}
+                    required
+                    autoComplete={
+                      signup ? 'new-password' : 'current-password'
+                    }
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setShowPassword(current => !current)
+                    }
+                  >
+                    {showPassword ? 'Hide' : 'Show'}
+                  </button>
+                </div>
+              </label>
+
+              {signup && (
+                <label>
+                  Confirm password
+
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={passwordConfirmation}
+                    onChange={event =>
+                      setPasswordConfirmation(event.target.value)
+                    }
+                    minLength={12}
+                    required
+                    autoComplete="new-password"
+                  />
+                </label>
+              )}
+
+              {!signup && (
+                <div className="login-options">
+                  <label className="remember-toggle">
+                    <input
+                      type="checkbox"
+                      checked={remember}
+                      onChange={event =>
+                        setRemember(event.target.checked)
+                      }
+                    />
+
+                    <span className="toggle-switch"></span>
+
+                    <span>Remember me</span>
+                  </label>
+
+                  <button
+                    className="forgot-password"
+                    type="button"
+                    onClick={openForgotPassword}
+                  >
+                    Forgot password?
+                  </button>
+                </div>
+              )}
+
+              <button className="primary" disabled={busy}>
+                {busy
+                  ? 'Please wait...'
+                  : signup
+                    ? 'Create candidate account'
+                    : 'Sign in'}
+              </button>
+
+              <div className="auth-divider">
+                <span>or</span>
+              </div>
+
+              <a
+                className="google-btn"
+                href={`${API}/oauth2/authorization/google`}
+                onClick={() =>
+                  sessionStorage.setItem(
+                    'oauthRemember',
+                    String(remember)
+                  )
                 }
-                minLength={12}
-                required
-                autoComplete="new-password"
-              />
-            </label>
+              >
+                <GoogleLogo />
+                {signup ? 'Sign up with Google' : 'Sign in with Google'}
+              </a>
+
+              <button
+                className="auth-toggle"
+                type="button"
+                onClick={toggleSignup}
+              >
+                {signup
+                  ? 'Already registered? Sign in'
+                  : 'Candidate? Create an account'}
+              </button>
+
+              <small className="security">
+                Internal accounts are provisioned by an administrator.
+              </small>
+            </>
           )}
-
-          {!signup && (
-            <label className="remember-toggle">
-              <input
-                type="checkbox"
-                checked={remember}
-                onChange={event => setRemember(event.target.checked)}
-              />
-
-              <div className="toggle-switch"></div>
-
-              <span>Remember me</span>
-            </label>
-          )}
-
-          <button className="primary" disabled={busy}>
-            {busy
-              ? 'Please wait...'
-              : signup
-                ? 'Create candidate account'
-                : 'Sign in'}
-          </button>
-
-          <div className="auth-divider">
-            <span>or</span>
-          </div>
-
-          <a
-            className="google-btn"
-            href={`${API}/oauth2/authorization/google`}
-            onClick={() =>
-              sessionStorage.setItem(
-                'oauthRemember',
-                String(remember)
-              )
-            }
-          >
-            <GoogleLogo />
-            {signup ? 'Sign up with Google' : 'Sign in with Google'}
-          </a>
-
-          <button
-            className="auth-toggle"
-            type="button"
-            onClick={toggleSignup}
-          >
-            {signup
-              ? 'Already registered? Sign in'
-              : 'Candidate? Create an account'}
-          </button>
-
-          <small className="security">
-            Internal accounts are provisioned by an administrator.
-          </small>
         </form>
       </section>
     </main>
