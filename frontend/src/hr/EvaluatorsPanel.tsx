@@ -16,7 +16,10 @@ type Evaluator = {
 };
 
 async function request<T>(path: string, token: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${API}${path}`, { ...init, headers: { ...authHeaders(token), ...(init?.headers || {}) } });
+  const res = await fetch(`${API}${path}`, {
+    ...init,
+    headers: { ...authHeaders(token), ...(init?.headers || {}) },
+  });
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     throw new Error(body.message || body.error || `Request failed (${res.status})`);
@@ -25,37 +28,14 @@ async function request<T>(path: string, token: string, init?: RequestInit): Prom
   return res.json();
 }
 
-const primaryBtn: React.CSSProperties = {
-  background: '#128c78', 
-  color: '#fff', 
-  border: 'none', 
-  borderRadius: 8,
-  padding: '12px 24px', 
-  fontSize: 14, 
-  fontWeight: 700, 
-  cursor: 'pointer', 
-  whiteSpace: 'nowrap',
-  transition: 'all 0.2s ease',
-  boxShadow: '0 2px 4px rgba(18, 140, 120, 0.2)',
-};
-
-const secondaryBtn: React.CSSProperties = {
-  background: '#fff', 
-  color: '#17243e', 
-  border: '1px solid #dce2ea', 
-  borderRadius: 8,
-  padding: '10px 18px', 
-  fontSize: 13, 
-  fontWeight: 600, 
-  cursor: 'pointer', 
-  whiteSpace: 'nowrap',
-  transition: 'all 0.2s ease',
-};
-
-export function EvaluatorsPanel({ session, offers, loadingOffers }: { 
-  session: Session; 
-  offers: JobOffer[]; 
-  loadingOffers: boolean 
+export function EvaluatorsPanel({
+  session,
+  offers,
+  loadingOffers,
+}: {
+  session: Session;
+  offers: JobOffer[];
+  loadingOffers: boolean;
 }) {
   const [evaluators, setEvaluators] = useState<Evaluator[]>([]);
   const [selectedOffer, setSelectedOffer] = useState<JobOffer | null>(null);
@@ -64,17 +44,11 @@ export function EvaluatorsPanel({ session, offers, loadingOffers }: {
   const [loadingAssignments, setLoadingAssignments] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
-  const [notice, setNotice] = useState('');
 
   const loadEvaluators = useCallback(async () => {
     setLoadingEvaluators(true);
     try {
-      setEvaluators(
-        await request<Evaluator[]>(
-          '/api/hr/evaluators',
-          session.accessToken
-        )
-      );
+      setEvaluators(await request<Evaluator[]>('/api/hr/evaluators', session.accessToken));
     } catch {
       setError('Could not load the evaluator list.');
     } finally {
@@ -90,29 +64,33 @@ export function EvaluatorsPanel({ session, offers, loadingOffers }: {
     setSelectedOffer(offer);
     setAssigned([]);
     setError('');
-    setNotice('');
     setLoadingAssignments(true);
     try {
-      setAssigned(await request<number[]>(`/api/hr/offers/${offer.id}/evaluators`, session.accessToken));
+      setAssigned(
+        await request<number[]>(`/api/hr/offers/${offer.id}/evaluators`, session.accessToken)
+      );
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Impossible de charger les affectations de cette offre.');
+      setError(
+        err instanceof Error ? err.message : 'Could not load the assignments for this offer.'
+      );
     } finally {
       setLoadingAssignments(false);
     }
   };
 
-  const toggleEvaluator = (id: number) => 
-    setAssigned(current => current.includes(id) ? current.filter(item => item !== id) : [...current, id]);
+  const toggleEvaluator = (id: number) =>
+    setAssigned(current =>
+      current.includes(id) ? current.filter(item => item !== id) : [...current, id]
+    );
 
   const save = async () => {
     if (!selectedOffer) return;
     setSaving(true);
     setError('');
-    setNotice('');
     try {
       await request(`/api/hr/offers/${selectedOffer.id}/evaluators`, session.accessToken, {
-        method: 'PUT', 
-        body: JSON.stringify({ evaluatorIds: assigned }) 
+        method: 'PUT',
+        body: JSON.stringify({ evaluatorIds: assigned }),
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not save the assignment.');
@@ -123,220 +101,100 @@ export function EvaluatorsPanel({ session, offers, loadingOffers }: {
 
   return (
     <>
-      <header style={{ marginBottom: 32 }}>
+      <header>
         <div>
-          <small style={{ 
-            display: 'block', 
-            fontSize: 11, 
-            fontWeight: 700, 
-            color: '#718096', 
-            marginBottom: 12,
-            letterSpacing: '1px',
-            textTransform: 'uppercase',
-          }}>EVALUATORS</small>
-          <h1 style={{ 
-            fontSize: 28, 
-            fontWeight: 700, 
-            color: '#17243e', 
-            margin: '0 0 12px',
-            letterSpacing: '-0.5px',
-          }}>Evaluator assignment</h1>
-          <p style={{ 
-            fontSize: 15, 
-            color: '#718096', 
-            margin: 0,
-            lineHeight: 1.6,
-          }}>Choose an offer, then select the evaluators who should review its applications.</p>
+          <small>EVALUATORS</small>
+          <h1>Evaluator assignment</h1>
+          <p>Choose an offer, then select the evaluators who should review its applications.</p>
         </div>
       </header>
-      {error && (
-        <div className="alert" style={{
-          background: '#fef2f2',
-          border: '1px solid #fecaca',
-          color: '#dc2626',
-          padding: '16px 20px',
-          borderRadius: 8,
-          marginBottom: 24,
-          fontWeight: 500,
-        }}>{error}</div>
-      )}
-      <section className="table-card" style={{
-        background: '#fff',
-        borderRadius: 12,
-        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-        border: '1px solid #eef1f5',
-        overflow: 'hidden',
-      }}>
-        <div style={{
-          display: 'grid', 
-          gridTemplateColumns: '2fr 1.2fr 1.4fr 180px',
-          alignItems: 'center', 
-          gap: 16, 
-          padding: '18px 28px', 
-          background: '#f7f9fc',
-          borderBottom: '2px solid #eef1f5',
-          fontSize: 12, 
-          fontWeight: 700, 
-          color: '#718096',
-          textTransform: 'uppercase',
-          letterSpacing: '0.5px',
-        }}>
-          <span>Offer</span>
-          <span>Department</span>
-          <span>Assigned evaluators</span>
-          <span>Actions</span>
-        </div>
-        {loadingOffers ? (
-          <div className="loading" style={{ padding: '48px 28px', textAlign: 'center', color: '#718096' }}>
-            Loading offers…
+
+      {error && <div className="alert">{error}</div>}
+
+      <section className="hr-table-card">
+        <div className="hr-table evaluators-table">
+          <div className="tr head">
+            <span>Offer</span>
+            <span>Department</span>
+            <span>Assigned evaluators</span>
+            <span>Actions</span>
           </div>
-        ) : offers.length === 0 ? (
-          <div className="loading" style={{ padding: '48px 28px', textAlign: 'center', color: '#718096' }}>
-            No offers yet.
-          </div>
-        ) : (
-          offers.map(offer => (
-            <div 
-              key={offer.id} 
-              style={{
-                display: 'grid', 
-                gridTemplateColumns: '2fr 1.2fr 1.4fr 180px',
-                alignItems: 'center', 
-                gap: 16, 
-                padding: '22px 28px', 
-                borderBottom: '1px solid #eef1f5',
-                fontSize: 14,
-                transition: 'background 0.2s ease',
-              }}
-            >
-              <span style={{ 
-                fontWeight: 600, 
-                overflow: 'hidden', 
-                textOverflow: 'ellipsis', 
-                whiteSpace: 'nowrap',
-                color: '#17243e',
-                fontSize: 15,
-              }}>
-                {offer.title}
-              </span>
-              <span style={{ color: '#718096', fontSize: 14 }}>
-                {offer.department || '—'}
-              </span>
-              <span style={{ color: '#718096', fontSize: 14 }}>
-                {selectedOffer?.id === offer.id ? (
-                  <span style={{ 
-                    background: '#f0f9f8', 
-                    color: '#128c78', 
-                    padding: '6px 12px', 
-                    borderRadius: 6,
-                    fontWeight: 600,
-                    fontSize: 13,
-                  }}>
-                    {assigned.length} selected
+
+          {loadingOffers ? (
+            <div className="loading">Loading offers…</div>
+          ) : offers.length === 0 ? (
+            <div className="loading">No offers yet.</div>
+          ) : (
+            offers.map(offer => {
+              const isSelected = selectedOffer?.id === offer.id;
+
+              return (
+                <div className="tr" key={offer.id}>
+                  <span className="job-offer-title">
+                    <b>{offer.title}</b>
+                    <small>{offer.department || 'No department'}</small>
                   </span>
-                ) : '—'}
-              </span>
-              <span style={{ display: 'flex', justifyContent: 'flex-start' }}>
-                <button 
-                  style={{
-                    ...secondaryBtn,
-                    background: selectedOffer?.id === offer.id ? '#128c78' : '#fff',
-                    color: selectedOffer?.id === offer.id ? '#fff' : '#17243e',
-                    border: selectedOffer?.id === offer.id ? '1px solid #128c78' : '1px solid #dce2ea',
-                  }} 
-                  onClick={() => openOffer(offer)}
-                >
-                  {selectedOffer?.id === offer.id ? '✓ Managing' : 'Assign evaluators'}
-                </button>
-              </span>
-            </div>
-          ))
-        )}
+
+                  <span className="job-offer-date">{offer.department || '—'}</span>
+
+                  <span>
+                    <em className={isSelected ? 'active' : 'disabled'}>
+                      <i></i>
+                      {isSelected ? `${assigned.length} selected` : 'Not selected'}
+                    </em>
+                  </span>
+
+                  <span className="actions job-offer-actions">
+                    <button
+                      type="button"
+                      className="hr-btn-secondary"
+                      onClick={() => void openOffer(offer)}
+                    >
+                      {isSelected ? '✓ Managing' : 'Assign evaluators'}
+                    </button>
+                  </span>
+                </div>
+              );
+            })
+          )}
+        </div>
       </section>
 
       {selectedOffer && (
-        <section className="table-card" style={{ 
-          background: '#fff',
-          borderRadius: 12,
-          boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-          border: '1px solid #eef1f5',
-          padding: 28, 
-          marginTop: 24,
-        }}>
-          <h3 style={{ 
-            margin: '0 0 20px', 
-            fontSize: 18, 
-            fontWeight: 700,
-            color: '#17243e',
-          }}>
-            Evaluators for "{selectedOffer.title}"
-          </h3>
-          {loadingEvaluators ? (
-            <div className="loading" style={{ padding: '32px', textAlign: 'center', color: '#718096' }}>
-              Loading evaluators…
-            </div>
+        <section className="hr-table-card evaluators-assignment">
+          <div className="evaluators-assignment-head">
+            <small>SELECTED OFFER</small>
+            <h3>Evaluators for "{selectedOffer.title}"</h3>
+          </div>
+
+          {loadingAssignments || loadingEvaluators ? (
+            <div className="loading">Loading evaluators…</div>
           ) : evaluators.length === 0 ? (
-            <p style={{ color: '#8490a3', fontSize: 14, margin: 0 }}>No evaluators available.</p>
+            <p className="empty-hint">No evaluators available.</p>
           ) : (
-            <div style={{ 
-              display: 'grid', 
-              gap: 12, 
-              marginBottom: 24,
-              background: '#f7f9fc',
-              padding: 20,
-              borderRadius: 10,
-            }}>
+            <div className="hr-evaluator-list">
               {evaluators.map(evaluator => (
-                <label 
-                  key={evaluator.id} 
-                  className="check" 
-                  style={{ 
-                    display: 'flex', 
-                    gap: 14, 
-                    alignItems: 'center',
-                    padding: '14px 16px',
-                    background: '#fff',
-                    borderRadius: 8,
-                    border: '1px solid #eef1f5',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                  }}
-                >
-                  <input 
-                    type="checkbox" 
-                    checked={assigned.includes(evaluator.id)} 
+                <label className="check" key={evaluator.id}>
+                  <input
+                    type="checkbox"
+                    checked={assigned.includes(evaluator.id)}
                     onChange={() => toggleEvaluator(evaluator.id)}
-                    style={{
-                      width: 18,
-                      height: 18,
-                      cursor: 'pointer',
-                      accentColor: '#128c78',
-                    }}
                   />
-                  <span style={{ fontWeight: 600, color: '#17243e', fontSize: 14 }}>
+                  <b>
                     {evaluator.firstName} {evaluator.lastName}
-                  </span>
-                  <small style={{ color: '#8490a3', fontSize: 13 }}>
-                    ({evaluator.email})
-                  </small>
+                  </b>
+                  <small>({evaluator.email})</small>
                 </label>
               ))}
             </div>
           )}
-          <div className="modal-actions" style={{ 
-            display: 'flex', 
-            justifyContent: 'flex-end',
-            paddingTop: 8,
-          }}>
-            <button 
-              style={{
-                ...primaryBtn,
-                background: saving ? '#9ca3af' : '#128c78',
-                cursor: saving ? 'not-allowed' : 'pointer',
-                boxShadow: saving ? 'none' : '0 2px 4px rgba(18, 140, 120, 0.2)',
-              }} 
-              disabled={saving} 
-              onClick={save}
+
+          <div className="modal-actions">
+            <button
+              type="button"
+              className="hr-btn-primary"
+              disabled={saving}
+              onClick={() => void save()}
             >
               {saving ? 'Saving…' : 'Save assignment'}
             </button>

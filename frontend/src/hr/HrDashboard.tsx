@@ -223,42 +223,11 @@ function HomeView({
 
   return (
     <>
-      <header style={{ marginBottom: 40 }}>
+      <header>
         <div>
-          <small
-            style={{
-              display: 'block',
-              fontSize: 11,
-              fontWeight: 700,
-              color: '#718096',
-              marginBottom: 12,
-              letterSpacing: '1px',
-              textTransform: 'uppercase',
-            }}
-          >
-            DASHBOARD
-          </small>
-          <h1
-            style={{
-              fontSize: 32,
-              fontWeight: 700,
-              color: '#17243e',
-              margin: '0 0 12px',
-              letterSpacing: '-0.5px',
-            }}
-          >
-            Welcome back, {session.firstName}
-          </h1>
-          <p
-            style={{
-              fontSize: 16,
-              color: '#718096',
-              margin: 0,
-              lineHeight: 1.6,
-            }}
-          >
-            Manage job offers, application forms and evaluator assignments.
-          </p>
+          <small>DASHBOARD</small>
+          <h1>Welcome back, {session.firstName}</h1>
+          <p>Manage job offers, application forms and evaluator assignments.</p>
         </div>
       </header>
 

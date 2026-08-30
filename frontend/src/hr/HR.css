@@ -974,3 +974,24 @@ aside {
 .forms-table .actions button {
   white-space: nowrap;
 }
+
+.job-offers-table .tr {
+  display: grid;
+  grid-template-columns: 1.6fr 0.9fr 0.9fr 0.9fr 2fr 1.4fr;
+  align-items: center;
+  gap: 16px;
+}
+.job-offers-table .tr.head {
+  grid-template-columns: 1.6fr 0.9fr 0.9fr 0.9fr 2fr 1.4fr;
+}
+.job-offer-actions {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+  white-space: nowrap;
+}
+.job-offer-link {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
