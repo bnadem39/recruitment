@@ -1,226 +1,342 @@
-import { useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { API, authHeaders } from '../shared/api';
 import type { Session } from '../shared/types';
 
-export type FormListItem = { id: number; title: string; description?: string; active: boolean; updatedAt: string };
+export type FormListItem = {
+  id: number;
+  title: string;
+  description?: string;
+  active: boolean;
+  updatedAt: string;
+};
 
 async function request<T>(path: string, token: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${API}${path}`, { ...init, headers: { ...authHeaders(token), ...(init?.headers || {}) } });
+  const res = await fetch(`${API}${path}`, {
+    ...init,
+    headers: { ...authHeaders(token), ...(init?.headers || {}) },
+  });
+
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     throw new Error(body.message || body.error || `Request failed (${res.status})`);
   }
+
   if (res.status === 204) return undefined as T;
   return res.json();
 }
 
-const primaryBtn: React.CSSProperties = { 
-  background: '#128c78', 
-  color: '#fff', 
-  border: 'none', 
-  borderRadius: 8, 
-  padding: '14px 28px', 
-  fontWeight: 700, 
-  cursor: 'pointer',
-  fontSize: 14,
-  transition: 'all 0.2s ease',
-  boxShadow: '0 2px 4px rgba(18, 140, 120, 0.2)',
-};
-
-const secondaryBtn: React.CSSProperties = { 
-  background: '#fff', 
-  color: '#17243e', 
-  border: '1px solid #dce2ea', 
-  borderRadius: 8, 
-  padding: '10px 18px', 
-  fontWeight: 600, 
-  cursor: 'pointer',
-  fontSize: 13,
-  transition: 'all 0.2s ease',
-};
-
-const dangerBtn: React.CSSProperties = { 
-  background: '#fff', 
-  color: '#a8323e', 
-  border: '1px solid #f0c4c8', 
-  borderRadius: 8, 
-  padding: '10px 18px', 
-  fontSize: 13, 
-  fontWeight: 600, 
-  cursor: 'pointer',
-  transition: 'all 0.2s ease',
-};
-
-export function FormsPanel({ forms, loading, session, reload, setError, openBuilder }: {
-  forms: FormListItem[]; loading: boolean; session: Session; reload: () => void; setError: (msg: string) => void; openBuilder: () => void;
+export function FormsPanel({
+  forms,
+  loading,
+  session,
+  reload,
+  setError,
+  openBuilder,
+}: {
+  forms: FormListItem[];
+  loading: boolean;
+  session: Session;
+  reload: () => void;
+  setError: (msg: string) => void;
+  openBuilder: (formId?: number) => void;
 }) {
   const [tab, setTab] = useState<'active' | 'archived'>('active');
-  const visible = forms.filter(f => tab === 'active' ? f.active : !f.active);
+  const [createModal, setCreateModal] = useState(false);
+  const [editingForm, setEditingForm] = useState<FormListItem | null>(null);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [archivingId, setArchivingId] = useState<number | null>(null);
+
+  const visible = forms.filter((f) => (tab === 'active' ? f.active : !f.active));
 
   const archive = async (form: FormListItem) => {
+    setArchivingId(form.id);
+    setError('');
     try {
-      await request(`/api/forms/${form.id}`, session.accessToken, { 
-        method: 'PUT', 
-        body: JSON.stringify({ title: form.title, description: form.description, active: !form.active }) 
+      await request(`/api/forms/${form.id}`, session.accessToken, {
+        method: 'PUT',
+        body: JSON.stringify({
+          title: form.title,
+          description: form.description,
+          active: !form.active,
+        }),
       });
       reload();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not update form status.');
+    } finally {
+      setArchivingId(null);
     }
   };
 
   const remove = async (form: FormListItem) => {
-    if (!confirm(`Delete the form "${form.title}"? This cannot be undone.`)) return;
+    if (!confirm(`Delete the form "${form.title}"?\n\nThis action cannot be undone.`)) return;
+
+    setDeletingId(form.id);
+    setError('');
     try {
       await request(`/api/forms/${form.id}`, session.accessToken, { method: 'DELETE' });
       reload();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not delete form.');
+    } finally {
+      setDeletingId(null);
     }
   };
 
   return (
     <>
-      <header style={{ marginBottom: 32 }}>
+      <header>
         <div>
-          <small style={{ 
-            display: 'block', 
-            fontSize: 11, 
-            fontWeight: 700, 
-            color: '#718096', 
-            marginBottom: 12,
-            letterSpacing: '1px',
-            textTransform: 'uppercase',
-          }}>FORMS</small>
-          <h1 style={{ 
-            fontSize: 28, 
-            fontWeight: 700, 
-            color: '#17243e', 
-            margin: '0 0 12px',
-            letterSpacing: '-0.5px',
-          }}>Application forms</h1>
-          <p style={{ 
-            fontSize: 15, 
-            color: '#718096', 
-            margin: 0,
-            lineHeight: 1.6,
-          }}>Build and manage the forms candidates fill in when applying.</p>
+          <small>FORMS</small>
+          <h1>Application forms</h1>
+          <p>Build and manage the forms candidates fill in when applying.</p>
         </div>
-        <button style={primaryBtn} onClick={openBuilder}>+ New form</button>
-      </header>
-      <div className="candidate-tabs" style={{
-        display: 'inline-flex',
-        gap: 0,
-        marginBottom: 24,
-        background: '#eef1f5',
-        padding: 6,
-        borderRadius: 10,
-      }}>
-        <button 
-          className={tab === 'active' ? 'active' : ''} 
-          onClick={() => setTab('active')}
-          style={{
-            padding: '12px 28px',
-            background: tab === 'active' ? '#128c78' : 'transparent',
-            border: 'none',
-            borderRadius: 8,
-            fontSize: 14,
-            fontWeight: tab === 'active' ? 700 : 600,
-            color: tab === 'active' ? '#fff' : '#718096',
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          <span style={{ marginRight: 6 }}>●</span>Active
+        <button type="button" className="hr-btn-primary" onClick={() => setCreateModal(true)}>
+          + New form
         </button>
-        <button 
-          className={tab === 'archived' ? 'active' : ''} 
-          onClick={() => setTab('archived')}
-          style={{
-            padding: '12px 28px',
-            background: tab === 'archived' ? '#128c78' : 'transparent',
-            border: 'none',
-            borderRadius: 8,
-            fontSize: 14,
-            fontWeight: tab === 'archived' ? 700 : 600,
-            color: tab === 'archived' ? '#fff' : '#718096',
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-            whiteSpace: 'nowrap',
-          }}
+      </header>
+
+      <div className="hr-tabs" style={{ marginBottom: 20 }}>
+        <button
+          type="button"
+          className={tab === 'active' ? 'active' : ''}
+          onClick={() => setTab('active')}
         >
-          <span style={{ marginRight: 6 }}>🗄</span>Archived
+          Active
+        </button>
+        <button
+          type="button"
+          className={tab === 'archived' ? 'active' : ''}
+          onClick={() => setTab('archived')}
+        >
+          Archived
         </button>
       </div>
-      <section className="table-card" style={{
-        background: '#fff',
-        borderRadius: 12,
-        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-        border: '1px solid #eef1f5',
-        overflow: 'hidden',
-      }}>
-        <div className="table" style={{ width: '100%' }}>
-          <div className="tr head" style={{
-            display: 'grid',
-            gridTemplateColumns: '2fr 2.5fr 1fr 1.5fr',
-            alignItems: 'center',
-            gap: 16,
-            padding: '18px 28px',
-            background: '#f7f9fc',
-            borderBottom: '2px solid #eef1f5',
-            fontSize: 12,
-            fontWeight: 700,
-            color: '#718096',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-          }}>
+
+      <section className="hr-table-card">
+        <div className="hr-table forms-table">
+          <div className="tr head">
             <span>Title</span>
             <span>Description</span>
             <span>Updated</span>
             <span>Actions</span>
           </div>
+
           {loading ? (
-            <div className="loading" style={{ padding: '48px 28px', textAlign: 'center', color: '#718096' }}>
-              Loading forms…
-            </div>
+            <div className="loading">Loading forms…</div>
           ) : visible.length === 0 ? (
-            <div className="loading" style={{ padding: '48px 28px', textAlign: 'center', color: '#718096' }}>
+            <div className="loading">
               {tab === 'active' ? 'No active forms yet.' : 'No archived forms.'}
             </div>
           ) : (
-            visible.map(form => (
-              <div className="tr" key={form.id} style={{
-                display: 'grid',
-                gridTemplateColumns: '2fr 2.5fr 1fr 1.5fr',
-                alignItems: 'center',
-                gap: 16,
-                padding: '22px 28px',
-                borderBottom: '1px solid #eef1f5',
-                fontSize: 14,
-                transition: 'background 0.2s ease',
-              }}>
-                <span>
-                  <b style={{ fontSize: 15, color: '#17243e', fontWeight: 600 }}>{form.title}</b>
+            visible.map((form) => (
+              <div className="tr" key={form.id}>
+                <span className="job-offer-title">
+                  <b>{form.title}</b>
+                  <small>{form.active ? 'Active' : 'Archived'}</small>
                 </span>
-                <span style={{ color: '#718096', fontSize: 14 }}>
-                  {form.description || '—'}
-                </span>
-                <span style={{ color: '#718096', fontSize: 14 }}>
+
+                <span>{form.description || '—'}</span>
+
+                <span className="job-offer-date">
                   {new Date(form.updatedAt).toLocaleDateString('fr-FR')}
                 </span>
-                <span className="actions" style={{ display: 'flex', gap: 10 }}>
-                  <button style={secondaryBtn} onClick={openBuilder}>Edit</button>
-                  <button style={secondaryBtn} onClick={() => archive(form)}>
-                    {tab === 'active' ? 'Archive' : 'Restore'}
+
+                <span className="actions job-offer-actions">
+                  {/* Edit = title + description */}
+                  <button
+                    type="button"
+                    className="hr-btn-secondary"
+                    onClick={() => setEditingForm(form)}
+                  >
+                    Edit
                   </button>
-                  <button style={dangerBtn} onClick={() => remove(form)}>Delete</button>
+
+                  {/* Design = drag & drop builder */}
+                  <button
+                    type="button"
+                    className="hr-btn-secondary"
+                    onClick={() => openBuilder(form.id)}
+                  >
+                    Design
+                  </button>
+
+                  <button
+                    type="button"
+                    className="hr-btn-secondary"
+                    disabled={archivingId === form.id}
+                    onClick={() => void archive(form)}
+                  >
+                    {archivingId === form.id
+                      ? '…'
+                      : tab === 'active'
+                        ? 'Archive'
+                        : 'Restore'}
+                  </button>
+
+                  <button
+                    type="button"
+                    className="hr-btn-danger"
+                    disabled={deletingId === form.id}
+                    onClick={() => void remove(form)}
+                  >
+                    {deletingId === form.id ? 'Deleting…' : 'Delete'}
+                  </button>
                 </span>
               </div>
             ))
           )}
         </div>
       </section>
+
+      {createModal && (
+        <FormMetaModal
+          session={session}
+          form={null}
+          close={() => setCreateModal(false)}
+          done={(id) => {
+            setCreateModal(false);
+            reload();
+            if (id != null) openBuilder(id);
+          }}
+          setError={setError}
+        />
+      )}
+
+      {editingForm && (
+        <FormMetaModal
+          session={session}
+          form={editingForm}
+          close={() => setEditingForm(null)}
+          done={() => {
+            setEditingForm(null);
+            reload();
+          }}
+          setError={setError}
+        />
+      )}
     </>
+  );
+}
+
+/** Modal create / edit title + description */
+function FormMetaModal({
+  session,
+  form,
+  close,
+  done,
+  setError,
+}: {
+  session: Session;
+  form: FormListItem | null;
+  close: () => void;
+  done: (formId?: number) => void;
+  setError: (msg: string) => void;
+}) {
+  const isEditing = form !== null;
+  const [title, setTitle] = useState(form?.title ?? '');
+  const [description, setDescription] = useState(form?.description ?? '');
+  const [busy, setBusy] = useState(false);
+  const [localError, setLocalError] = useState('');
+
+  const submit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!title.trim()) {
+      setLocalError('The form title is required.');
+      return;
+    }
+
+    setBusy(true);
+    setLocalError('');
+
+    try {
+      if (isEditing && form) {
+        await request(`/api/forms/${form.id}`, session.accessToken, {
+          method: 'PUT',
+          body: JSON.stringify({
+            title: title.trim(),
+            description: description.trim() || undefined,
+            active: form.active,
+          }),
+        });
+        done();
+      } else {
+        const created = await request<{ id: number }>('/api/forms', session.accessToken, {
+          method: 'POST',
+          body: JSON.stringify({
+            title: title.trim(),
+            description: description.trim() || undefined,
+            active: false,
+          }),
+        });
+        done(created.id);
+      }
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : isEditing
+            ? 'Could not update the form.'
+            : 'Could not create the form.';
+      setLocalError(message);
+      setError(message);
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div
+      className="overlay"
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget && !busy) close();
+      }}
+    >
+      <form className="modal" onSubmit={submit}>
+        <button type="button" className="close" onClick={close} disabled={busy}>
+          ×
+        </button>
+
+        <small>{isEditing ? 'EDIT FORM' : 'NEW FORM'}</small>
+        <h2>{isEditing ? 'Edit form' : 'Create a form'}</h2>
+
+        {localError && <div className="alert">{localError}</div>}
+
+        <label>
+          Title
+          <input
+            required
+            autoFocus
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="e.g. Financial Officer Application"
+          />
+        </label>
+
+        <label>
+          Description <small>(optional)</small>
+          <textarea
+            rows={3}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Short description of this form"
+          />
+        </label>
+
+        <div className="modal-actions">
+          <button type="button" disabled={busy} onClick={close}>
+            Cancel
+          </button>
+          <button className="primary" disabled={busy}>
+            {busy
+              ? isEditing
+                ? 'Saving…'
+                : 'Creating…'
+              : isEditing
+                ? 'Save changes'
+                : 'Create and open builder'}
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }

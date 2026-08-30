@@ -11,18 +11,21 @@
   background: #f7f9fc;
 }
 
-.hr-shell > aside {
-  position: fixed;
+:root {
+  --role-color: #128c78;
+}
+
+aside {
+  position: sticky;
   top: 0;
-  bottom: 0;
-  width: 260px;
-  overflow-y: auto;
-  background: #fff;
-  border-right: 1px solid #eef1f5;
-  padding: 24px 0;
+  align-self: start;
+  height: 100vh;
+  overflow: hidden;
+  background: #0d2038;
+  color: #d9e2eb;
+  padding: 30px 18px;
   display: flex;
   flex-direction: column;
-  z-index: 10;
 }
 
 .hr-shell .side-logo {
@@ -515,7 +518,6 @@
     minmax(180px, 1.4fr)
     minmax(115px, 0.8fr)
     minmax(105px, 0.7fr)
-    minmax(105px, 0.7fr)
     minmax(210px, 1.5fr)
     minmax(230px, auto);
 }
@@ -917,4 +919,58 @@
   .hr-quick-access {
     padding: 20px;
   }
+
+}
+
+.hr-quick-card {
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.hr-quick-card:hover {
+  background: #effaf7 !important;
+  border-color: #92cdbf !important;
+  transform: translateY(-2px);
+}
+
+.hr-quick-card:hover div {
+  color: #128c78 !important;
+}
+
+.hr-quick-card:hover small {
+  color: #0f7665 !important;
+}
+
+/* ========== FORMS TABLE – aligné sur Job Offers ========== */
+.forms-table .tr {
+  display: grid !important;
+  grid-template-columns:
+    minmax(200px, 1.5fr)
+    minmax(180px, 1.3fr)
+    minmax(110px, 0.5fr)
+    minmax(260px, auto) !important;
+  gap: 16px;
+  align-items: center;
+  min-width: 760px;
+  padding: 18px 24px;
+}
+
+.forms-table .tr.head {
+  color: #718096;
+  background: #f7f9fc;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.forms-table .actions {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center;
+  gap: 8px;
+}
+
+.forms-table .actions button {
+  white-space: nowrap;
 }

@@ -6,6 +6,11 @@
 }
 
 aside {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
+  overflow: hidden;
   background: #0d2038;
   color: #d9e2eb;
   padding: 30px 18px;

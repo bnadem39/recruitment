@@ -5,6 +5,8 @@ import org.example.recrutment.dto.formulairesAdaptatifs.FormFieldResponseDTO;
 import org.example.recrutment.entities.formulairesAdaptatifs.Form;
 import org.example.recrutment.entities.formulairesAdaptatifs.FormField;
 import org.example.recrutment.exceptions.ResourceNotFoundException;
+import org.example.recrutment.repositories.formulairesAdaptatifs.FieldConditionRepository;
+import org.example.recrutment.repositories.formulairesAdaptatifs.FieldOptionRepository;
 import org.example.recrutment.repositories.formulairesAdaptatifs.FormFieldRepository;
 import org.example.recrutment.repositories.formulairesAdaptatifs.FormRepository;
 import org.springframework.stereotype.Service;
@@ -12,22 +14,24 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-/**
- * Implémentation de FormFieldService.
- * Chaque opération vérifie d'abord que le formulaire parent (formId) existe,
- * puis que le champ demandé (fieldId) lui appartient bien avant d'agir dessus
- * -- ça évite qu'un champ du formulaire A soit modifié/supprimé via l'URL du
- * formulaire B par erreur ou par une requête malveillante.
- */
 @Service
 public class FormFieldServiceImpl implements FormFieldService {
 
     private final FormFieldRepository formFieldRepository;
     private final FormRepository formRepository;
+    private final FieldConditionRepository fieldConditionRepository;
+    private final FieldOptionRepository fieldOptionRepository;
 
-    public FormFieldServiceImpl(FormFieldRepository formFieldRepository, FormRepository formRepository) {
+    public FormFieldServiceImpl(
+            FormFieldRepository formFieldRepository,
+            FormRepository formRepository,
+            FieldConditionRepository fieldConditionRepository,
+            FieldOptionRepository fieldOptionRepository
+    ) {
         this.formFieldRepository = formFieldRepository;
         this.formRepository = formRepository;
+        this.fieldConditionRepository = fieldConditionRepository;
+        this.fieldOptionRepository = fieldOptionRepository;
     }
 
     // ==================== Create ====================
@@ -60,13 +64,12 @@ public class FormFieldServiceImpl implements FormFieldService {
 
     @Override
     public FormFieldResponseDTO getById(Long formId, Long fieldId) {
-        FormField field = findFieldOrThrow(formId, fieldId);
-        return toResponseDTO(field);
+        return toResponseDTO(findFieldOrThrow(formId, fieldId));
     }
 
     @Override
     public List<FormFieldResponseDTO> getAllByForm(Long formId) {
-        findFormOrThrow(formId); // vérifie que le formulaire existe avant de lister ses champs
+        findFormOrThrow(formId);
         return formFieldRepository.findByForm_FormIdOrderByDisplayOrderAsc(formId)
                 .stream()
                 .map(this::toResponseDTO)
@@ -96,8 +99,7 @@ public class FormFieldServiceImpl implements FormFieldService {
         field.setMinimumLength(request.getMinimumLength());
         field.setMaximumLength(request.getMaximumLength());
 
-        FormField updated = formFieldRepository.save(field);
-        return toResponseDTO(updated);
+        return toResponseDTO(formFieldRepository.save(field));
     }
 
     // ==================== Delete ====================
@@ -106,14 +108,23 @@ public class FormFieldServiceImpl implements FormFieldService {
     @Transactional
     public void delete(Long formId, Long fieldId) {
         FormField field = findFieldOrThrow(formId, fieldId);
+
+        // 1. Conditions
+        fieldConditionRepository.deleteAllByFieldId(fieldId);
+
+        // 2. Options
+        fieldOptionRepository.deleteAllByFieldId(fieldId);
+
+        // 3. Champ
         formFieldRepository.delete(field);
     }
 
-    // ==================== Méthodes utilitaires privées ====================
+    // ==================== Utils ====================
 
     private Form findFormOrThrow(Long formId) {
         return formRepository.findById(formId)
-                .orElseThrow(() -> new ResourceNotFoundException("Formulaire introuvable avec l'id : " + formId));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Formulaire introuvable avec l'id : " + formId));
     }
 
     private FormField findFieldOrThrow(Long formId, Long fieldId) {
