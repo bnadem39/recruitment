@@ -18,5 +18,9 @@ public interface JobOfferService {
 
     JobOfferResponseDTO update(Long id, JobOfferRequestDTO request);
 
+    JobOfferResponseDTO publish(Long id);
+
+    JobOfferResponseDTO hide(Long id);
+
     void delete(Long id);
 }

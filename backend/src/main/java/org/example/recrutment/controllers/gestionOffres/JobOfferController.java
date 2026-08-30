@@ -10,6 +10,7 @@ import org.example.recrutment.services.gestionOffres.JobOfferService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -19,6 +20,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/offers")
+@PreAuthorize("hasAnyRole('ADMIN', 'HR')")
 @Tag(name = "Offres", description = "Gestion des offres d'emploi et de stage")
 public class JobOfferController {
 
@@ -57,6 +59,18 @@ public class JobOfferController {
     @Operation(summary = "Modifier une offre existante")
     public ResponseEntity<JobOfferResponseDTO> update(@PathVariable Long id, @Valid @RequestBody JobOfferRequestDTO request) {
         return ResponseEntity.ok(jobOfferService.update(id, request));
+    }
+
+    @PostMapping("/{id}/publish")
+    @Operation(summary = "Rendre une offre visible aux candidats")
+    public ResponseEntity<JobOfferResponseDTO> publish(@PathVariable Long id) {
+        return ResponseEntity.ok(jobOfferService.publish(id));
+    }
+
+    @PostMapping("/{id}/hide")
+    @Operation(summary = "Masquer une offre des candidats")
+    public ResponseEntity<JobOfferResponseDTO> hide(@PathVariable Long id) {
+        return ResponseEntity.ok(jobOfferService.hide(id));
     }
 
     @DeleteMapping("/{id}")

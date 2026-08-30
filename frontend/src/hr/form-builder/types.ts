@@ -81,6 +81,7 @@ export type JobOffer = {
   deadline?: string;
 
   status?: 'DRAFT' | 'PUBLISHED' | 'CLOSED' | 'ARCHIVED' | string;
+  openForApplications?: boolean;
 
   formId?: number | null;
 

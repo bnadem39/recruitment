@@ -6,7 +6,7 @@ import './Evaluator.css';
 import { ROLE_THEME } from '../shared/roleTheme';
 
 type Recommendation = 'FAVORABLE' | 'RESERVED' | 'UNFAVORABLE';
-type EvaluatorView = 'calendar' | 'evaluations' | 'comments' | 'recommendations';
+type EvaluatorView = 'calendar' | 'applications' | 'evaluations' | 'comments' | 'recommendations';
 type Filter = 'all' | 'todo' | 'done' | 'upcoming';
 type EvaluatorInterview = InterviewSummary & {
   applicationId?: number;
@@ -28,6 +28,7 @@ type Evaluation = {
   createdAt?: string;
 };
 type JoinAction = { disabled: boolean; label: string; detail: string };
+type CandidateApplication = { id: number; status: string; submittedAt?: string; jobOfferTitle: string; candidateName: string; candidateEmail: string; answers: { label: string; textValue?: string; numberValue?: number; dateValue?: string; booleanValue?: boolean }[] };
 
 const emptyEvaluation: Evaluation = {
   technicalScore: '',
@@ -180,6 +181,7 @@ function joinAction(interview: EvaluatorInterview): JoinAction {
 export function EvaluatorDashboard({ session, logout }: { session: Session; logout: () => void }) {
   const [view, setView] = useState<EvaluatorView>('calendar');
   const [interviews, setInterviews] = useState<EvaluatorInterview[]>([]);
+  const [applications, setApplications] = useState<CandidateApplication[]>([]);
   const [evaluations, setEvaluations] = useState<Record<number, Evaluation>>({});
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [detailsId, setDetailsId] = useState<number | null>(null);
@@ -246,6 +248,10 @@ export function EvaluatorDashboard({ session, logout }: { session: Session; logo
         if (active) setLoading(false);
       });
 
+    request<CandidateApplication[]>('/api/evaluator/applications', session.accessToken)
+      .then(items => { if (active) setApplications(items); })
+      .catch(caught => { if (active) setError(caught instanceof Error ? caught.message : 'Could not load assigned applications.'); });
+
     return () => {
       active = false;
     };
@@ -311,6 +317,19 @@ export function EvaluatorDashboard({ session, logout }: { session: Session; logo
     setRoom(interview);
   }
 
+  async function decideApplication(id: number, accepted: boolean): Promise<void> {
+    setError('');
+    try {
+      const updated = await request<CandidateApplication>(`/api/evaluator/applications/${id}/decision`, session.accessToken, {
+        method: 'POST', body: JSON.stringify({ accepted }),
+      });
+      setApplications(current => current.map(item => item.id === id ? updated : item));
+      setNotice(accepted ? 'Candidate accepted and ready for interview scheduling.' : 'Candidate rejected.');
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'Could not save the decision.');
+    }
+  }
+
   async function saveEvaluation(): Promise<void> {
     if (!selected) return;
 
@@ -367,6 +386,7 @@ export function EvaluatorDashboard({ session, logout }: { session: Session; logo
         <nav>
           <b>EVALUATOR</b>
           <NavButton active={view === 'calendar'} onClick={() => setView('calendar')} icon="▦">Interviews</NavButton>
+          <NavButton active={view === 'applications'} onClick={() => setView('applications')} icon="☷">Applications</NavButton>
           <NavButton active={view === 'evaluations'} onClick={() => { setView('evaluations'); setFilter('todo'); }} icon="✓">Evaluations</NavButton>
           <NavButton active={view === 'comments'} onClick={() => setView('comments')} icon="◫">Comments</NavButton>
           <NavButton active={view === 'recommendations'} onClick={() => setView('recommendations')} icon="◇">Recommendations</NavButton>
@@ -418,6 +438,8 @@ export function EvaluatorDashboard({ session, logout }: { session: Session; logo
             onOpen={openInterviewDetails}
           />
         )}
+
+        {view === 'applications' && <ApplicationsReview applications={applications} decide={decideApplication} />}
 
         {view === 'evaluations' && (
           <EvaluationWorkspace
@@ -485,8 +507,23 @@ function Metric({ label, value, detail, tone }: {
   );
 }
 
+function ApplicationsReview({ applications, decide }: { applications: CandidateApplication[]; decide: (id: number, accepted: boolean) => Promise<void> }) {
+  return <section className="evaluation-history">
+    {applications.map(application => <article key={application.id}>
+      <header><div><small>{application.jobOfferTitle}</small><h2>{application.candidateName}</h2><p>{application.candidateEmail} · {nice(application.status)}</p></div></header>
+      <div className="history-comments">{application.answers.map(answer => <div key={answer.label}><b>{answer.label}</b><p>{String(answer.textValue ?? answer.numberValue ?? answer.dateValue ?? answer.booleanValue ?? '-')}</p></div>)}</div>
+      <div className="modal-actions">
+        <button type="button" disabled={application.status === 'REJECTED'} onClick={() => void decide(application.id, false)}>Reject</button>
+        <button type="button" className="primary" disabled={application.status === 'ACCEPTED'} onClick={() => void decide(application.id, true)}>Accept</button>
+      </div>
+    </article>)}
+    {!applications.length && <div className="candidate-empty"><strong>No assigned applications</strong><span>Candidate submissions for your assigned offers appear here.</span></div>}
+  </section>;
+}
+
 function viewTitle(view: EvaluatorView): string {
   if (view === 'calendar') return 'Interview calendar';
+  if (view === 'applications') return 'Candidate applications';
   if (view === 'comments') return 'Evaluation comments';
   if (view === 'recommendations') return 'Submitted recommendations';
   return 'Candidate evaluation';
@@ -494,6 +531,7 @@ function viewTitle(view: EvaluatorView): string {
 
 function viewDescription(view: EvaluatorView): string {
   if (view === 'calendar') return 'View all your scheduled interviews and open an evaluation directly from the calendar.';
+  if (view === 'applications') return 'Review answers submitted for job offers assigned to you.';
   if (view === 'comments') return 'Find the internal HR comment and the feedback shared with each candidate.';
   if (view === 'recommendations') return 'View the final scores and recommendations you have already submitted.';
   return 'Assign scores, justify your decision for HR, and prepare candidate feedback.';

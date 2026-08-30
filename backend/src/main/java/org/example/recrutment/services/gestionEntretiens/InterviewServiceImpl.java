@@ -3,6 +3,7 @@ package org.example.recrutment.services.gestionEntretiens;
 import org.example.recrutment.dto.gestionEntretiens.InterviewRequestDTO;
 import org.example.recrutment.dto.gestionEntretiens.InterviewResponseDTO;
 import org.example.recrutment.entities.candidatures.Application;
+import org.example.recrutment.entities.candidatures.ApplicationStatus;
 import org.example.recrutment.entities.gestionEntretiens.Interview;
 import org.example.recrutment.entities.gestionEntretiens.InterviewStatus;
 import org.example.recrutment.exceptions.ResourceNotFoundException;
@@ -45,6 +46,9 @@ public class InterviewServiceImpl implements InterviewService {
     @Transactional
     public InterviewResponseDTO create(InterviewRequestDTO request) {
         Application application = findApplicationOrThrow(request.getApplicationId());
+        if (application.getStatus() != ApplicationStatus.ACCEPTED) {
+            throw new IllegalArgumentException("Only accepted applications can be scheduled for an interview");
+        }
         Users evaluator = findEvaluator(request.getAssignedEvaluatorId());
         InterviewMode mode = request.getMode() != null ? request.getMode() : InterviewMode.ONSITE;
 
@@ -66,6 +70,11 @@ public class InterviewServiceImpl implements InterviewService {
         notificationService.notify(application.getCandidate(), "Interview scheduled",
                 "An interview has been scheduled for your application to " + application.getJobOffer().getTitle() + ".",
                 "INTERVIEW_SCHEDULED", "/interviews/" + saved.getId());
+        if (evaluator != null) {
+            notificationService.notify(evaluator, "Interview scheduled",
+                    "You have been assigned an interview for " + application.getJobOffer().getTitle() + ".",
+                    "INTERVIEW_SCHEDULED", "/interviews/" + saved.getId());
+        }
         return toResponseDTO(saved);
     }
 
@@ -126,6 +135,11 @@ public class InterviewServiceImpl implements InterviewService {
             notificationService.notify(application.getCandidate(), "Interview updated",
                     "Your interview for " + application.getJobOffer().getTitle() + " has been updated.",
                     "INTERVIEW_UPDATED", "/interviews/" + updated.getId());
+            if (updated.getAssignedEvaluator() != null) {
+                notificationService.notify(updated.getAssignedEvaluator(), "Interview updated",
+                        "Your interview for " + application.getJobOffer().getTitle() + " has been updated.",
+                        "INTERVIEW_UPDATED", "/interviews/" + updated.getId());
+            }
         }
         return toResponseDTO(updated);
     }

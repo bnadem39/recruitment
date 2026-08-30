@@ -66,14 +66,25 @@ export function EvaluatorsPanel({ session, offers, loadingOffers }: {
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
 
-  useEffect(() => {
-    request<Evaluator[]>('/api/admin/users?role=EVALUATOR', session.accessToken)
-      .then(setEvaluators)
-      .catch(() => setError('Could not load the evaluator list.'))
-      .finally(() => setLoading(false));
+  const loadEvaluators = useCallback(async () => {
+    setLoadingEvaluators(true);
+    try {
+      setEvaluators(
+        await request<Evaluator[]>(
+          '/api/hr/evaluators',
+          session.accessToken
+        )
+      );
+    } catch {
+      setError('Could not load the evaluator list.');
+    } finally {
+      setLoadingEvaluators(false);
+    }
   }, [session.accessToken]);
 
-  useEffect(() => { void loadEvaluators(true); }, [loadEvaluators]);
+  useEffect(() => {
+    void loadEvaluators();
+  }, [loadEvaluators]);
 
   const openOffer = async (offer: JobOffer) => {
     setSelectedOffer(offer);
@@ -99,7 +110,7 @@ export function EvaluatorsPanel({ session, offers, loadingOffers }: {
     setError('');
     setNotice('');
     try {
-      await request(`/api/offers/${selectedOffer.id}/evaluators`, session.accessToken, { 
+      await request(`/api/hr/offers/${selectedOffer.id}/evaluators`, session.accessToken, {
         method: 'PUT', 
         body: JSON.stringify({ evaluatorIds: assigned }) 
       });
@@ -260,7 +271,7 @@ export function EvaluatorsPanel({ session, offers, loadingOffers }: {
           }}>
             Evaluators for "{selectedOffer.title}"
           </h3>
-          {loading ? (
+          {loadingEvaluators ? (
             <div className="loading" style={{ padding: '32px', textAlign: 'center', color: '#718096' }}>
               Loading evaluators…
             </div>

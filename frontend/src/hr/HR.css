@@ -515,6 +515,7 @@
     minmax(180px, 1.4fr)
     minmax(115px, 0.8fr)
     minmax(105px, 0.7fr)
+    minmax(105px, 0.7fr)
     minmax(210px, 1.5fr)
     minmax(230px, auto);
 }
