@@ -24,3 +24,86 @@
 .evaluator-actions{padding-top:18px}.evaluator-empty{padding:28px;text-align:center;color:#8490a3}
 .evaluator-notice{padding:12px 14px;border:1px solid #a9dccf;border-radius:9px;color:#146c5d;background:#edfaf6;margin:14px 0}
 @media(max-width:850px){.evaluator-directory-row{grid-template-columns:1fr auto}.evaluator-directory-row .evaluator-availability{grid-column:1/-1}.evaluator-row{grid-template-columns:auto 1fr auto}.evaluator-row .evaluator-availability{grid-column:2/-1}.evaluator-assignment-head{align-items:flex-start}.evaluator-offers-table .tr{min-width:760px}}
+
+.evaluators-table .tr {
+  grid-template-columns: 2fr 1.2fr 1.4fr 220px;
+}
+
+.evaluators-table em {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  width: max-content;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.evaluators-table em i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.evaluators-table em.active {
+  background: #e7f8f3;
+  color: #128c78;
+}
+
+.evaluators-table em.disabled {
+  background: #f1f4f7;
+  color: #7c8999;
+}
+
+.evaluators-assignment {
+  margin-top: 24px;
+}
+
+.evaluators-assignment {
+  margin-top: 24px;
+  padding: 28px;
+}
+
+.evaluators-assignment-head {
+  margin-bottom: 22px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #eef1f5;
+}
+
+.evaluators-assignment-head small {
+  display: block;
+  margin-bottom: 8px;
+  color: #128c78;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.evaluators-assignment-head h3 {
+  margin: 0;
+  color: #17243e;
+  font-family: Manrope, sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+}
+
+.hr-evaluator-list {
+  margin-bottom: 0;
+}
+
+.empty-hint {
+  padding: 24px 0;
+  color: #8490a3;
+  font-size: 14px;
+}
+
+.evaluators-assignment .modal-actions {
+  margin-top: 26px;
+  padding-top: 20px;
+  border-top: 1px solid #eef1f5;
+}
