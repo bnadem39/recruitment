@@ -8,6 +8,8 @@ import org.example.recrutment.entities.gestionOffres.OfferStatus;
 import org.example.recrutment.exceptions.ResourceNotFoundException;
 import org.example.recrutment.repositories.formulairesAdaptatifs.FormRepository;
 import org.example.recrutment.repositories.gestionOffres.JobOfferRepository;
+import org.example.recrutment.hr.EvaluatorAssignmentRepository;
+import org.example.recrutment.services.notifications.NotificationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,10 +26,16 @@ public class JobOfferServiceImpl implements JobOfferService {
 
     private final JobOfferRepository jobOfferRepository;
     private final FormRepository formRepository;
+    private final EvaluatorAssignmentRepository evaluatorAssignments;
+    private final NotificationService notifications;
 
-    public JobOfferServiceImpl(JobOfferRepository jobOfferRepository, FormRepository formRepository) {
+    public JobOfferServiceImpl(JobOfferRepository jobOfferRepository, FormRepository formRepository,
+                               EvaluatorAssignmentRepository evaluatorAssignments,
+                               NotificationService notifications) {
         this.jobOfferRepository = jobOfferRepository;
         this.formRepository = formRepository;
+        this.evaluatorAssignments = evaluatorAssignments;
+        this.notifications = notifications;
     }
 
     // ==================== Create ====================
@@ -102,6 +110,33 @@ public class JobOfferServiceImpl implements JobOfferService {
 
         JobOffer updated = jobOfferRepository.save(offer);
         return toResponseDTO(updated);
+    }
+
+    @Override
+    @Transactional
+    public JobOfferResponseDTO publish(Long id) {
+        JobOffer offer = findOfferOrThrow(id);
+        boolean newlyPublished = offer.getStatus() != OfferStatus.PUBLISHED;
+        offer.setStatus(OfferStatus.PUBLISHED);
+        if (offer.getPublicationDate() == null) {
+            offer.setPublicationDate(java.time.LocalDate.now());
+        }
+        JobOffer published = jobOfferRepository.save(offer);
+        if (newlyPublished) {
+            evaluatorAssignments.findByOfferIdWithEvaluator(published.getId()).forEach(assignment ->
+                    notifications.notify(assignment.getEvaluator(), "New recruitment offer",
+                            "A new job offer is now visible and candidates can submit applications.",
+                            "JOB_OFFER_PUBLISHED", "/evaluator/offers/" + published.getId()));
+        }
+        return toResponseDTO(published);
+    }
+
+    @Override
+    @Transactional
+    public JobOfferResponseDTO hide(Long id) {
+        JobOffer offer = findOfferOrThrow(id);
+        offer.setStatus(OfferStatus.DRAFT);
+        return toResponseDTO(jobOfferRepository.save(offer));
     }
 
     // ==================== Delete ====================

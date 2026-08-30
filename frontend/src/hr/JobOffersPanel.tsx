@@ -92,6 +92,7 @@ export function JobOffersPanel({
   const [editingOffer, setEditingOffer] = useState<JobOffer | null>(null);
   const [copiedId, setCopiedId] = useState<number | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [visibilityId, setVisibilityId] = useState<number | null>(null);
 
   const openCreateModal = () => {
     setEditingOffer(null);
@@ -154,6 +155,27 @@ export function JobOffersPanel({
     }
   };
 
+  const setVisibility = async (offer: JobOffer, visible: boolean) => {
+    setVisibilityId(offer.id);
+    setError('');
+    try {
+      await request<JobOffer>(
+        `/api/offers/${offer.id}/${visible ? 'publish' : 'hide'}`,
+        session.accessToken,
+        { method: 'POST' }
+      );
+      reload();
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : 'Could not update job-offer visibility.'
+      );
+    } finally {
+      setVisibilityId(null);
+    }
+  };
+
   return (
     <>
       <header>
@@ -177,6 +199,7 @@ export function JobOffersPanel({
           <div className="tr head">
             <span>Title</span>
             <span>Deadline</span>
+            <span>Visibility</span>
             <span>Form</span>
             <span>Application link</span>
             <span>Actions</span>
@@ -208,6 +231,13 @@ export function JobOffersPanel({
                   </span>
 
                   <span>
+                    <em className={offer.status === 'PUBLISHED' ? 'active' : 'disabled'}>
+                      <i></i>
+                      {offer.status === 'PUBLISHED' ? 'Visible' : 'Hidden'}
+                    </em>
+                  </span>
+
+                  <span>
                     <em className={offer.formId ? 'active' : 'disabled'}>
                       <i></i>
                       {offer.formId ? 'Linked' : 'Not linked'}
@@ -225,6 +255,19 @@ export function JobOffersPanel({
                       onClick={() => openEditModal(offer)}
                     >
                       Edit
+                    </button>
+
+                    <button
+                      type="button"
+                      className="hr-btn-secondary"
+                      disabled={visibilityId === offer.id}
+                      onClick={() => void setVisibility(offer, offer.status !== 'PUBLISHED')}
+                    >
+                      {visibilityId === offer.id
+                        ? 'Saving…'
+                        : offer.status === 'PUBLISHED'
+                          ? 'Hide'
+                          : 'Make visible'}
                     </button>
 
                     <button

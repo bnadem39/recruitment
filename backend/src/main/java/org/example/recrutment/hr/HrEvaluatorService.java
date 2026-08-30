@@ -8,6 +8,7 @@ import org.example.recrutment.entities.users.Users;
 import org.example.recrutment.exceptions.ResourceNotFoundException;
 import org.example.recrutment.repositories.gestionOffres.JobOfferRepository;
 import org.example.recrutment.repositories.users.UserRepository;
+import org.example.recrutment.services.notifications.NotificationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,7 @@ public class HrEvaluatorService {
     private final UserRepository users;
     private final JobOfferRepository offers;
     private final EvaluatorAssignmentRepository assignmentRepository;
+    private final NotificationService notifications;
 
     @Transactional(readOnly = true)
     public List<EvaluatorResponse> list() {
@@ -55,6 +57,9 @@ public class HrEvaluatorService {
     @Transactional
     public List<Long> assign(Long offerId, List<Long> evaluatorIds) {
         JobOffer offer = findOffer(offerId);
+        java.util.Set<Long> currentIds = assignmentRepository.findByOfferIdWithEvaluator(offerId).stream()
+                .map(assignment -> assignment.getEvaluator().getId())
+                .collect(Collectors.toSet());
         LinkedHashSet<Long> requestedIds = new LinkedHashSet<>(evaluatorIds);
         List<Users> evaluators = users.findAllById(requestedIds);
         Map<Long, Users> evaluatorsById = evaluators.stream()
@@ -81,6 +86,11 @@ public class HrEvaluatorService {
                 .map(evaluator -> EvaluatorAssignment.builder().offer(offer).evaluator(evaluator).build())
                 .toList();
         assignmentRepository.saveAll(savedAssignments);
+        evaluators.stream()
+                .filter(evaluator -> !currentIds.contains(evaluator.getId()))
+                .forEach(evaluator -> notifications.notify(evaluator, "New evaluator assignment",
+                        "You have been assigned to review applications for " + offer.getTitle() + ".",
+                        "EVALUATOR_ASSIGNED", "/evaluator/applications"));
         return requestedIds.stream().sorted().toList();
     }
 

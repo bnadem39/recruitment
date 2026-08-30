@@ -27,6 +27,8 @@ import org.example.recrutment.repositories.formulairesAdaptatifs.FormFieldReposi
 import org.example.recrutment.repositories.gestionEntretiens.InterviewRepository;
 import org.example.recrutment.repositories.gestionOffres.JobOfferRepository;
 import org.example.recrutment.repositories.users.CandidateRepository;
+import org.example.recrutment.hr.EvaluatorAssignmentRepository;
+import org.example.recrutment.services.notifications.NotificationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -55,6 +57,8 @@ public class CandidatePortalController {
     private final FieldOptionRepository fieldOptionRepository;
     private final FieldConditionRepository fieldConditionRepository;
     private final InterviewRepository interviewRepository;
+    private final EvaluatorAssignmentRepository evaluatorAssignments;
+    private final NotificationService notifications;
 
     @GetMapping("/profile")
     public CandidateProfileResponse profile(@AuthenticationPrincipal Users user) {
@@ -194,6 +198,13 @@ public class CandidatePortalController {
             else entity.setTextValue(response.textValue());
             fieldResponseRepository.save(entity);
         }
+        evaluatorAssignments.findByOfferIdWithEvaluator(offer.getId()).forEach(assignment ->
+                notifications.notify(assignment.getEvaluator(), "New candidate application",
+                        "A candidate submitted an application for " + offer.getTitle() + ".",
+                        "APPLICATION_SUBMITTED", "/evaluator/applications/" + saved.getId()));
+        notifications.notify(candidate, "Application submitted",
+                "Your application for " + offer.getTitle() + " has been submitted successfully.",
+                "APPLICATION_SUBMITTED", "/applications/" + saved.getId());
         return new ApplicationSubmissionResponse(saved.getId(), offer.getTitle(), saved.getSubmittedAt(), "APP-" + saved.getId());
     }
 
