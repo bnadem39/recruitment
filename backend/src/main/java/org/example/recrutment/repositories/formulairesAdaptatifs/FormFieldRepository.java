@@ -2,6 +2,9 @@ package org.example.recrutment.repositories.formulairesAdaptatifs;
 
 import org.example.recrutment.entities.formulairesAdaptatifs.FormField;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -15,4 +18,8 @@ public interface FormFieldRepository extends JpaRepository<FormField, Long> {
 
     /** Un champ précis, en vérifiant qu'il appartient bien au formulaire donné. */
     Optional<FormField> findByIdAndForm_FormId(Long fieldId, Long formId);
+
+    @Modifying
+    @Query("DELETE FROM FormField f WHERE f.form.formId = :formId")
+    void deleteByForm_FormId(@Param("formId") Long formId);
 }
