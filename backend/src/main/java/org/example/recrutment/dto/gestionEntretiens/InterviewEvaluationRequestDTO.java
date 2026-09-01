@@ -14,51 +14,24 @@ import org.example.recrutment.entities.gestionEntretiens.Recommendation;
 
 import java.math.BigDecimal;
 
-/**
- * Données envoyées pour créer ou modifier l'évaluation d'un entretien.
- * Un seul InterviewEvaluation par Interview (relation OneToOne) -- l'URL
- * ne contient donc pas d'id d'évaluation, uniquement l'interviewId.
- */
+/** Request for the one evaluation associated with an interview. */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class InterviewEvaluationRequestDTO {
-
-    @DecimalMin(value = "0.0", message = "Le score technique doit être entre 0 et 20")
-    @DecimalMax(value = "20.0", message = "Le score technique doit être entre 0 et 20")
-    @NotNull(message = "Le score technique est obligatoire")
+    @DecimalMin(value = "0.0") @DecimalMax(value = "20.0") @NotNull
     private BigDecimal technicalScore;
-
-    @DecimalMin(value = "0.0", message = "Le score de communication doit être entre 0 et 20")
-    @DecimalMax(value = "20.0", message = "Le score de communication doit être entre 0 et 20")
-    @NotNull(message = "Le score de communication est obligatoire")
+    @DecimalMin(value = "0.0") @DecimalMax(value = "20.0") @NotNull
     private BigDecimal communicationScore;
-
-    @DecimalMin(value = "0.0", message = "Le score de motivation doit être entre 0 et 20")
-    @DecimalMax(value = "20.0", message = "Le score de motivation doit être entre 0 et 20")
-    @NotNull(message = "Le score de motivation est obligatoire")
+    @DecimalMin(value = "0.0") @DecimalMax(value = "20.0") @NotNull
     private BigDecimal motivationScore;
-
-    @DecimalMin(value = "0.0", message = "Le score de professionnalisme doit être entre 0 et 20")
-    @DecimalMax(value = "20.0", message = "Le score de professionnalisme doit être entre 0 et 20")
-    @NotNull(message = "Le score de professionnalisme est obligatoire")
+    @DecimalMin(value = "0.0") @DecimalMax(value = "20.0") @NotNull
     private BigDecimal professionalismScore;
-
-    @DecimalMin(value = "0.0", message = "Le score global doit être entre 0 et 20")
-    @DecimalMax(value = "20.0", message = "Le score global doit être entre 0 et 20")
-    @NotNull(message = "Le score global est obligatoire")
+    @DecimalMin(value = "0.0") @DecimalMax(value = "100.0") @NotNull
     private BigDecimal overallScore;
-
-    @NotNull(message = "La recommandation est obligatoire")
-    private Recommendation recommendation;
-
-    @NotBlank(message = "Le commentaire destine aux RH est obligatoire")
-    @Size(max = 5000, message = "Le commentaire RH ne peut pas depasser 5000 caracteres")
-    private String hrComment;
-
-    @NotBlank(message = "Le commentaire destine au candidat est obligatoire")
-    @Size(max = 5000, message = "Le commentaire candidat ne peut pas depasser 5000 caracteres")
-    private String candidateComment;
+    @NotNull private Recommendation recommendation;
+    @NotBlank @Size(max = 5000) private String hrComment;
+    @NotBlank @Size(max = 5000) private String candidateComment;
 }

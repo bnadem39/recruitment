@@ -67,14 +67,34 @@ public class InterviewServiceImpl implements InterviewService {
                 .build();
 
         Interview saved = interviewRepository.save(interview);
-        notificationService.notify(application.getCandidate(), "Interview scheduled",
-                "An interview has been scheduled for your application to " + application.getJobOffer().getTitle() + ".",
-                "INTERVIEW_SCHEDULED", "/interviews/" + saved.getId());
-        if (evaluator != null) {
-            notificationService.notify(evaluator, "Interview scheduled",
-                    "You have been assigned an interview for " + application.getJobOffer().getTitle() + ".",
-                    "INTERVIEW_SCHEDULED", "/interviews/" + saved.getId());
+        notifyInterviewScheduled(saved);
+        return toResponseDTO(saved);
+    }
+
+    @Override
+    @Transactional
+    public InterviewResponseDTO scheduleForAssignedEvaluator(InterviewRequestDTO request, Users evaluator) {
+        if (evaluator == null || evaluator.getUserRole() != UserRole.EVALUATOR) {
+            throw new IllegalArgumentException("An evaluator must schedule the interview");
         }
+        Application application = findApplicationOrThrow(request.getApplicationId());
+        if (application.getStatus() != ApplicationStatus.ACCEPTED) {
+            throw new IllegalArgumentException("Only accepted applications can be scheduled for an interview");
+        }
+        boolean hasActiveInterview = interviewRepository.findByApplication_Id(application.getId()).stream()
+                .anyMatch(existing -> existing.getStatus() != InterviewStatus.CANCELLED);
+        if (hasActiveInterview) {
+            throw new IllegalStateException("This application already has an active interview");
+        }
+        InterviewMode mode = request.getMode() != null ? request.getMode() : InterviewMode.ONLINE;
+        Interview interview = Interview.builder().interviewType(request.getInterviewType())
+                .scheduledAt(request.getScheduledAt()).durationMinutes(request.getDurationMinutes())
+                .location(request.getLocation()).meetingLink(request.getMeetingLink()).mode(mode)
+                .roomId(mode == InterviewMode.ONLINE ? java.util.UUID.randomUUID().toString() : null)
+                .assignedEvaluator(evaluator).status(InterviewStatus.SCHEDULED).notes(request.getNotes())
+                .application(application).build();
+        Interview saved = interviewRepository.save(interview);
+        notifyInterviewScheduled(saved);
         return toResponseDTO(saved);
     }
 
@@ -191,5 +211,22 @@ public class InterviewServiceImpl implements InterviewService {
             throw new IllegalArgumentException("Assigned interview participant must have the EVALUATOR role");
         }
         return evaluator;
+    }
+
+    private void notifyInterviewScheduled(Interview interview) {
+        Application application = interview.getApplication();
+        String jobTitle = application.getJobOffer().getTitle();
+        String when = interview.getScheduledAt() == null ? "the selected time"
+                : interview.getScheduledAt().toLocalDate() + " at " + interview.getScheduledAt().toLocalTime();
+        notificationService.notify(application.getCandidate(), "Interview scheduled",
+                "Your interview for " + jobTitle + " is scheduled for " + when + ".",
+                "INTERVIEW_SCHEDULED", "/interviews/" + interview.getId());
+        userRepository.findByUserRoleOrderByFirstNameAscLastNameAsc(UserRole.HR).forEach(hr -> notificationService.notify(hr,
+                "Interview scheduled", "An interview has been scheduled for " + application.getCandidate().getFirstName()
+                        + " " + application.getCandidate().getLastName() + " for " + jobTitle + ".",
+                "INTERVIEW_SCHEDULED", "/hr/reviews/interviews"));
+        if (interview.getAssignedEvaluator() != null) notificationService.notify(interview.getAssignedEvaluator(),
+                "Interview scheduled", "Interview successfully scheduled.", "INTERVIEW_SCHEDULED",
+                "/interviews/" + interview.getId());
     }
 }

@@ -42,3 +42,46 @@ BEGIN
             DROP CONSTRAINT notifications_notification_type_check;
     END IF;
 END $$@@
+
+DO $$
+BEGIN
+    IF to_regclass(format('%I.%I', current_schema(), 'applications')) IS NOT NULL THEN
+        IF EXISTS (
+            SELECT 1
+            FROM pg_constraint c
+            JOIN pg_class t ON t.oid = c.conrelid
+            JOIN pg_namespace n ON n.oid = t.relnamespace
+            WHERE t.relname = 'applications'
+              AND n.nspname = current_schema()
+              AND c.conname = 'applications_status_check'
+        ) THEN
+            ALTER TABLE applications
+                DROP CONSTRAINT applications_status_check;
+        END IF;
+
+        IF NOT EXISTS (
+            SELECT 1
+            FROM pg_constraint c
+            JOIN pg_class t ON t.oid = c.conrelid
+            JOIN pg_namespace n ON n.oid = t.relnamespace
+            WHERE t.relname = 'applications'
+              AND n.nspname = current_schema()
+              AND c.conname = 'applications_status_check'
+        ) THEN
+            ALTER TABLE applications
+                ADD CONSTRAINT applications_status_check CHECK (
+                    status IN (
+                        'DRAFT',
+                        'PENDING_EVALUATION',
+                        'SUBMITTED',
+                        'UNDER_REVIEW',
+                        'PRESELECTED',
+                        'INTERVIEW_PENDING',
+                        'ACCEPTED',
+                        'REJECTED',
+                        'WITHDRAWN'
+                    )
+                );
+        END IF;
+    END IF;
+END $$@@

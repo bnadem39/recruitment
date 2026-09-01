@@ -6,6 +6,7 @@ import { AdminDashboard } from './admin/AdminDashboard';
 import { HrDashboard } from './hr/HrDashboard';
 import { EvaluatorDashboard } from './evaluator/EvaluatorDashboard';
 import { CandidateDashboard } from './candidate/CandidateDashboard';
+import { RealtimeProvider } from './shared/realtime';
 import type { Session } from './shared/types';
 
 type RawSession = {
@@ -308,27 +309,33 @@ export default function App() {
     );
   }
 
-  switch (session.role) {
-    case 'ADMIN':
-      return <AdminDashboard session={session} logout={logout} />;
+  return (
+    <RealtimeProvider session={session}>
+      {(() => {
+        switch (session.role) {
+          case 'ADMIN':
+            return <AdminDashboard session={session} logout={logout} />;
 
-    case 'HR':
-      return <HrDashboard session={session} logout={logout} />;
+          case 'HR':
+            return <HrDashboard session={session} logout={logout} />;
 
-    case 'EVALUATOR':
-      return <EvaluatorDashboard session={session} logout={logout} />;
+          case 'EVALUATOR':
+            return <EvaluatorDashboard session={session} logout={logout} />;
 
-    case 'CANDIDATE':
-      return (
-        <CandidateDashboard
-          session={session}
-          logout={logout}
-          initialOfferId={pendingOfferId}
-        />
-      );
+          case 'CANDIDATE':
+            return (
+              <CandidateDashboard
+                session={session}
+                logout={logout}
+                initialOfferId={pendingOfferId}
+              />
+            );
 
-    default:
-      logout();
-      return null;
-  }
+          default:
+            logout();
+            return null;
+        }
+      })()}
+    </RealtimeProvider>
+  );
 }

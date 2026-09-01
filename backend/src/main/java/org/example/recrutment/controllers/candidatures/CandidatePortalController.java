@@ -158,20 +158,20 @@ public class CandidatePortalController {
         Candidates candidate = candidate(user);
         JobOffer offer = publishedOffer(id);
         Application application = applicationRepository.findByCandidate_IdAndJobOffer_Id(candidate.getId(), offer.getId()).orElse(null);
-        if (application != null && application.getStatus() == ApplicationStatus.SUBMITTED) {
+        if (application != null && application.getStatus() != ApplicationStatus.DRAFT) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "You have already applied to this job offer");
         }
         if (application == null) {
             application = Application.builder()
                     .candidate(candidate)
                     .jobOffer(offer)
-                    .status(ApplicationStatus.SUBMITTED)
-                    .currentStage(RecruitmentStage.SUBMISSION)
+                    .status(ApplicationStatus.PENDING_EVALUATION)
+                    .currentStage(RecruitmentStage.HR_REVIEW)
                     .finalDecision(FinalDecision.PENDING)
                     .submittedAt(LocalDateTime.now())
                     .build();
         } else {
-            application.setStatus(ApplicationStatus.SUBMITTED);
+            application.setStatus(ApplicationStatus.PENDING_EVALUATION);
             application.setSubmittedAt(application.getSubmittedAt() == null ? LocalDateTime.now() : application.getSubmittedAt());
         }
         Application saved = applicationRepository.save(application);
@@ -200,8 +200,8 @@ public class CandidatePortalController {
         }
         evaluatorAssignments.findByOfferIdWithEvaluator(offer.getId()).forEach(assignment ->
                 notifications.notify(assignment.getEvaluator(), "New candidate application",
-                        "A candidate submitted an application for " + offer.getTitle() + ".",
-                        "APPLICATION_SUBMITTED", "/evaluator/applications/" + saved.getId()));
+                        "A candidate has submitted a response for " + offer.getTitle() + ". Please evaluate the application.",
+                        "APPLICATION_SUBMITTED", "/evaluator/form-evaluation/" + saved.getId()));
         notifications.notify(candidate, "Application submitted",
                 "Your application for " + offer.getTitle() + " has been submitted successfully.",
                 "APPLICATION_SUBMITTED", "/applications/" + saved.getId());
@@ -272,7 +272,7 @@ public class CandidatePortalController {
     }
 
     private ApplicationCandidateResponse toApplication(Application application) {
-        return new ApplicationCandidateResponse(application.getId(), application.getStatus(), application.getCurrentStage(), application.getSubmittedAt(), application.getUpdatedAt(), application.getJobOffer().getId(), application.getJobOffer().getTitle(), application.getJobOffer().getDepartment(), application.getJobOffer().getLocation());
+        return new ApplicationCandidateResponse(application.getId(), application.getStatus(), application.getCurrentStage(), application.getSubmittedAt(), application.getUpdatedAt(), application.getJobOffer().getId(), application.getJobOffer().getTitle(), application.getJobOffer().getDepartment(), application.getJobOffer().getLocation(), application.getFormScore(), application.getFormCandidateComment(), application.getFormDecision(), application.getFormEvaluatedAt());
     }
 
     private FieldResponseCandidateResponse toFieldResponse(FieldResponse response) {
@@ -286,7 +286,7 @@ public class CandidatePortalController {
     public record FormFieldCandidateResponse(Long id, String label, FieldType fieldType, Boolean required, String placeholder, Boolean defaultVisible, Integer displayOrder, String validationRule, BigDecimal minimumValue, BigDecimal maximumValue, Integer minimumLength, Integer maximumLength, List<FieldOptionCandidateResponse> options) {}
     public record FieldOptionCandidateResponse(Long id, String label, String value, Integer displayOrder) {}
     public record FieldConditionCandidateResponse(Long id, Long sourceFieldId, Long targetFieldId, ConditionOperator operator, String expectedValue, ConditionAction action) {}
-    public record ApplicationCandidateResponse(Long id, ApplicationStatus status, RecruitmentStage currentStage, LocalDateTime submittedAt, LocalDateTime updatedAt, Long jobOfferId, String jobTitle, String department, String location) {}
+    public record ApplicationCandidateResponse(Long id, ApplicationStatus status, RecruitmentStage currentStage, LocalDateTime submittedAt, LocalDateTime updatedAt, Long jobOfferId, String jobTitle, String department, String location, Integer formScore, String formCandidateComment, FinalDecision formDecision, LocalDateTime formEvaluatedAt) {}
     public record ApplicationDetailResponse(ApplicationCandidateResponse application, List<FieldResponseCandidateResponse> responses) {}
     public record FieldResponseCandidateResponse(Long id, Long fieldId, String fieldLabel, String textValue, BigDecimal numberValue, LocalDate dateValue, Boolean booleanValue) {}
     public record FieldResponseRequest(Long fieldId, String textValue, BigDecimal numberValue, LocalDate dateValue, Boolean booleanValue) {}
