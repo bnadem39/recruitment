@@ -41,7 +41,7 @@ public class InterviewEvaluation {
     private BigDecimal professionalismScore;
 
     /** Score global, calculé (moyenne pondérée) ou saisi directement par l'évaluateur. */
-    @Column(name = "overall_score", precision = 4, scale = 2)
+    @Column(name = "overall_score", precision = 5, scale = 2)
     private BigDecimal overallScore;
 
     // ==================== Avis de l'évaluateur ====================

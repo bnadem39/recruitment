@@ -23,7 +23,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 @RestController
 @RequestMapping("/api/interviews/{interviewId}/evaluation")
 @Tag(name = "Évaluations d'entretien", description = "Notation détaillée et recommandation suite à un entretien")
-@PreAuthorize("hasAnyRole('ADMIN', 'HR', 'EVALUATOR')")
+@PreAuthorize("hasAnyRole('ADMIN', 'EVALUATOR')")
 public class InterviewEvaluationController {
 
     private final InterviewEvaluationService interviewEvaluationService;

@@ -28,7 +28,8 @@ type Evaluation = {
   createdAt?: string;
 };
 type JoinAction = { disabled: boolean; label: string; detail: string };
-type CandidateApplication = { id: number; status: string; submittedAt?: string; jobOfferTitle: string; candidateName: string; candidateEmail: string; answers: { label: string; textValue?: string; numberValue?: number; dateValue?: string; booleanValue?: boolean }[] };
+type CandidateApplication = { id: number; status: string; submittedAt?: string; jobOfferTitle: string; candidateName: string; candidateEmail: string; formScore?: number; formHrComment?: string; formCandidateComment?: string; formDecision?: string; formEvaluatedAt?: string; answers: { label: string; textValue?: string; numberValue?: number; dateValue?: string; booleanValue?: boolean }[] };
+type FormEvaluation = { score: number | ''; commentForHR: string; commentForCandidate: string; decision: 'ACCEPTED' | 'REJECTED' | '' };
 
 const emptyEvaluation: Evaluation = {
   technicalScore: '',
@@ -258,6 +259,24 @@ export function EvaluatorDashboard({ session, logout }: { session: Session; logo
   }, [session.accessToken]);
 
   useEffect(() => {
+    const handleNavigation = (event: Event) => {
+      const actionUrl = (event as CustomEvent<string>).detail || '';
+      if (actionUrl.startsWith('/evaluator/form-evaluation/')) {
+        setView('applications');
+        request<CandidateApplication[]>('/api/evaluator/applications', session.accessToken).then(setApplications)
+          .catch(caught => setError(caught instanceof Error ? caught.message : 'Could not load form evaluations.'));
+      }
+      const interviewMatch = actionUrl.match(/\/interviews\/(\d+)/);
+      if (interviewMatch) {
+        setSelectedId(Number(interviewMatch[1]));
+        setView('calendar');
+      }
+    };
+    window.addEventListener('app:navigate', handleNavigation);
+    return () => window.removeEventListener('app:navigate', handleNavigation);
+  }, [session.accessToken]);
+
+  useEffect(() => {
     if (!selected?.id) {
       setEvaluation(emptyEvaluation);
       return;
@@ -317,17 +336,30 @@ export function EvaluatorDashboard({ session, logout }: { session: Session; logo
     setRoom(interview);
   }
 
-  async function decideApplication(id: number, accepted: boolean): Promise<void> {
+  async function evaluateApplication(id: number, evaluation: FormEvaluation): Promise<CandidateApplication> {
     setError('');
     try {
-      const updated = await request<CandidateApplication>(`/api/evaluator/applications/${id}/decision`, session.accessToken, {
-        method: 'POST', body: JSON.stringify({ accepted }),
+      const updated = await request<CandidateApplication>(`/api/evaluator/applications/${id}/evaluation`, session.accessToken, {
+        method: 'POST', body: JSON.stringify(evaluation),
       });
       setApplications(current => current.map(item => item.id === id ? updated : item));
-      setNotice(accepted ? 'Candidate accepted and ready for interview scheduling.' : 'Candidate rejected.');
+      setNotice(evaluation.decision === 'ACCEPTED' ? 'Candidate accepted. Schedule the interview below.' : 'Candidate rejected.');
+      return updated;
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Could not save the decision.');
     }
+    throw new Error('Could not save the form evaluation.');
+  }
+
+  async function scheduleInterview(id: number, value: { scheduledAt: string; durationMinutes: number }): Promise<void> {
+    const created = await request<EvaluatorInterview>(`/api/evaluator/applications/${id}/interview`, session.accessToken, {
+      method: 'POST', body: JSON.stringify({ ...value, interviewType: 'HR', mode: 'ONLINE' }),
+    });
+    const refreshed = await request<EvaluatorInterview[]>('/api/interview-rooms/my', session.accessToken);
+    setInterviews(refreshed);
+    setSelectedId(created.id);
+    setView('calendar');
+    setNotice('Interview scheduled and notifications sent.');
   }
 
   async function saveEvaluation(): Promise<void> {
@@ -413,11 +445,6 @@ export function EvaluatorDashboard({ session, logout }: { session: Session; logo
             <p>{viewDescription(view)}</p>
           </div>
 
-          {selected?.joinAvailable && (
-            <button className="primary add" type="button" onClick={() => setRoom(selected)}>
-              Join interview
-            </button>
-          )}
         </header>
 
         <section className="stats evaluator-stats">
@@ -439,7 +466,7 @@ export function EvaluatorDashboard({ session, logout }: { session: Session; logo
           />
         )}
 
-        {view === 'applications' && <ApplicationsReview applications={applications} decide={decideApplication} />}
+        {view === 'applications' && <ApplicationsReview applications={applications} evaluate={evaluateApplication} schedule={scheduleInterview} />}
 
         {view === 'evaluations' && (
           <EvaluationWorkspace
@@ -484,10 +511,12 @@ function NavButton({ active, onClick, icon, children }: {
   icon: string;
   children: string;
 }) {
+  const label = children === 'Applications' ? 'Form Evaluation'
+    : children === 'Evaluations' ? 'Interview Evaluation' : children;
   return (
     <button type="button" className={active ? 'active' : ''} onClick={onClick}>
       <span aria-hidden="true">{icon}</span>
-      {children}
+      {label}
     </button>
   );
 }
@@ -507,7 +536,47 @@ function Metric({ label, value, detail, tone }: {
   );
 }
 
-function ApplicationsReview({ applications, decide }: { applications: CandidateApplication[]; decide: (id: number, accepted: boolean) => Promise<void> }) {
+function ApplicationsReview({ applications, evaluate, schedule }: {
+  applications: CandidateApplication[];
+  evaluate: (id: number, evaluation: FormEvaluation) => Promise<CandidateApplication>;
+  schedule: (id: number, value: { scheduledAt: string; durationMinutes: number }) => Promise<void>;
+}) {
+  return <section className="evaluation-history">
+    {applications.map(application => <FormEvaluationCard key={application.id} application={application} evaluate={evaluate} schedule={schedule} />)}
+    {!applications.length && <div className="candidate-empty"><strong>No form evaluations</strong><span>Submitted responses for your assigned job offers appear here.</span></div>}
+  </section>;
+}
+
+function FormEvaluationCard({ application, evaluate, schedule }: {
+  application: CandidateApplication;
+  evaluate: (id: number, evaluation: FormEvaluation) => Promise<CandidateApplication>;
+  schedule: (id: number, value: { scheduledAt: string; durationMinutes: number }) => Promise<void>;
+}) {
+  const [value, setValue] = useState<FormEvaluation>({ score: application.formScore ?? '', commentForHR: application.formHrComment || '', commentForCandidate: application.formCandidateComment || '', decision: (application.formDecision as FormEvaluation['decision']) || '' });
+  const [saved, setSaved] = useState(application.formDecision || '');
+  const [scheduledAt, setScheduledAt] = useState('');
+  const [durationMinutes, setDurationMinutes] = useState(30);
+  const [saving, setSaving] = useState(false);
+  const submit = async (decision: 'ACCEPTED' | 'REJECTED') => {
+    setSaving(true);
+    try { const updated = await evaluate(application.id, { ...value, decision }); setSaved(updated.formDecision || decision); }
+    finally { setSaving(false); }
+  };
+  return <article>
+    <header><div><small>{application.jobOfferTitle}</small><h2>{application.candidateName}</h2><p>{application.candidateEmail} - {nice(application.status)}</p></div></header>
+    <div className="history-comments">{application.answers.map(answer => <div key={answer.label}><b>{answer.label}</b><p>{String(answer.textValue ?? answer.numberValue ?? answer.dateValue ?? answer.booleanValue ?? '-')}</p></div>)}</div>
+    {!saved && <div className="review-panel evaluator-form">
+      <label className="candidate-field">Score (0 - 100)<input required type="number" min="0" max="100" value={value.score} onChange={event => setValue(current => ({ ...current, score: event.target.value === '' ? '' : Number(event.target.value) }))} /></label>
+      <label className="candidate-field">Comment for HR<textarea rows={3} value={value.commentForHR} onChange={event => setValue(current => ({ ...current, commentForHR: event.target.value }))} /></label>
+      <label className="candidate-field">Comment for candidate<textarea rows={3} value={value.commentForCandidate} onChange={event => setValue(current => ({ ...current, commentForCandidate: event.target.value }))} /></label>
+      <div className="modal-actions"><button type="button" disabled={saving || value.score === ''} onClick={() => void submit('REJECTED')}>Reject candidate</button><button type="button" className="primary" disabled={saving || value.score === ''} onClick={() => void submit('ACCEPTED')}>Accept candidate</button></div>
+    </div>}
+    {saved === 'ACCEPTED' && <div className="review-panel evaluator-form"><h3>Schedule interview</h3><p>Candidate: {application.candidateName}<br />Job offer: {application.jobOfferTitle}</p><label className="candidate-field">Date and time<input type="datetime-local" value={scheduledAt} onChange={event => setScheduledAt(event.target.value)} /></label><label className="candidate-field">Duration (minutes)<input type="number" min="1" value={durationMinutes} onChange={event => setDurationMinutes(Number(event.target.value))} /></label><button type="button" className="primary" disabled={!scheduledAt || saving} onClick={() => { setSaving(true); void schedule(application.id, { scheduledAt, durationMinutes }).finally(() => setSaving(false)); }}>Schedule interview</button></div>}
+    {saved === 'REJECTED' && <p className="candidate-result-pending">Candidate was not selected for the next stage.</p>}
+  </article>;
+}
+
+function LegacyApplicationsReview({ applications, decide }: { applications: CandidateApplication[]; decide: (id: number, accepted: boolean) => Promise<void> }) {
   return <section className="evaluation-history">
     {applications.map(application => <article key={application.id}>
       <header><div><small>{application.jobOfferTitle}</small><h2>{application.candidateName}</h2><p>{application.candidateEmail} · {nice(application.status)}</p></div></header>
@@ -523,18 +592,18 @@ function ApplicationsReview({ applications, decide }: { applications: CandidateA
 
 function viewTitle(view: EvaluatorView): string {
   if (view === 'calendar') return 'Interview calendar';
-  if (view === 'applications') return 'Candidate applications';
+  if (view === 'applications') return 'Form evaluation';
   if (view === 'comments') return 'Evaluation comments';
   if (view === 'recommendations') return 'Submitted recommendations';
-  return 'Candidate evaluation';
+  return 'Interview evaluation';
 }
 
 function viewDescription(view: EvaluatorView): string {
   if (view === 'calendar') return 'View all your scheduled interviews and open an evaluation directly from the calendar.';
-  if (view === 'applications') return 'Review answers submitted for job offers assigned to you.';
+  if (view === 'applications') return 'Review submitted answers, score the form, and accept or reject the candidate.';
   if (view === 'comments') return 'Find the internal HR comment and the feedback shared with each candidate.';
   if (view === 'recommendations') return 'View the final scores and recommendations you have already submitted.';
-  return 'Assign scores, justify your decision for HR, and prepare candidate feedback.';
+  return 'Evaluate completed interviews and share the appropriate feedback with HR and the candidate.';
 }
 
 function InterviewCalendar({ month, interviews, loading, onMonth, onOpen }: {
@@ -942,6 +1011,7 @@ function ScoreInput({ label, value, onChange }: {
   value: number | '';
   onChange: (value: number | '') => void;
 }) {
+  const overall = label === 'Overall score';
   return (
     <label>
       <span>{label}</span>
@@ -949,12 +1019,12 @@ function ScoreInput({ label, value, onChange }: {
         required
         type="number"
         min="0"
-        max="20"
+        max={overall ? "100" : "20"}
         step="0.5"
         value={value}
         onChange={event => onChange(event.target.value === '' ? '' : Number(event.target.value))}
       />
-      <small>/ 20</small>
+      <small>{overall ? '/ 100' : '/ 20'}</small>
     </label>
   );
 }
@@ -966,7 +1036,7 @@ function ScorePill({ value }: { value: number | '' }) {
   return (
     <div className={`score-pill ${tone}`}>
       <b>{value === '' ? '-' : value}</b>
-      <span>/20</span>
+      <span>/100</span>
     </div>
   );
 }

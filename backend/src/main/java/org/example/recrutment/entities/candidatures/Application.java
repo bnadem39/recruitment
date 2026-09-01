@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.example.recrutment.entities.gestionOffres.JobOffer;
 import org.example.recrutment.entities.users.Candidates;
+import org.example.recrutment.entities.users.Users;
 
 @Entity
 @Table(name = "applications")
@@ -68,6 +69,28 @@ public class Application {
 
     @Column(name = "withdrawal_reason")
     private String withdrawalReason;
+
+    /** Form screening outcome.  Stored on the existing application because it is
+     * the single evaluation for a submitted application (not a second entity). */
+    @Column(name = "form_score")
+    private Integer formScore;
+
+    @Column(name = "form_hr_comment", columnDefinition = "TEXT")
+    private String formHrComment;
+
+    @Column(name = "form_candidate_comment", columnDefinition = "TEXT")
+    private String formCandidateComment;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "form_decision")
+    private FinalDecision formDecision;
+
+    @Column(name = "form_evaluated_at")
+    private LocalDateTime formEvaluatedAt;
+
+    @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY)
+    @JoinColumn(name = "form_evaluator_id")
+    private Users formEvaluator;
 
     @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY, optional = false)
     @JoinColumn(name = "candidate_id", nullable = false)

@@ -7,7 +7,11 @@ import org.example.recrutment.entities.gestionEntretiens.InterviewEvaluation;
 import org.example.recrutment.exceptions.ResourceNotFoundException;
 import org.example.recrutment.repositories.gestionEntretiens.InterviewRepository;
 import org.example.recrutment.services.notifications.NotificationService;
+import org.example.recrutment.entities.gestionEntretiens.InterviewStatus;
+import org.example.recrutment.entities.users.UserRole;
+import org.example.recrutment.repositories.users.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
@@ -18,11 +22,20 @@ public class InterviewEvaluationServiceImpl implements InterviewEvaluationServic
 
     private final InterviewRepository interviewRepository;
     private final NotificationService notificationService;
+    private final UserRepository userRepository;
 
+    @Autowired
     public InterviewEvaluationServiceImpl(InterviewRepository interviewRepository,
-                                          NotificationService notificationService) {
+                                          NotificationService notificationService, UserRepository userRepository) {
         this.interviewRepository = interviewRepository;
         this.notificationService = notificationService;
+        this.userRepository = userRepository;
+    }
+
+    /** Retained for existing unit tests and callers that only assert candidate notification behaviour. */
+    public InterviewEvaluationServiceImpl(InterviewRepository interviewRepository,
+                                          NotificationService notificationService) {
+        this(interviewRepository, notificationService, null);
     }
 
     // ==================== Create ====================
@@ -31,6 +44,10 @@ public class InterviewEvaluationServiceImpl implements InterviewEvaluationServic
     @Transactional
     public InterviewEvaluationResponseDTO create(Long interviewId, InterviewEvaluationRequestDTO request) {
         Interview interview = findInterviewOrThrow(interviewId);
+
+        if (interview.getStatus() != InterviewStatus.COMPLETED) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Only completed interviews can be evaluated");
+        }
 
         if (interview.getEvaluation() != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
@@ -51,7 +68,7 @@ public class InterviewEvaluationServiceImpl implements InterviewEvaluationServic
         interview.setEvaluation(evaluation);
         Interview savedInterview = interviewRepository.save(interview);
 
-        notifyCandidate(savedInterview, false);
+        notifyEvaluationCompleted(savedInterview, false);
         return toResponseDTO(savedInterview.getId(), savedInterview.getEvaluation());
     }
 
@@ -82,7 +99,7 @@ public class InterviewEvaluationServiceImpl implements InterviewEvaluationServic
         evaluation.setCandidateComment(request.getCandidateComment().trim());
 
         Interview savedInterview = interviewRepository.save(interview);
-        notifyCandidate(savedInterview, true);
+        notifyEvaluationCompleted(savedInterview, true);
         return toResponseDTO(savedInterview.getId(), savedInterview.getEvaluation());
     }
 
@@ -128,15 +145,19 @@ public class InterviewEvaluationServiceImpl implements InterviewEvaluationServic
                 .build();
     }
 
-    private void notifyCandidate(Interview interview, boolean updated) {
+    private void notifyEvaluationCompleted(Interview interview, boolean updated) {
         InterviewEvaluation evaluation = interview.getEvaluation();
         String jobTitle = interview.getApplication().getJobOffer().getTitle();
         notificationService.notify(
                 interview.getApplication().getCandidate(),
-                updated ? "Evaluation mise a jour" : "Resultat de votre entretien disponible",
-                "Votre note pour " + jobTitle + " est " + evaluation.getOverallScore()
-                        + "/20. Recommandation : " + evaluation.getRecommendation() + ".",
+                "Interview evaluation completed",
+                "Your interview evaluation for " + jobTitle + " has been completed.",
                 updated ? "INTERVIEW_EVALUATION_UPDATED" : "INTERVIEW_EVALUATION_SUBMITTED",
                 "/candidate/interviews/" + interview.getId());
+        if (userRepository != null) userRepository.findByUserRoleOrderByFirstNameAscLastNameAsc(UserRole.HR).forEach(hr -> notificationService.notify(hr,
+                    "Interview evaluation completed", "The interview evaluation for "
+                            + interview.getApplication().getCandidate().getFirstName() + " "
+                            + interview.getApplication().getCandidate().getLastName() + " has been completed.",
+                    "INTERVIEW_EVALUATION_SUBMITTED", "/hr/reviews/interviews"));
     }
 }
