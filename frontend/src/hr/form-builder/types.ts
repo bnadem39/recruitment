@@ -1,6 +1,22 @@
-export type BackendFieldType = 'TEXT' | 'TEXTAREA' | 'NUMBER' | 'DATE' | 'EMAIL' | 'PHONE' | 'RADIO' | 'CHECKBOX' | 'SELECT' | 'MULTI_SELECT' | 'FILE' | 'BOOLEAN';
+export type BackendFieldType =
+  | 'TEXT'
+  | 'TEXTAREA'
+  | 'NUMBER'
+  | 'DATE'
+  | 'EMAIL'
+  | 'PHONE'
+  | 'RADIO'
+  | 'CHECKBOX'
+  | 'SELECT'
+  | 'MULTI_SELECT'
+  | 'FILE'
+  | 'BOOLEAN';
 
-export type ButtonRole = 'next' | 'back' | 'submit' | 'custom';
+export type ButtonRole =
+  | 'next'
+  | 'back'
+  | 'submit'
+  | 'custom';
 
 export type BuilderElement = {
   id: string;
@@ -31,10 +47,11 @@ export type BuilderElement = {
   acceptedFormats?: string;
   maxFileSize?: number;
   multiple?: boolean;
-  // Élément "bouton" (Suivant / Précédent / Envoyer / lien personnalisé)
+
   buttonRole?: ButtonRole;
   buttonText?: string;
   buttonLink?: string;
+
   logic?: {
     sourceId: string;
     operator: 'EQUALS' | 'NOT_EQUALS' | 'CONTAINS';
@@ -43,13 +60,18 @@ export type BuilderElement = {
   };
 };
 
-export type FormStep = { id: string; title: string; eyebrow: string; elements: BuilderElement[] };
+export type FormStep = {
+  id: string;
+  title: string;
+  eyebrow: string;
+  elements: BuilderElement[];
+};
 
 export type BuilderDraft = {
   backendId?: number;
   name: string;
   description: string;
-  jobOfferId?: number;
+  jobOfferIds?: number[];
   status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
   successMessage: string;
   allowDraft: boolean;
@@ -69,21 +91,39 @@ export type CatalogItem = {
 export type JobOffer = {
   id: number;
   title: string;
-
   description?: string;
   department?: string;
   contractType?: string;
   location?: string;
-
   numberOfPositions?: number;
-
   publicationDate?: string;
   deadline?: string;
 
-  status?: 'DRAFT' | 'PUBLISHED' | 'CLOSED' | 'ARCHIVED' | string;
+  status?:
+    | 'DRAFT'
+    | 'PUBLISHED'
+    | 'CLOSED'
+    | 'ARCHIVED'
+    | string;
+
   openForApplications?: boolean;
 
+  /**
+   * Ancienne relation : une seule offre → un formulaire.
+   *
+   * À supprimer lorsque ton backend utilisera uniquement
+   * la table job_offer_forms.
+   */
   formId?: number | null;
+
+  /**
+   * Nouvelle relation : une offre peut être liée
+   * à plusieurs formulaires.
+   *
+   * Exemple :
+   * formIds: [2, 9, 10]
+   */
+  formIds?: number[];
 
   createdAt?: string;
   updatedAt?: string;

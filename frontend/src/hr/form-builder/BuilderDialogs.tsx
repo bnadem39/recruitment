@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import { FormElement } from './FormElement';
-import type { BuilderDraft, FormTemplate, JobOffer } from './types';
+import type {
+  BuilderDraft,
+  FormTemplate,
+  JobOffer,
+} from './types';
 
 type ModalProps = {
   children: React.ReactNode;
@@ -400,17 +404,17 @@ export function SaveTemplateDialog({
 
 export function PublishDialog({
   draft,
-  offers,
+  offers = [],
   onClose,
   onPublish,
-  onLinkOffer,
+  onToggleOffer,
   busy,
 }: {
   draft: BuilderDraft;
   offers?: JobOffer[];
   onClose: () => void;
   onPublish: () => void;
-  onLinkOffer: (offerId: number | undefined) => void;
+  onToggleOffer: (offerId: number) => void;
   busy: boolean;
 }) {
   const fields = draft.steps.flatMap(
@@ -421,88 +425,175 @@ export function PublishDialog({
     (field) => field.required
   ).length;
 
+  const selectedOfferIds = draft.jobOfferIds ?? [];
+
   return (
-    <Modal
-      className="fb-publish-modal"
-      onClose={onClose}
-      closeDisabled={busy}
-    >
-      <DialogHeader
-        centered
-        eyebrow="READY TO GO LIVE?"
-        title="Publish this form"
-        description="Once published, candidates can submit applications through this form."
-      />
+  <Modal
+    className="fb-publish-modal"
+    onClose={onClose}
+    closeDisabled={busy}
+  >
+    <DialogHeader
+      centered
+      eyebrow="READY TO GO LIVE?"
+      title="Publish this form"
+      description="Once published, candidates can submit applications through this form."
+    />
 
-      <div className="fb-publish-summary">
-        <div className="fb-publish-info-row">
-          <span>Form name</span>
+    <div className="fb-publish-summary">
+      <div className="fb-publish-info-row">
+        <span>Form name</span>
 
-          <b title={draft.name || '—'}>
-            {draft.name || '—'}
-          </b>
-        </div>
-
-        <div className="fb-publish-offer-field">
-          <label htmlFor="publish-job-offer">
-            Job offer
-          </label>
-
-          <div className="fb-publish-select-wrapper">
-            <select
-              id="publish-job-offer"
-              value={draft.jobOfferId ?? ''}
-              disabled={busy}
-              onChange={(event) => {
-                onLinkOffer(
-                  event.target.value
-                    ? Number(event.target.value)
-                    : undefined
-                );
-              }}
-            >
-              <option value="">Not linked</option>
-
-              {(offers ?? []).map((offer) => (
-                <option key={offer.id} value={offer.id}>
-                  {offer.title}
-                  {offer.department
-                    ? ` - ${offer.department}`
-                    : ''}
-                </option>
-              ))}
-            </select>
-
-            <span aria-hidden="true">⌄</span>
-          </div>
-        </div>
-
-        <div className="fb-publish-stats">
-          <PublishStat
-            label="Fields"
-            value={fields.length}
-          />
-
-          <PublishStat
-            label="Required"
-            value={requiredCount}
-          />
-
-          <PublishStat
-            label="Steps"
-            value={draft.steps.length}
-          />
-        </div>
+        <b title={draft.name || '—'}>
+          {draft.name || '—'}
+        </b>
       </div>
 
-      <DialogActions
-        onClose={onClose}
-        onConfirm={onPublish}
-        confirmLabel="Publish form"
-        busy={busy}
-      />
-    </Modal>
-  );
+      <div className="fb-publish-offer-field">
+        <label>
+          Job offers
+        </label>
+
+        <small
+          style={{
+            display: 'block',
+            marginTop: 4,
+            marginBottom: 10,
+            color: '#718096',
+          }}
+        >
+          Select one or more job offers for this form.
+        </small>
+
+        <div
+          className="fb-publish-offer-list"
+          style={{
+            maxHeight: 220,
+            overflowY: 'auto',
+            border: '1px solid #dce2ea',
+            borderRadius: 9,
+            background: '#fff',
+          }}
+        >
+          {offers.map((offer) => {
+            const checked = (
+              draft.jobOfferIds ?? []
+            ).includes(offer.id);
+
+            return (
+              <label
+                key={offer.id}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  minHeight: 58,
+                  padding: '10px 12px',
+                  borderBottom:
+                    '1px solid #edf1f5',
+                  cursor: busy
+                    ? 'not-allowed'
+                    : 'pointer',
+                  opacity: busy ? 0.6 : 1,
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={checked}
+                  disabled={busy}
+                  onChange={() =>
+                    onToggleOffer(offer.id)
+                  }
+                  style={{
+                    width: 18,
+                    height: 18,
+                    flex: '0 0 auto',
+                  }}
+                />
+
+                <span
+                  style={{
+                    minWidth: 0,
+                    overflow: 'hidden',
+                  }}
+                >
+                  <b
+                    style={{
+                      display: 'block',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      fontSize: 13,
+                      color: '#17243e',
+                    }}
+                  >
+                    {offer.title}
+                  </b>
+
+                  <small
+                    style={{
+                      display: 'block',
+                      marginTop: 3,
+                      color: '#718096',
+                    }}
+                  >
+                    {offer.department
+                      ? `${offer.department} · `
+                      : ''}
+                    {offer.status || 'DRAFT'}
+                  </small>
+                </span>
+              </label>
+            );
+          })}
+        </div>
+
+        <small
+          style={{
+            display: 'block',
+            marginTop: 10,
+            color: '#128c78',
+            fontWeight: 700,
+          }}
+        >
+          {(draft.jobOfferIds ?? []).length === 0
+            ? 'No job offer selected.'
+            : `${
+                (draft.jobOfferIds ?? []).length
+              } job offer${
+                (draft.jobOfferIds ?? []).length > 1
+                  ? 's'
+                  : ''
+              } selected.`}
+        </small>
+      </div>
+
+      <div className="fb-publish-stats">
+        <PublishStat
+          label="Fields"
+          value={fields.length}
+        />
+
+        <PublishStat
+          label="Required"
+          value={requiredCount}
+        />
+
+        <PublishStat
+          label="Steps"
+          value={draft.steps.length}
+        />
+      </div>
+    </div>
+
+    <DialogActions
+      onClose={onClose}
+      onConfirm={onPublish}
+      confirmLabel="Publish form"
+      busy={busy}
+    />
+  </Modal>
+);
 }
 
 export function SettingsDialog({
@@ -566,28 +657,25 @@ export function SettingsDialog({
           </label>
 
           <label>
-            <span>Associated job offer</span>
+            <span>Associated job offers</span>
 
-            <select
-              value={draft.jobOfferId || ''}
-              onChange={(event) =>
-                onChange({
-                  jobOfferId:
-                    Number(event.target.value) || undefined,
-                })
-              }
+            <small
+              style={{
+                color: '#718096',
+                marginTop: 4,
+              }}
             >
-              <option value="">No offer selected</option>
+              Choose job offers in the Publish dialog.
+            </small>
 
-              {offers.map((offer) => (
-                <option key={offer.id} value={offer.id}>
-                  {offer.title}
-                  {offer.department
-                    ? ` - ${offer.department}`
-                    : ''}
-                </option>
-              ))}
-            </select>
+            <input
+              readOnly
+              value={
+                (draft.jobOfferIds ?? []).length === 0
+                  ? 'No job offer selected'
+                  : `${draft.jobOfferIds?.length} job offer(s) selected`
+              }
+            />
           </label>
 
           <label>
@@ -677,7 +765,9 @@ export function PreviewMode({
 
           <span>
             <b>Preview mode</b>
-            <small>Interactive candidate experience</small>
+            <small>
+              Interactive candidate experience
+            </small>
           </span>
         </div>
 
@@ -768,7 +858,8 @@ export function PreviewMode({
             {hasMultipleSteps && (
               <div className="fb-preview-progress">
                 <span>
-                  STEP {stepIndex + 1} OF {draft.steps.length}
+                  STEP {stepIndex + 1} OF{' '}
+                  {draft.steps.length}
                 </span>
 
                 <i>

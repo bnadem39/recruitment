@@ -59,6 +59,17 @@ const snap = (value: number) => {
   );
 };
 
+const toggleId = (
+  ids: number[] | undefined,
+  id: number
+): number[] => {
+  const currentIds = ids ?? [];
+
+  return currentIds.includes(id)
+    ? currentIds.filter((currentId) => currentId !== id)
+    : [...currentIds, id];
+};
+
 const estimateElementHeight = (
   element: BuilderElement
 ) => {
@@ -168,6 +179,7 @@ function templateDraftSnapshot(
     ...cloneDraft(draft),
     backendId: undefined,
     status: 'DRAFT',
+    jobOfferIds: [],
     steps: draft.steps.map((step, index) => ({
       ...step,
       id: uid(),
@@ -223,6 +235,9 @@ export function FormBuilder({
     'Saved' | 'Saving...' | 'Save failed'
   >('Saved');
 
+  const [hasUnsavedChanges, setHasUnsavedChanges] =
+    useState(false);
+
   const [dialog, setDialog] = useState<
     | 'templates'
     | 'settings'
@@ -249,11 +264,16 @@ export function FormBuilder({
 
         setHistory({
           past: [],
-          present: loadedDraft,
+          present: {
+            ...loadedDraft,
+            jobOfferIds: loadedDraft.jobOfferIds ?? [],
+          },
           future: [],
         });
 
         setLoadError('');
+        setHasUnsavedChanges(false);
+        setSaveState('Saved');
       })
       .catch((error) => {
         if (!active) return;
@@ -332,7 +352,7 @@ export function FormBuilder({
       };
     });
 
-    setSaveState('Saving...');
+    setHasUnsavedChanges(true);
   };
 
   const updateElement = (
@@ -367,7 +387,6 @@ export function FormBuilder({
 
     const targetIndex = index ?? step.elements.length;
     const sources = item.block || [item.id];
-
     const anchor = point || nextFreePoint(step.elements);
 
     const newElements = positionNewElements(
@@ -525,12 +544,16 @@ export function FormBuilder({
 
     setSaveState('Saving...');
 
-    const target = publishStatus
+    const target: BuilderDraft = publishStatus
       ? {
           ...draft,
-          status: 'PUBLISHED' as const,
+          status: 'PUBLISHED',
+          jobOfferIds: draft.jobOfferIds ?? [],
         }
-      : draft;
+      : {
+          ...draft,
+          jobOfferIds: draft.jobOfferIds ?? [],
+        };
 
     try {
       const saved = await saveDraftToBackend(
@@ -543,11 +566,15 @@ export function FormBuilder({
 
         return {
           ...current,
-          present: saved,
+          present: {
+            ...saved,
+            jobOfferIds: saved.jobOfferIds ?? [],
+          },
         };
       });
 
       setSaveState('Saved');
+      setHasUnsavedChanges(false);
 
       setToast(
         publishStatus
@@ -557,7 +584,9 @@ export function FormBuilder({
 
       setDialog(null);
 
-      if (publishStatus) onExit();
+      if (publishStatus) {
+        onExit();
+      }
     } catch {
       setSaveState('Save failed');
       setToast('Could not reach the backend');
@@ -745,6 +774,8 @@ export function FormBuilder({
         ],
       };
     });
+
+    setHasUnsavedChanges(true);
   };
 
   const redo = () => {
@@ -759,6 +790,8 @@ export function FormBuilder({
         future: current.future.slice(1),
       };
     });
+
+    setHasUnsavedChanges(true);
   };
 
   if (loading) {
@@ -929,7 +962,10 @@ export function FormBuilder({
           >
             <span>+</span>
             <h3>No pages yet</h3>
-            <p>Add your first page to start building the form.</p>
+            <p>
+              Add your first page to start building the
+              form.
+            </p>
 
             <div>
               <button
@@ -986,7 +1022,10 @@ export function FormBuilder({
 
       {dialog === 'templates' && (
         <TemplateSelector
-          templates={[...TEMPLATES, ...customTemplates]}
+          templates={[
+            ...TEMPLATES,
+            ...customTemplates,
+          ]}
           onClose={() => setDialog(null)}
           onSelect={applyTemplate}
           onDelete={deleteTemplate}
@@ -1021,10 +1060,13 @@ export function FormBuilder({
           offers={offers}
           onClose={() => setDialog(null)}
           onPublish={() => save(true)}
-          onLinkOffer={(offerId) =>
+          onToggleOffer={(offerId: number) =>
             commit((current) => ({
               ...current,
-              jobOfferId: offerId,
+              jobOfferIds: toggleId(
+                current.jobOfferIds,
+                offerId
+              ),
             }))
           }
           busy={saveState === 'Saving...'}

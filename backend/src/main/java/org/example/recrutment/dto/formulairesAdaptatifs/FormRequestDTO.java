@@ -7,11 +7,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * Données envoyées par le client (admin RH) pour créer ou modifier un Form.
- * Ne contient volontairement pas d'id, createdAt, updatedAt : ce sont des
- * informations gérées côté serveur, jamais fournies par le client.
- */
+import java.util.ArrayList;
+import java.util.List;
+
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -25,4 +24,7 @@ public class FormRequestDTO {
     private String description;
 
     private Boolean active;
+
+    @Builder.Default
+    private List<Long> jobOfferIds = new ArrayList<>();
 }

@@ -500,8 +500,8 @@
 /* Notification Center */
 .notification-center {
   position: fixed;
-  right: 24px;
-  top: 20px;
+  right: 10px;
+  top: 10px;
   z-index: 30;
 }
 
