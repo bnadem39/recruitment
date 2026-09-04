@@ -4,9 +4,10 @@ import { API, authHeaders } from '../shared/api';
 import type { Session } from '../shared/types';
 import './Evaluator.css';
 import { ROLE_THEME } from '../shared/roleTheme';
+import { ComplaintsPage } from '../shared/ComplaintsPage';
 
 type Recommendation = 'FAVORABLE' | 'RESERVED' | 'UNFAVORABLE';
-type EvaluatorView = 'calendar' | 'applications' | 'evaluations' | 'comments' | 'recommendations';
+type EvaluatorView = 'calendar' | 'applications' | 'evaluations' | 'comments' | 'recommendations' | 'complaints';
 type Filter = 'all' | 'todo' | 'done' | 'upcoming';
 type EvaluatorInterview = InterviewSummary & {
   applicationId?: number;
@@ -52,7 +53,7 @@ async function request<T>(url: string, token: string, init?: RequestInit): Promi
 
   if (!response.ok) {
     const body = await response.json().catch(() => ({}));
-    throw new Error(body.message || body.error || `Request failed (${response.status})`);
+    throw new Error(body.message || body.detail || body.error || `Request failed (${response.status})`);
   }
 
   return response.json() as Promise<T>;
@@ -422,6 +423,7 @@ export function EvaluatorDashboard({ session, logout }: { session: Session; logo
           <NavButton active={view === 'evaluations'} onClick={() => { setView('evaluations'); setFilter('todo'); }} icon="✓">Evaluations</NavButton>
           <NavButton active={view === 'comments'} onClick={() => setView('comments')} icon="◫">Comments</NavButton>
           <NavButton active={view === 'recommendations'} onClick={() => setView('recommendations')} icon="◇">Recommendations</NavButton>
+          <NavButton active={view === 'complaints'} onClick={() => setView('complaints')} icon="⚑">Complaints</NavButton>
         </nav>
 
         <div
@@ -487,6 +489,7 @@ export function EvaluatorDashboard({ session, logout }: { session: Session; logo
         {view === 'comments' && (
           <CommentsView interviews={interviews} evaluations={evaluations} onOpen={openEvaluation} />
         )}
+        {view === 'complaints' && <ComplaintsPage session={session} logout={logout} />}
 
         {view === 'recommendations' && (
           <RecommendationsView interviews={interviews} evaluations={evaluations} onOpen={openEvaluation} />

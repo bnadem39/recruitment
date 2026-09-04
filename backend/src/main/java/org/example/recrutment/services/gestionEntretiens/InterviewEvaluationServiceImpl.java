@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
+import java.time.LocalDateTime;
 
 
 @Service
@@ -45,7 +46,7 @@ public class InterviewEvaluationServiceImpl implements InterviewEvaluationServic
     public InterviewEvaluationResponseDTO create(Long interviewId, InterviewEvaluationRequestDTO request) {
         Interview interview = findInterviewOrThrow(interviewId);
 
-        if (interview.getStatus() != InterviewStatus.COMPLETED) {
+        if (!isCompletedOrFinished(interview)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Only completed interviews can be evaluated");
         }
 
@@ -128,6 +129,19 @@ public class InterviewEvaluationServiceImpl implements InterviewEvaluationServic
         }
         return interview.getEvaluation();
     }
+
+        private boolean isCompletedOrFinished(Interview interview) {
+        if (interview.getStatus() == InterviewStatus.COMPLETED) return true;
+        if (interview.getStatus() != InterviewStatus.SCHEDULED
+            && interview.getStatus() != InterviewStatus.IN_PROGRESS) return false;
+
+        LocalDateTime scheduledEnd = interview.getScheduledAt().plusMinutes(
+            interview.getDurationMinutes() != null ? interview.getDurationMinutes() : 60);
+        if (LocalDateTime.now().isBefore(scheduledEnd)) return false;
+
+        interview.setStatus(InterviewStatus.COMPLETED);
+        return true;
+        }
 
     private InterviewEvaluationResponseDTO toResponseDTO(Long interviewId, InterviewEvaluation evaluation) {
         return InterviewEvaluationResponseDTO.builder()

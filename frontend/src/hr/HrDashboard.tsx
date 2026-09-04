@@ -7,9 +7,10 @@ import { EvaluatorsPanel } from './EvaluatorsPanel';
 import { FormsPanel, type FormListItem } from './FormsPanel';
 import { JobOffersPanel } from './JobOffersPanel';
 import { ROLE_THEME } from '../shared/roleTheme';
+import { ComplaintsPage } from '../shared/ComplaintsPage';
 import './HR.css';
 
-type View = 'home' | 'jobOffers' | 'forms' | 'evaluators' | 'builder';
+type View = 'home' | 'jobOffers' | 'forms' | 'evaluators' | 'builder' | 'complaints';
 
 async function request<T>(path: string, token: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API}${path}`, {
@@ -109,6 +110,7 @@ export function HrDashboard({ session, logout }: { session: Session; logout: () 
           >
             ◇ Evaluators
           </button>
+          <button className={view === 'complaints' ? 'active' : ''} onClick={() => setView('complaints')}>⚑ Complaints</button>
         </nav>
         <div
           className="profile"
@@ -195,6 +197,7 @@ export function HrDashboard({ session, logout }: { session: Session; logout: () 
             loadingOffers={loadingOffers}
           />
         )}
+        {view === 'complaints' && <ComplaintsPage session={session} logout={logout} />}
       </main>
     </div>
   );
