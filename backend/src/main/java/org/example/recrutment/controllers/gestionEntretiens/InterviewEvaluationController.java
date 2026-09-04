@@ -19,6 +19,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
  * Imbriqué sous /api/interviews/{interviewId}/evaluation -- ressource
  * "singleton" (pas de collection ni d'id d'évaluation dans l'URL) car
  * la relation Interview <-> Evaluation est un OneToOne.
+ *
+ * IMPORTANT : cette ressource est distincte de la Form Evaluation stockée
+ * sur l'Application. Une application peut donc avoir une evaluation de
+ * formulaire ET une evaluation d'entretien, tant que chaque entite est
+ * unique par son propre conteneur (Application vs Interview).
  */
 @RestController
 @RequestMapping("/api/interviews/{interviewId}/evaluation")

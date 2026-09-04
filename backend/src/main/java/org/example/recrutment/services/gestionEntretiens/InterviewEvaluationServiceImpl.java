@@ -51,7 +51,7 @@ public class InterviewEvaluationServiceImpl implements InterviewEvaluationServic
 
         if (interview.getEvaluation() != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "Cet entretien a déjà une évaluation. Utilisez PUT pour la modifier.");
+                    "This interview already has an interview evaluation. Use PUT to update it; the application form evaluation is stored separately and does not block this record.");
         }
 
         InterviewEvaluation evaluation = InterviewEvaluation.builder()
