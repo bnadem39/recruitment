@@ -5,8 +5,9 @@ import { InterviewRoom } from '../shared/InterviewRoom';
 import { LocationMap } from '../shared/LocationMap';
 import './Candidate.css';
 import { ROLE_THEME } from '../shared/roleTheme';
+import { ComplaintsPage } from '../shared/ComplaintsPage';
 
-type View = 'dashboard' | 'jobs' | 'offer' | 'apply' | 'applications' | 'application' | 'interviews' | 'interview-room' | 'profile';
+type View = 'dashboard' | 'jobs' | 'offer' | 'apply' | 'applications' | 'application' | 'interviews' | 'interview-room' | 'profile' | 'complaints';
 type FieldType = 'TEXT' | 'TEXTAREA' | 'NUMBER' | 'DATE' | 'EMAIL' | 'PHONE' | 'RADIO' | 'CHECKBOX' | 'SELECT' | 'MULTI_SELECT' | 'FILE' | 'BOOLEAN';
 type Stage = 'SUBMISSION' | 'HR_REVIEW' | 'PRESELECTION' | 'HR_INTERVIEW' | 'TECHNICAL_INTERVIEW' | 'FINAL_VALIDATION' | 'FINAL_DECISION';
 type Offer = { id: number; title: string; description?: string; department?: string; contractType?: string; location?: string; publicationDate?: string; deadline?: string; formId?: number };
@@ -118,6 +119,7 @@ export function CandidateDashboard({ session, logout, initialOfferId }: { sessio
         <button className={view === 'applications' || view === 'application' ? 'active' : ''} onClick={() => navigate('applications')}>My Applications</button>
         <button className={view === 'interviews' || view === 'interview-room' ? 'active' : ''} onClick={() => navigate('interviews')}>Interviews & Results</button>
         <button className={view === 'profile' ? 'active' : ''} onClick={() => navigate('profile')}>My Profile</button>
+        <button className={view === 'complaints' ? 'active' : ''} onClick={() => navigate('complaints')}>Complaints</button>
       </nav>
       <div className="profile" style={{ '--role-color': ROLE_THEME.USER.color } as React.CSSProperties}>
         <span>{session.firstName[0]}{session.lastName[0]}</span>
@@ -137,6 +139,7 @@ export function CandidateDashboard({ session, logout, initialOfferId }: { sessio
         {view === 'interviews' && <Interviews interviews={interviews} focusedId={focusedInterviewId} join={(id) => { setSelectedInterviewId(id); setView('interview-room'); }} />}
         {view === 'interview-room' && selectedInterviewId && <InterviewRoom interview={interviews.find(item => item.id === selectedInterviewId)!} token={session.accessToken} onLeave={() => navigate('interviews')} onAuthExpired={logout} />}
         {view === 'profile' && profile && <CandidateProfile profile={profile} token={session.accessToken} onSaved={setProfile} />}
+        {view === 'complaints' && <ComplaintsPage session={session} logout={logout} />}
       </>}
     </main>
   </div>;

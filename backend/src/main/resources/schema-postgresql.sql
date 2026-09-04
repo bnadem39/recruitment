@@ -43,6 +43,20 @@ BEGIN
     END IF;
 END $$@@
 
+CREATE TABLE IF NOT EXISTS complaints (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL REFERENCES users(id),
+    subject VARCHAR(200) NOT NULL,
+    message TEXT NOT NULL,
+    category VARCHAR(30) NOT NULL,
+    status VARCHAR(30) NOT NULL DEFAULT 'PENDING',
+    response TEXT,
+    responded_by BIGINT REFERENCES users(id),
+    created_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    responded_at TIMESTAMP(6)
+)@@
+
 DO $$
 BEGIN
     IF to_regclass(format('%I.%I', current_schema(), 'applications')) IS NOT NULL THEN

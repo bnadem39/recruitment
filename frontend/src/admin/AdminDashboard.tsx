@@ -2,9 +2,10 @@ import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { API, authHeaders } from '../shared/api';
 import type { InternalUser, Session } from '../shared/types';
 import { ROLE_THEME } from '../shared/roleTheme';
+import { AdminComplaintsPage } from '../shared/AdminComplaintsPage';
 import './Admin.css';
 
-type View = 'users' | 'recruitment' | 'evaluations' | 'reports';
+type View = 'users' | 'recruitment' | 'evaluations' | 'reports' | 'complaints';
 
 export function AdminDashboard({ session, logout }: { session: Session; logout: () => void }) {
   const [view, setView] = useState<View>('users');
@@ -65,6 +66,7 @@ export function AdminDashboard({ session, logout }: { session: Session; logout: 
           <button className={view === 'recruitment' ? 'active' : ''} onClick={() => setView('recruitment')}>◫ Recruitment</button>
           <button className={view === 'evaluations' ? 'active' : ''} onClick={() => setView('evaluations')}>◇ Evaluations</button>
           <button className={view === 'reports' ? 'active' : ''} onClick={() => setView('reports')}>◌ Reports</button>
+          <button className={view === 'complaints' ? 'active' : ''} onClick={() => setView('complaints')}>⚑ Complaints</button>
         </nav>
         <div className="profile" style={{ '--role-color': ROLE_THEME.ADMIN.color } as React.CSSProperties}>
           <span>{session.firstName[0]}{session.lastName[0]}</span>
@@ -130,6 +132,7 @@ export function AdminDashboard({ session, logout }: { session: Session; logout: 
         {view === 'recruitment' && <ComingSoon label="RECRUITMENT" title="Recruitment overview" body="A cross-team view of job offers and hiring pipelines is coming soon." />}
         {view === 'evaluations' && <ComingSoon label="EVALUATIONS" title="Evaluations overview" body="Aggregated evaluator activity and scores are coming soon." />}
         {view === 'reports' && <ComingSoon label="REPORTS" title="Reports" body="Recruitment analytics and exportable reports are coming soon." />}
+        {view === 'complaints' && <AdminComplaintsPage session={session} />}
       </main>
 
       {modal && <AddUser headers={headers} close={() => setModal(false)} done={() => { setModal(false); void load(); }} />}

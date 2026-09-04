@@ -14,6 +14,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
         "org.example.recrutment.entities.liaisons",
         "org.example.recrutment.entities.audit",
         "org.example.recrutment.entities.notification",
+        "org.example.recrutment.entities.complaints",
         "org.example.recrutment.entities.talentpool",
         "org.example.recrutment.hr"
 })
