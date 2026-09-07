@@ -20,4 +20,9 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
     @Transactional
     @Query("UPDATE Application a SET a.formEvaluator = null WHERE a.formEvaluator.id = :userId")
     void unassignFormEvaluator(Long userId);
+
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM Application a WHERE a.jobOffer.id = :offerId")
+    void deleteByJobOfferId(Long offerId);
 }

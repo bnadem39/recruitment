@@ -21,4 +21,9 @@ public interface InterviewRepository extends JpaRepository<Interview, Long> {
     @Transactional
     @Query("UPDATE Interview i SET i.assignedEvaluator = null WHERE i.assignedEvaluator.id = :userId")
     void unassignEvaluator(Long userId);
+
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM Interview i WHERE i.application.jobOffer.id = :offerId")
+    void deleteByApplicationJobOfferId(Long offerId);
 }
