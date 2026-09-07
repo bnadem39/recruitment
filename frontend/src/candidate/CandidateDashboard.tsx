@@ -81,11 +81,20 @@ export function CandidateDashboard({ session, logout, initialOfferId }: { sessio
   useEffect(() => { void load(); }, []);
 
   useEffect(() => {
-    if (!initialOfferId) return;
-    sessionStorage.removeItem('pendingOfferId');
-    setSelectedOfferId(initialOfferId);
-    setView('offer');
-  }, [initialOfferId]);
+  if (
+    initialOfferId === undefined ||
+    initialOfferId === null ||
+    !Number.isFinite(initialOfferId) ||
+    initialOfferId <= 0
+  ) {
+    return;
+  }
+
+  setSelectedOfferId(initialOfferId);
+  setView('offer');
+
+  sessionStorage.removeItem('pendingOfferId');
+}, [initialOfferId]);
 
   useEffect(() => {
     const handleNavigation = (event: Event) => {
@@ -184,7 +193,144 @@ function ApplicationForm({ offerId, token, onSubmitted }: { offerId: number; tok
   const submit = async () => { if (!form || !validate() || !window.confirm('Submit this application?')) return; setSubmitting(true); setMessage(''); try { const responses = visibleFields.map(field => toResponse(field, answers[field.id], files[field.id])); const result = await request<{ applicationId: number }>(`/api/candidate/job-offers/${offerId}/submit`, token, { method: 'POST', body: JSON.stringify({ responses }) }); setMessage('Application submitted successfully. Your application has been received.'); onSubmitted(result.applicationId); } catch (err) { setMessage(err instanceof Error ? err.message : 'Submission failed'); } finally { setSubmitting(false); } };
   if (message && !form) return <div className="candidate-alert">{message}</div>;
   if (!form) return <CandidateLoading />;
-  return <section><PageHeader label="Application Form" title={form.title} body={form.description || 'Complete the form prepared by HR.'} />{message && <div className="candidate-success">{message}</div>}{!review ? <div className="dynamic-form">{visibleFields.map(field => <DynamicField key={field.id} field={field} value={answers[field.id]} file={files[field.id]} error={errors[field.id]} setValue={setAnswer} setFile={(file) => setFiles(prev => ({ ...prev, [field.id]: file }))} />)}<div className="candidate-form-actions"><button onClick={() => validate() && setReview(true)} className="primary">Review Application</button></div></div> : <div className="review-panel"><h2>Review Application</h2>{visibleFields.map(field => <div className="review-row" key={field.id}><strong>{field.label}</strong><span>{reviewValue(field, answers[field.id], files[field.id])}</span></div>)}<div className="candidate-form-actions"><button onClick={() => setReview(false)}>Edit</button><button className="primary" disabled={submitting} onClick={submit}>{submitting ? 'Submitting...' : 'Submit Application'}</button></div></div>}</section>;
+  return (
+  <section>
+    <PageHeader
+      label="Application Form"
+      title={form.title}
+      body={form.description || 'Complete the form prepared by HR.'}
+    />
+
+    {message && (
+      <div className="candidate-success">
+        {message}
+      </div>
+    )}
+
+    {!review ? (
+      <div className="dynamic-form">
+        {visibleFields.map(field => (
+          <DynamicField
+            key={field.id}
+            field={field}
+            value={answers[field.id]}
+            file={files[field.id]}
+            error={errors[field.id]}
+            setValue={setAnswer}
+            setFile={file =>
+              setFiles(previous => ({
+                ...previous,
+                [field.id]: file,
+              }))
+            }
+          />
+        ))}
+
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            marginTop: '24px',
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => {
+              if (validate()) {
+                setReview(true);
+              }
+            }}
+            style={{
+              width: '220px',
+              minWidth: '220px',
+              height: '48px',
+              padding: '0 24px',
+              border: '1px solid #147d73',
+              borderRadius: '10px',
+              background: '#147d73',
+              color: '#ffffff',
+              fontSize: '16px',
+              fontWeight: 700,
+              cursor: 'pointer',
+            }}
+          >
+            Review Application
+          </button>
+        </div>
+      </div>
+    ) : (
+      <div className="review-panel">
+        <h2>Review Application</h2>
+
+        {visibleFields.map(field => (
+          <div className="review-row" key={field.id}>
+            <strong>{field.label}</strong>
+
+            <span>
+              {reviewValue(
+                field,
+                answers[field.id],
+                files[field.id]
+              )}
+            </span>
+          </div>
+        ))}
+
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-start',
+            gap: '16px',
+            marginTop: '24px',
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => setReview(false)}
+            style={{
+              width: '96px',
+              minWidth: '96px',
+              height: '48px',
+              padding: '0 20px',
+              border: '1px solid #cbd5e1',
+              borderRadius: '10px',
+              background: '#ffffff',
+              color: '#155e63',
+              fontSize: '16px',
+              fontWeight: 700,
+              cursor: 'pointer',
+            }}
+          >
+            Edit
+          </button>
+
+          <button
+            type="button"
+            disabled={submitting}
+            onClick={() => void submit()}
+            style={{
+              width: '220px',
+              minWidth: '220px',
+              height: '48px',
+              padding: '0 24px',
+              border: '1px solid #147d73',
+              borderRadius: '10px',
+              background: '#147d73',
+              color: '#ffffff',
+              fontSize: '16px',
+              fontWeight: 700,
+              cursor: submitting ? 'not-allowed' : 'pointer',
+              opacity: submitting ? 0.65 : 1,
+            }}
+          >
+            {submitting ? 'Submitting...' : 'Submit Application'}
+          </button>
+        </div>
+      </div>
+    )}
+  </section>
+);
 }
 
 function DynamicField({ field, value, file, error, setValue, setFile }: { field: Field; value?: string | boolean; file?: File; error?: string; setValue: (id: number, value: string | boolean) => void; setFile: (file?: File) => void }) {

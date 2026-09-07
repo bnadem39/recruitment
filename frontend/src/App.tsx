@@ -279,11 +279,6 @@ export default function App() {
     );
   }
 
-  /*
-   * THIS IS THE IMPORTANT PART:
-   * After signup, show EmailVerification.tsx instead of
-   * the old "Check your email" page.
-   */
   if (!session && signupVerification) {
     return (
       <EmailVerification

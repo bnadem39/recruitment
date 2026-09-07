@@ -60,6 +60,20 @@ export function EvaluatorsPanel({
     void loadEvaluators();
   }, [loadEvaluators]);
 
+  // Nombre d'évaluateurs assignés à une offre donnée.
+  // - Si c'est l'offre actuellement ouverte dans le panneau du bas, on utilise
+  //   l'état local `assigned` (reflète les cases cochées en direct, avant même save).
+  // - Sinon, on déduit le compte depuis `evaluators[].assignedOffers`, qui vient du back.
+  const assignedCount = useCallback(
+    (offerId: number) => {
+      if (selectedOffer?.id === offerId) return assigned.length;
+      return evaluators.filter(evaluator =>
+        evaluator.assignedOffers.some(assignedOffer => assignedOffer.id === offerId)
+      ).length;
+    },
+    [selectedOffer, assigned, evaluators]
+  );
+
   const openOffer = async (offer: JobOffer) => {
     setSelectedOffer(offer);
     setAssigned([]);
@@ -92,6 +106,9 @@ export function EvaluatorsPanel({
         method: 'PUT',
         body: JSON.stringify({ evaluatorIds: assigned }),
       });
+      // Recharge la liste des évaluateurs pour que les autres lignes du tableau
+      // (offres non ouvertes) reflètent aussi le nouvel état après sauvegarde.
+      await loadEvaluators();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not save the assignment.');
     } finally {
@@ -127,6 +144,8 @@ export function EvaluatorsPanel({
           ) : (
             offers.map(offer => {
               const isSelected = selectedOffer?.id === offer.id;
+              const count = assignedCount(offer.id);
+              const hasEvaluators = count > 0;
 
               return (
                 <div className="tr" key={offer.id}>
@@ -138,9 +157,9 @@ export function EvaluatorsPanel({
                   <span className="job-offer-date">{offer.department || '—'}</span>
 
                   <span>
-                    <em className={isSelected ? 'active' : 'disabled'}>
+                    <em className={hasEvaluators ? 'active' : 'disabled'}>
                       <i></i>
-                      {isSelected ? `${assigned.length} selected` : 'Not selected'}
+                      {hasEvaluators ? `${count} selected` : 'Not selected'}
                     </em>
                   </span>
 
