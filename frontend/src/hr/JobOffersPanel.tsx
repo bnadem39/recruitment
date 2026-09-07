@@ -109,19 +109,45 @@ export function JobOffersPanel({
     setEditingOffer(null);
   };
 
-  const copyLink = async (offerId: number) => {
-    const link = `${window.location.origin}/?applyOffer=${offerId}`;
+  const copyLink = async (offer: JobOffer) => {
+    if (offer.status !== 'PUBLISHED') {
+      setError('Publish the job offer before sharing its application link.');
+      return;
+    }
+
+    const link = `${window.location.origin}/?applyOffer=${offer.id}`;
 
     try {
-      await navigator.clipboard.writeText(link);
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(link);
+      } else {
+        const input = document.createElement('textarea');
 
-      setCopiedId(offerId);
+        input.value = link;
+        input.style.position = 'fixed';
+        input.style.opacity = '0';
+
+        document.body.appendChild(input);
+        input.focus();
+        input.select();
+
+        const copied = document.execCommand('copy');
+
+        document.body.removeChild(input);
+
+        if (!copied) {
+          throw new Error('Copy command failed.');
+        }
+      }
+
+      setCopiedId(offer.id);
+      setError('');
 
       window.setTimeout(() => {
-        setCopiedId(current => (current === offerId ? null : current));
+        setCopiedId(current => (current === offer.id ? null : current));
       }, 2000);
     } catch {
-      setError('Could not copy the application link.');
+      setError('Could not copy the application link. Please copy it manually.');
     }
   };
 
@@ -273,7 +299,13 @@ export function JobOffersPanel({
                     <button
                       type="button"
                       className="hr-btn-secondary"
-                      onClick={() => void copyLink(offer.id)}
+                      disabled={offer.status !== 'PUBLISHED'}
+                      title={
+                        offer.status !== 'PUBLISHED'
+                          ? 'Publish this offer before copying its public link.'
+                          : 'Copy application link'
+                      }
+                      onClick={() => void copyLink(offer)}
                     >
                       {copiedId === offer.id ? '✓ Copied' : 'Copy'}
                     </button>
