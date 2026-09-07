@@ -23,4 +23,6 @@ public interface EvaluatorAssignmentRepository extends JpaRepository<EvaluatorAs
     @Modifying
     @Query("delete from EvaluatorAssignment assignment where assignment.offer.id = :offerId")
     void deleteByOfferId(@Param("offerId") Long offerId);
+
+    void deleteByEvaluator_Id(Long evaluatorId);
 }

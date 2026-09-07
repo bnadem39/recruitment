@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface EmailVerificationTokenRepository extends JpaRepository<EmailVerificationToken, Long> {
     Optional<EmailVerificationToken> findTopByUser_EmailIgnoreCaseAndCodeHashAndUsedAtIsNullOrderByCreatedAtDesc(String email, String codeHash);
     List<EmailVerificationToken> findByUser_EmailIgnoreCaseAndUsedAtIsNull(String email);
+    void deleteByUser_Id(Long userId);
 }
