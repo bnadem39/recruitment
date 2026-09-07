@@ -6,7 +6,10 @@ import org.example.recrutment.entities.formulairesAdaptatifs.Form;
 import org.example.recrutment.entities.gestionOffres.JobOffer;
 import org.example.recrutment.entities.gestionOffres.OfferStatus;
 import org.example.recrutment.exceptions.ResourceNotFoundException;
+import org.example.recrutment.repositories.candidatures.ApplicationRepository;
+import org.example.recrutment.repositories.candidatures.FieldResponseRepository;
 import org.example.recrutment.repositories.formulairesAdaptatifs.FormRepository;
+import org.example.recrutment.repositories.gestionEntretiens.InterviewRepository;
 import org.example.recrutment.repositories.gestionOffres.JobOfferRepository;
 import org.example.recrutment.hr.EvaluatorAssignmentRepository;
 import org.example.recrutment.services.notifications.NotificationService;
@@ -28,14 +31,26 @@ public class JobOfferServiceImpl implements JobOfferService {
     private final FormRepository formRepository;
     private final EvaluatorAssignmentRepository evaluatorAssignments;
     private final NotificationService notifications;
+    private final ApplicationRepository applicationRepository;
+    private final InterviewRepository interviewRepository;
+    private final FieldResponseRepository fieldResponseRepository;
+
+
 
     public JobOfferServiceImpl(JobOfferRepository jobOfferRepository, FormRepository formRepository,
                                EvaluatorAssignmentRepository evaluatorAssignments,
-                               NotificationService notifications) {
+                               NotificationService notifications,
+                               ApplicationRepository applicationRepository,
+                               InterviewRepository interviewRepository,
+                               FieldResponseRepository fieldResponseRepository) {
         this.jobOfferRepository = jobOfferRepository;
         this.formRepository = formRepository;
         this.evaluatorAssignments = evaluatorAssignments;
         this.notifications = notifications;
+        this.applicationRepository = applicationRepository;
+        this.interviewRepository = interviewRepository;
+        this.fieldResponseRepository = fieldResponseRepository;
+
     }
 
     // ==================== Create ====================
@@ -145,6 +160,10 @@ public class JobOfferServiceImpl implements JobOfferService {
     @Transactional
     public void delete(Long id) {
         JobOffer offer = findOfferOrThrow(id);
+        fieldResponseRepository.deleteByApplicationJobOfferId(id);
+        interviewRepository.deleteByApplicationJobOfferId(id);
+        applicationRepository.deleteByJobOfferId(id);
+        evaluatorAssignments.deleteByOfferId(id);
         jobOfferRepository.delete(offer);
     }
 
