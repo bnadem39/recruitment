@@ -29,7 +29,8 @@ type Evaluation = {
   createdAt?: string;
 };
 type JoinAction = { disabled: boolean; label: string; detail: string };
-type CandidateApplication = { id: number; status: string; submittedAt?: string; jobOfferTitle: string; candidateName: string; candidateEmail: string; formScore?: number; formHrComment?: string; formCandidateComment?: string; formDecision?: string; formEvaluatedAt?: string; answers: { label: string; textValue?: string; numberValue?: number; dateValue?: string; booleanValue?: boolean }[] };
+type CandidateApplication = { id: number; status: string; submittedAt?: string; jobOfferTitle: string; candidateName: string; candidateEmail: string; formScore?: number; formHrComment?: string; formCandidateComment?: string; formDecision?: string; formEvaluatedAt?: string; answers: { label: string; textValue?: string; numberValue?: number; dateValue?: string; booleanValue?: boolean }[]; documents?: DocumentMetadata[] };
+type DocumentMetadata = { id: number; applicationId: number; originalName: string; mimeType: string; fileSize: string; verificationStatus: string; uploadedAt?: string };
 type FormEvaluation = { score: number | ''; commentForHR: string; commentForCandidate: string; decision: 'ACCEPTED' | 'REJECTED' | '' };
 
 const emptyEvaluation: Evaluation = {
@@ -568,6 +569,24 @@ function FormEvaluationCard({ application, evaluate, schedule }: {
   return <article>
     <header><div><small>{application.jobOfferTitle}</small><h2>{application.candidateName}</h2><p>{application.candidateEmail} - {nice(application.status)}</p></div></header>
     <div className="history-comments">{application.answers.map(answer => <div key={answer.label}><b>{answer.label}</b><p>{String(answer.textValue ?? answer.numberValue ?? answer.dateValue ?? answer.booleanValue ?? '-')}</p></div>)}</div>
+    {(application.documents && application.documents.length > 0) && (
+      <div className="documents-section" style={{ marginTop: 16, padding: 16, background: '#f9fafb', borderRadius: 8, border: '1px solid #e5e7eb' }}>
+        <h3 style={{ margin: '0 0 12px 0', fontSize: 14, fontWeight: 600, color: '#1f2937' }}>📄 Candidate Documents ({application.documents.length})</h3>
+        <div style={{ display: 'grid', gap: 8 }}>
+          {application.documents.map(doc => (
+            <div key={doc.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 10, background: 'white', borderRadius: 6, border: '1px solid #dce2ea' }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 500, color: '#1f2937', fontSize: 13 }}>{doc.originalName}</div>
+                <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 2 }}>{doc.fileSize} • {doc.mimeType}</div>
+              </div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <span style={{ padding: '4px 8px', background: '#f0f9ff', color: '#3b82f6', borderRadius: 4, fontSize: 11, fontWeight: 600, textTransform: 'uppercase' }}>{doc.verificationStatus}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
     {!saved && <div className="review-panel evaluator-form">
       <label className="candidate-field">Score (0 - 100)<input required type="number" min="0" max="100" value={value.score} onChange={event => setValue(current => ({ ...current, score: event.target.value === '' ? '' : Number(event.target.value) }))} /></label>
       <label className="candidate-field">Comment for HR<textarea rows={3} value={value.commentForHR} onChange={event => setValue(current => ({ ...current, commentForHR: event.target.value }))} /></label>
