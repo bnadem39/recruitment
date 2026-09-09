@@ -6,11 +6,13 @@ import type { JobOffer } from './form-builder/types';
 import { EvaluatorsPanel } from './EvaluatorsPanel';
 import { FormsPanel, type FormListItem } from './FormsPanel';
 import { JobOffersPanel } from './JobOffersPanel';
+import { TalentPoolPage } from './TalentPoolPage';
+import { HrCandidateEvaluationsPage } from './HrCandidateEvaluationsPage';
 import { ROLE_THEME } from '../shared/roleTheme';
 import { ComplaintsPage } from '../shared/ComplaintsPage';
 import './HR.css';
 
-type View = 'home' | 'jobOffers' | 'forms' | 'evaluators' | 'builder' | 'complaints';
+type View = 'home' | 'jobOffers' | 'forms' | 'evaluators' | 'builder' | 'complaints' | 'talentPool' | 'evaluations';
 
 async function request<T>(path: string, token: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API}${path}`, {
@@ -110,6 +112,18 @@ export function HrDashboard({ session, logout }: { session: Session; logout: () 
           >
             ◇ Evaluators
           </button>
+          <button
+            className={view === 'evaluations' ? 'active' : ''}
+            onClick={() => setView('evaluations')}
+          >
+            📊 Candidate Evaluations
+          </button>
+          <button
+            className={view === 'talentPool' ? 'active' : ''}
+            onClick={() => setView('talentPool')}
+          >
+            ⭐ Talent Pool
+          </button>
           <button className={view === 'complaints' ? 'active' : ''} onClick={() => setView('complaints')}>⚑ Complaints</button>
         </nav>
         <div
@@ -197,6 +211,8 @@ export function HrDashboard({ session, logout }: { session: Session; logout: () 
             loadingOffers={loadingOffers}
           />
         )}
+        {view === 'evaluations' && <HrCandidateEvaluationsPage session={session} />}
+        {view === 'talentPool' && <TalentPoolPage session={session} />}
         {view === 'complaints' && <ComplaintsPage session={session} logout={logout} />}
       </main>
     </div>
