@@ -5,6 +5,7 @@ import org.example.recrutment.dto.formulairesAdaptatifs.FormFieldResponseDTO;
 import org.example.recrutment.entities.formulairesAdaptatifs.Form;
 import org.example.recrutment.entities.formulairesAdaptatifs.FormField;
 import org.example.recrutment.exceptions.ResourceNotFoundException;
+import org.example.recrutment.repositories.candidatures.FieldResponseRepository;
 import org.example.recrutment.repositories.formulairesAdaptatifs.FieldConditionRepository;
 import org.example.recrutment.repositories.formulairesAdaptatifs.FieldOptionRepository;
 import org.example.recrutment.repositories.formulairesAdaptatifs.FormFieldRepository;
@@ -21,32 +22,44 @@ public class FormFieldServiceImpl implements FormFieldService {
     private final FormRepository formRepository;
     private final FieldConditionRepository fieldConditionRepository;
     private final FieldOptionRepository fieldOptionRepository;
+    private final FieldResponseRepository fieldResponseRepository;
 
     public FormFieldServiceImpl(
             FormFieldRepository formFieldRepository,
             FormRepository formRepository,
             FieldConditionRepository fieldConditionRepository,
-            FieldOptionRepository fieldOptionRepository
+            FieldOptionRepository fieldOptionRepository,
+            FieldResponseRepository fieldResponseRepository
     ) {
         this.formFieldRepository = formFieldRepository;
         this.formRepository = formRepository;
         this.fieldConditionRepository = fieldConditionRepository;
         this.fieldOptionRepository = fieldOptionRepository;
+        this.fieldResponseRepository = fieldResponseRepository;
     }
-
-    // ==================== Create ====================
 
     @Override
     @Transactional
-    public FormFieldResponseDTO create(Long formId, FormFieldRequestDTO request) {
+    public FormFieldResponseDTO create(
+            Long formId,
+            FormFieldRequestDTO request
+    ) {
         Form form = findFormOrThrow(formId);
 
         FormField field = FormField.builder()
                 .label(request.getLabel())
                 .fieldType(request.getFieldType())
-                .required(request.getRequired() != null ? request.getRequired() : false)
+                .required(
+                        request.getRequired() != null
+                                ? request.getRequired()
+                                : false
+                )
                 .placeholder(request.getPlaceholder())
-                .defaultVisible(request.getDefaultVisible() != null ? request.getDefaultVisible() : true)
+                .defaultVisible(
+                        request.getDefaultVisible() != null
+                                ? request.getDefaultVisible()
+                                : true
+                )
                 .displayOrder(request.getDisplayOrder())
                 .validationRule(request.getValidationRule())
                 .minimumValue(request.getMinimumValue())
@@ -57,41 +70,51 @@ public class FormFieldServiceImpl implements FormFieldService {
                 .build();
 
         FormField saved = formFieldRepository.save(field);
+
         return toResponseDTO(saved);
     }
 
-    // ==================== Read ====================
-
     @Override
-    public FormFieldResponseDTO getById(Long formId, Long fieldId) {
+    public FormFieldResponseDTO getById(
+            Long formId,
+            Long fieldId
+    ) {
         return toResponseDTO(findFieldOrThrow(formId, fieldId));
     }
 
     @Override
     public List<FormFieldResponseDTO> getAllByForm(Long formId) {
         findFormOrThrow(formId);
-        return formFieldRepository.findByForm_FormIdOrderByDisplayOrderAsc(formId)
+
+        return formFieldRepository
+                .findByForm_FormIdOrderByDisplayOrderAsc(formId)
                 .stream()
                 .map(this::toResponseDTO)
                 .toList();
     }
 
-    // ==================== Update ====================
-
     @Override
     @Transactional
-    public FormFieldResponseDTO update(Long formId, Long fieldId, FormFieldRequestDTO request) {
+    public FormFieldResponseDTO update(
+            Long formId,
+            Long fieldId,
+            FormFieldRequestDTO request
+    ) {
         FormField field = findFieldOrThrow(formId, fieldId);
 
         field.setLabel(request.getLabel());
         field.setFieldType(request.getFieldType());
+
         if (request.getRequired() != null) {
             field.setRequired(request.getRequired());
         }
+
         field.setPlaceholder(request.getPlaceholder());
+
         if (request.getDefaultVisible() != null) {
             field.setDefaultVisible(request.getDefaultVisible());
         }
+
         field.setDisplayOrder(request.getDisplayOrder());
         field.setValidationRule(request.getValidationRule());
         field.setMinimumValue(request.getMinimumValue());
@@ -99,38 +122,45 @@ public class FormFieldServiceImpl implements FormFieldService {
         field.setMinimumLength(request.getMinimumLength());
         field.setMaximumLength(request.getMaximumLength());
 
-        return toResponseDTO(formFieldRepository.save(field));
-    }
+        FormField updated = formFieldRepository.save(field);
 
-    // ==================== Delete ====================
+        return toResponseDTO(updated);
+    }
 
     @Override
     @Transactional
     public void delete(Long formId, Long fieldId) {
         FormField field = findFieldOrThrow(formId, fieldId);
 
-        // 1. Conditions
+        // 1. Supprime les réponses des candidats liées à ce champ.
+        fieldResponseRepository.deleteAllByFieldId(fieldId);
+
+        // 2. Supprime les conditions utilisant ce champ.
         fieldConditionRepository.deleteAllByFieldId(fieldId);
 
-        // 2. Options
+        // 3. Supprime les options de ce champ.
         fieldOptionRepository.deleteAllByFieldId(fieldId);
 
-        // 3. Champ
+        // 4. Supprime le champ.
         formFieldRepository.delete(field);
     }
-
-    // ==================== Utils ====================
 
     private Form findFormOrThrow(Long formId) {
         return formRepository.findById(formId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Formulaire introuvable avec l'id : " + formId));
+                        "Formulaire introuvable avec l'id : " + formId
+                ));
     }
 
     private FormField findFieldOrThrow(Long formId, Long fieldId) {
-        return formFieldRepository.findByIdAndForm_FormId(fieldId, formId)
+        return formFieldRepository
+                .findByIdAndForm_FormId(fieldId, formId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Champ introuvable avec l'id : " + fieldId + " pour le formulaire : " + formId));
+                        "Champ introuvable avec l'id : "
+                                + fieldId
+                                + " pour le formulaire : "
+                                + formId
+                ));
     }
 
     private FormFieldResponseDTO toResponseDTO(FormField field) {
