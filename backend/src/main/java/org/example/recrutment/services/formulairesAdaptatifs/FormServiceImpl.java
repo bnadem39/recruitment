@@ -4,6 +4,7 @@ import org.example.recrutment.dto.formulairesAdaptatifs.FormRequestDTO;
 import org.example.recrutment.dto.formulairesAdaptatifs.FormResponseDTO;
 import org.example.recrutment.entities.formulairesAdaptatifs.Form;
 import org.example.recrutment.exceptions.ResourceNotFoundException;
+import org.example.recrutment.repositories.candidatures.FieldResponseRepository;
 import org.example.recrutment.repositories.formulairesAdaptatifs.FieldConditionRepository;
 import org.example.recrutment.repositories.formulairesAdaptatifs.FieldOptionRepository;
 import org.example.recrutment.repositories.formulairesAdaptatifs.FormFieldRepository;
@@ -22,19 +23,8 @@ public class FormServiceImpl implements FormService {
     private final FormFieldRepository formFieldRepository;
     private final FieldConditionRepository fieldConditionRepository;
     private final FieldOptionRepository fieldOptionRepository;
-
-    /*
-     * Conservé temporairement parce que ton code de suppression
-     * utilise encore job_offers.form_id.
-     *
-     * Tu pourras le retirer après avoir totalement migré vers
-     * job_offer_forms et supprimé job_offers.form_id.
-     */
+    private final FieldResponseRepository fieldResponseRepository;
     private final JobOfferRepository jobOfferRepository;
-
-    /*
-     * Nouveau service : crée les lignes dans job_offer_forms.
-     */
     private final JobOfferFormService jobOfferFormService;
 
     public FormServiceImpl(
@@ -42,6 +32,7 @@ public class FormServiceImpl implements FormService {
             FormFieldRepository formFieldRepository,
             FieldConditionRepository fieldConditionRepository,
             FieldOptionRepository fieldOptionRepository,
+            FieldResponseRepository fieldResponseRepository,
             JobOfferRepository jobOfferRepository,
             JobOfferFormService jobOfferFormService
     ) {
@@ -49,11 +40,10 @@ public class FormServiceImpl implements FormService {
         this.formFieldRepository = formFieldRepository;
         this.fieldConditionRepository = fieldConditionRepository;
         this.fieldOptionRepository = fieldOptionRepository;
+        this.fieldResponseRepository = fieldResponseRepository;
         this.jobOfferRepository = jobOfferRepository;
         this.jobOfferFormService = jobOfferFormService;
     }
-
-    // ==================== Create ====================
 
     @Override
     @Transactional
@@ -70,14 +60,6 @@ public class FormServiceImpl implements FormService {
 
         Form saved = formRepository.save(form);
 
-        /*
-         * Si le frontend envoie :
-         * "jobOfferIds": [3, 4]
-         *
-         * alors le backend ajoute :
-         * (job_offer_id = 3, form_id = saved.formId)
-         * (job_offer_id = 4, form_id = saved.formId)
-         */
         jobOfferFormService.addLinks(
                 saved,
                 request.getJobOfferIds()
@@ -85,8 +67,6 @@ public class FormServiceImpl implements FormService {
 
         return toResponseDTO(saved);
     }
-
-    // ==================== Read ====================
 
     @Override
     public FormResponseDTO getById(Long id) {
@@ -109,14 +89,9 @@ public class FormServiceImpl implements FormService {
                 .toList();
     }
 
-    // ==================== Update ====================
-
     @Override
     @Transactional
-    public FormResponseDTO update(
-            Long id,
-            FormRequestDTO request
-    ) {
+    public FormResponseDTO update(Long id, FormRequestDTO request) {
         Form form = findFormOrThrow(id);
 
         form.setTitle(request.getTitle());
@@ -128,14 +103,6 @@ public class FormServiceImpl implements FormService {
 
         Form saved = formRepository.save(form);
 
-        /*
-         * Ajoute les nouvelles offres sélectionnées dans le frontend.
-         *
-         * La méthode addLinks() utilise existsById(), donc :
-         * - un lien existant n'est pas dupliqué ;
-         * - les liens anciens ne sont pas supprimés ;
-         * - plusieurs offres peuvent être ajoutées au même formulaire.
-         */
         jobOfferFormService.addLinks(
                 saved,
                 request.getJobOfferIds()
@@ -144,51 +111,40 @@ public class FormServiceImpl implements FormService {
         return toResponseDTO(saved);
     }
 
-    // ==================== Delete ====================
-
     @Override
     @Transactional
     public void delete(Long id) {
         Form form = findFormOrThrow(id);
 
         /*
-         * Temporaire : ancien modèle, job_offers.form_id.
-         *
-         * Laisse cette ligne uniquement tant que la colonne
-         * job_offers.form_id existe encore dans PostgreSQL.
+         * Suppression définitive :
+         * les réponses candidates associées aux champs seront supprimées.
          */
+
+        // 1. Retire la référence du formulaire depuis les offres.
         jobOfferRepository.clearFormId(id);
 
-        /*
-         * Les liens dans job_offer_forms seront normalement supprimés
-         * automatiquement par la contrainte FK avec ON DELETE CASCADE.
-         *
-         * Si ta table job_offer_forms n'a pas ON DELETE CASCADE,
-         * nous ajouterons une suppression explicite plus tard.
-         */
+        // 2. Supprime les réponses candidates avant les champs.
+        fieldResponseRepository.deleteAllByFormId(id);
 
-        // 1. Conditions liées aux champs du formulaire.
+        // 3. Supprime les conditions des champs.
         fieldConditionRepository.deleteAllByFormId(id);
 
-        // 2. Options liées aux champs du formulaire.
+        // 4. Supprime les options des champs.
         fieldOptionRepository.deleteAllByFormId(id);
 
-        // 3. Champs du formulaire.
+        // 5. Supprime les champs.
         formFieldRepository.deleteByForm_FormId(id);
 
-        // 4. Formulaire.
+        // 6. Supprime le formulaire.
         formRepository.delete(form);
     }
 
-    // ==================== Utils ====================
-
     private Form findFormOrThrow(Long id) {
         return formRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Formulaire introuvable avec l'id : " + id
-                        )
-                );
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Formulaire introuvable avec l'id : " + id
+                ));
     }
 
     private FormResponseDTO toResponseDTO(Form form) {

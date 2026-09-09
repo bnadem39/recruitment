@@ -54,7 +54,7 @@
  
  
 /* =========================================================
-   PATCH PUBLISH MODAL - alignée sur le design "Edit form"
+   PATCH PUBLISH MODAL - alignÃ©e sur le design "Edit form"
    (bordures fines, gros titre, boutons pleine hauteur)
    Ne touche que .fb-publish-modal
    ========================================================= */
@@ -170,7 +170,7 @@
   color: #128c78 !important;
 }
  
-/* Bloc résumé */
+/* Bloc rÃ©sumÃ© */
 .form-builder .fb-publish-modal .fb-publish-summary {
   display: block !important;
   width: 100% !important;
@@ -398,7 +398,7 @@
  
  
 /* =========================================================
-   PATCH SAVE TEMPLATE MODAL - alignée sur le design "Edit form"
+   PATCH SAVE TEMPLATE MODAL - alignÃ©e sur le design "Edit form"
    Ne touche que .fb-save-template-modal (aucun impact sur
    fb-template-modal ni fb-settings-modal qui partagent
    pourtant .fb-modal-head / .fb-settings-fields)
@@ -452,7 +452,7 @@
   line-height: 1.5 !important;
 }
  
-/* Bouton X, aligné sur la référence "Edit form" */
+/* Bouton X, alignÃ© sur la rÃ©fÃ©rence "Edit form" */
 .form-builder .fb-save-template-modal .fb-modal-close {
   top: 14px !important;
   right: 16px !important;
@@ -556,7 +556,7 @@
   color: #17243e !important;
 }
  
-/* Dark mode : la modale reste sur fond clair (comme la référence) */
+/* Dark mode : la modale reste sur fond clair (comme la rÃ©fÃ©rence) */
 .form-builder.fb-dark .fb-save-template-modal {
   background: #ffffff !important;
   color: #17243e !important;
@@ -661,7 +661,7 @@
   text-align: center !important;
 }
 
-/* Titre centré */
+/* Titre centrÃ© */
 .form-builder .fb-publish-modal .fb-modal-head {
   display: flex !important;
   flex-direction: column !important;
@@ -784,7 +784,7 @@
   font-weight: 700 !important;
 }
 
-/* Nom du formulaire déplacé légèrement vers la gauche */
+/* Nom du formulaire dÃ©placÃ© lÃ©gÃ¨rement vers la gauche */
 .form-builder .fb-publish-modal .fb-publish-info-row b {
   display: block !important;
   min-width: 0 !important;
@@ -846,7 +846,7 @@
   box-shadow: 0 0 0 3px rgba(18, 140, 120, 0.1) !important;
 }
 
-/* Flèche corrigée : centrée verticalement dans le champ */
+/* FlÃ¨che corrigÃ©e : centrÃ©e verticalement dans le champ */
 .form-builder .fb-publish-modal .fb-publish-select-wrapper > span {
   position: absolute !important;
   top: 50% !important;
@@ -967,12 +967,12 @@
 }
 
 /* =========================================================
-   PUBLISH THIS FORM — CSS COMPLET CORRIGÉ
-   - Le titre est centré.
-   - Le nom du formulaire est légèrement à gauche.
-   - Le champ Job offer est correctement positionné.
-   - La flèche est centrée verticalement dans le select.
-   - La ligne noire près du bouton X est supprimée.
+   PUBLISH THIS FORM â€” CSS COMPLET CORRIGÃ‰
+   - Le titre est centrÃ©.
+   - Le nom du formulaire est lÃ©gÃ¨rement Ã  gauche.
+   - Le champ Job offer est correctement positionnÃ©.
+   - La flÃ¨che est centrÃ©e verticalement dans le select.
+   - La ligne noire prÃ¨s du bouton X est supprimÃ©e.
    ========================================================= */
 
 .form-builder .fb-publish-modal {
@@ -1146,7 +1146,7 @@
   white-space: nowrap !important;
 }
 
-/* Job offer : bloc correctement aligné */
+/* Job offer : bloc correctement alignÃ© */
 .form-builder .fb-publish-modal .fb-publish-offer-field {
   position: relative !important;
   display: block !important;
@@ -1176,7 +1176,7 @@
   padding: 0 !important;
 }
 
-/* Select : suppression de la flèche native */
+/* Select : suppression de la flÃ¨che native */
 .form-builder .fb-publish-modal .fb-publish-select-wrapper select {
   display: block !important;
   width: 100% !important;
@@ -1203,7 +1203,7 @@
   box-shadow: 0 0 0 3px rgba(18, 140, 120, 0.1) !important;
 }
 
-/* Flèche moderne pour la liste déroulante Job offer */
+/* FlÃ¨che moderne pour la liste dÃ©roulante Job offer */
 .form-builder .fb-publish-modal .fb-publish-select-wrapper > span {
   position: absolute !important;
   top: 50% !important;
@@ -1352,7 +1352,7 @@
   padding: 42px 40px 150px !important;
 }
 
-/* La page blanche est centrée dans la zone disponible. */
+/* La page blanche est centrÃ©e dans la zone disponible. */
 .form-builder .fb-page-stage,
 .form-builder .fb-page-stage.desktop {
   flex: 0 0 960px !important;
@@ -1375,7 +1375,7 @@
   margin: 0 auto !important;
 }
 
-/* La page garde la hauteur calculée dans FormCanvas.tsx. */
+/* La page garde la hauteur calculÃ©e dans FormCanvas.tsx. */
 .form-builder .fb-form-page.blank-sheet {
   width: 100% !important;
   margin: 0 !important;
@@ -1395,7 +1395,7 @@
   padding: 0 !important;
 }
 
-/* Le cadre vide reste en haut, centré dans la page. */
+/* Le cadre vide reste en haut, centrÃ© dans la page. */
 .form-builder .fb-free-canvas.empty {
   position: relative !important;
   width: 100% !important;
@@ -1403,7 +1403,7 @@
 }
 
 /* =========================================================
-   EMPTY PAGE : LÉGÈREMENT EN HAUT ET À DROITE
+   EMPTY PAGE : LÃ‰GÃˆREMENT EN HAUT ET Ã€ DROITE
    ========================================================= */
 
 /* Cadre Empty page */
@@ -1412,7 +1412,7 @@
 
   /*
     45% = un peu plus haut que le centre vertical.
-    52% = un peu plus à droite que le centre horizontal.
+    52% = un peu plus Ã  droite que le centre horizontal.
   */
   top: 45% !important;
   left: 52% !important;
@@ -1426,7 +1426,7 @@
   margin: 0 !important;
 
   /*
-    Centre le cadre par rapport à sa propre largeur et hauteur.
+    Centre le cadre par rapport Ã  sa propre largeur et hauteur.
     Ne change pas cette ligne.
   */
   transform: translate(+5%, -80%) !important;
@@ -1450,7 +1450,7 @@
 }
 
 /* =========================================================
-   RESPONSIVE — TABLETTE
+   RESPONSIVE â€” TABLETTE
    ========================================================= */
 @media (max-width: 920px) {
   .form-builder .fb-page-stage,
@@ -1461,7 +1461,7 @@
 }
 
 /* =========================================================
-   RESPONSIVE — MOBILE
+   RESPONSIVE â€” MOBILE
    ========================================================= */
 @media (max-width: 620px) {
   .form-builder .fb-canvas-scroll {
@@ -1481,7 +1481,7 @@
     height: 560px !important;
   }
 
-  /* Sur mobile : même position, avec un cadre adapté */
+  /* Sur mobile : mÃªme position, avec un cadre adaptÃ© */
   .form-builder .fb-free-canvas.empty > .fb-canvas-empty {
     top: 45% !important;
     left: 52% !important;
@@ -1501,7 +1501,7 @@
 
 
 /* =====================================================
-   Publish modal compacte et entièrement visible
+   Publish modal compacte et entiÃ¨rement visible
    ===================================================== */
 
 .fb-publish-modal {
@@ -1514,7 +1514,7 @@
   overflow: hidden;
 }
 
-/* Réduction de l'en-tête */
+/* RÃ©duction de l'en-tÃªte */
 .fb-publish-modal .fb-modal-head {
   flex: 0 0 auto;
   padding: 24px 32px 14px;
@@ -1645,7 +1645,7 @@
   border-top-color: rgba(255, 255, 255, 0.12);
 }
 
-/* Écran petit */
+/* Ã‰cran petit */
 @media (max-width: 600px) {
   .fb-publish-modal {
     width: calc(100vw - 16px);
@@ -1674,7 +1674,7 @@
     min-width: 0;
   }
 }
-/* Réduction légère des textes de la fenêtre Publish */
+/* RÃ©duction lÃ©gÃ¨re des textes de la fenÃªtre Publish */
 .fb-publish-modal .fb-modal-head {
   padding-top: 20px;
   padding-bottom: 10px;
@@ -1734,7 +1734,7 @@
 .fb-publish-modal .fb-modal-actions-row button {
   font-size: 11px;
 }
-/* Remonter légèrement les boutons de publication */
+/* Remonter lÃ©gÃ¨rement les boutons de publication */
 .fb-publish-modal .fb-modal-actions-row {
   margin-top: -8px;
   padding-top: 6px;
@@ -1755,5 +1755,2488 @@
 
 .fb-publish-modal .fb-publish-stat b {
   font-size: 16px;
+}
+
+
+
+
+/* =========================================================
+   FINAL GREEN + GRAY THEME
+   Compatible avec le CSS existant du Form Builder
+   Ã€ placer tout Ã  la fin du fichier CSS
+   ========================================================= */
+
+.form-builder {
+  --fb-bg: #f5f7f9;
+  --fb-panel: #ffffff;
+  --fb-panel-2: #f8fafb;
+  --fb-border: #dfe5e9;
+  --fb-border-dark: #cbd5db;
+
+  --fb-text: #172b2a;
+  --fb-text-secondary: #415654;
+  --fb-muted: #748582;
+  --fb-muted-light: #9aa9a6;
+
+  --fb-green-dark: #0b5f57;
+  --fb-green: #128c78;
+  --fb-green-light: #35b7a2;
+  --fb-green-soft: #eaf7f4;
+  --fb-green-softer: #f3fbf9;
+
+  --fb-danger: #c2414b;
+  --fb-danger-soft: #fff1f2;
+
+  --fb-canvas: #eef3f4;
+
+  background: var(--fb-bg);
+  color: var(--fb-text);
+}
+
+.form-builder *,
+.form-builder *::before,
+.form-builder *::after {
+  box-sizing: border-box;
+}
+
+.form-builder button,
+.form-builder input,
+.form-builder select,
+.form-builder textarea {
+  font-family: inherit;
+}
+
+.form-builder button:focus-visible,
+.form-builder input:focus-visible,
+.form-builder select:focus-visible,
+.form-builder textarea:focus-visible {
+  outline: 2px solid var(--fb-green);
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   TOOLBAR
+   ========================================================= */
+
+.form-builder .fb-toolbar {
+  background: #ffffff;
+  border-bottom: 1px solid var(--fb-border);
+  box-shadow: 0 5px 18px rgba(25, 55, 52, 0.06);
+}
+
+.form-builder .fb-logo {
+  min-width: 118px;
+  height: 38px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--fb-green-dark);
+  color: #ffffff;
+  box-shadow: none;
+}
+
+.form-builder .fb-logo span {
+  color: var(--fb-green-light);
+}
+
+.form-builder .fb-breadcrumb span,
+.form-builder .fb-breadcrumb i {
+  color: var(--fb-muted);
+}
+
+.form-builder .fb-breadcrumb b {
+  color: var(--fb-text);
+}
+
+.form-builder .fb-status {
+  border-color: #bfe5dc;
+  background: var(--fb-green-soft);
+  color: var(--fb-green-dark);
+}
+
+.form-builder .fb-tool-cluster {
+  border-color: var(--fb-border);
+  background: #ffffff;
+}
+
+.form-builder .fb-tool-cluster button,
+.form-builder .fb-tool-cluster select {
+  border-color: var(--fb-border);
+  background: #ffffff;
+  color: var(--fb-text-secondary);
+}
+
+.form-builder .fb-tool-cluster button:hover,
+.form-builder .fb-tool-cluster button.active {
+  background: var(--fb-green-soft);
+  color: var(--fb-green-dark);
+}
+
+.form-builder .fb-toolbar-actions > button {
+  border-color: var(--fb-border);
+  background: #ffffff;
+  color: var(--fb-text);
+}
+
+.form-builder .fb-toolbar-actions > button:hover {
+  border-color: var(--fb-green);
+  background: var(--fb-green-softer);
+  color: var(--fb-green-dark);
+}
+
+.form-builder .fb-toolbar-actions .fb-publish {
+  border-color: var(--fb-green);
+  background: var(--fb-green);
+  color: #ffffff;
+  box-shadow: none;
+}
+
+.form-builder .fb-toolbar-actions .fb-publish:hover {
+  background: var(--fb-green-dark);
+}
+
+/* =========================================================
+   PANELS LEFT AND RIGHT
+   ========================================================= */
+
+.form-builder .fb-library,
+.form-builder .fb-properties {
+  background: #ffffff;
+  color: var(--fb-text);
+  border-color: var(--fb-border);
+}
+
+.form-builder .fb-library {
+  border-right: 1px solid var(--fb-border);
+}
+
+.form-builder .fb-properties {
+  border-left: 1px solid var(--fb-border);
+}
+
+.form-builder .fb-panel-toggle,
+.form-builder .fb-icon-btn {
+  border: 1px solid var(--fb-border);
+  border-radius: 8px;
+  background: var(--fb-panel-2);
+  color: var(--fb-muted);
+}
+
+.form-builder .fb-panel-toggle:hover,
+.form-builder .fb-icon-btn:hover {
+  border-color: var(--fb-green);
+  background: var(--fb-green-soft);
+  color: var(--fb-green-dark);
+}
+
+.form-builder .fb-panel-head {
+  border-bottom: 1px solid var(--fb-border);
+}
+
+.form-builder .fb-panel-head small,
+.form-builder .fb-component-group h3,
+.form-builder .fb-property-section h3 {
+  color: var(--fb-green);
+}
+
+.form-builder .fb-panel-head h2 {
+  color: var(--fb-text);
+}
+
+/* =========================================================
+   SEARCH AND LIBRARY
+   ========================================================= */
+
+.form-builder .fb-search {
+  border-color: var(--fb-border);
+  background: var(--fb-panel-2);
+}
+
+.form-builder .fb-search span {
+  color: var(--fb-muted);
+}
+
+.form-builder .fb-search input {
+  color: var(--fb-text);
+}
+
+.form-builder .fb-search input::placeholder {
+  color: var(--fb-muted-light);
+}
+
+.form-builder .fb-component {
+  border-color: transparent;
+  background: transparent;
+  color: var(--fb-text);
+}
+
+.form-builder .fb-component:hover {
+  border-color: var(--fb-green);
+  background: var(--fb-green-softer);
+  transform: none;
+}
+
+.form-builder .fb-component-icon {
+  border-color: #cbe8e2;
+  background: var(--fb-green-soft);
+  color: var(--fb-green-dark);
+}
+
+.form-builder .fb-component b {
+  color: var(--fb-text);
+}
+
+.form-builder .fb-component small {
+  color: var(--fb-muted);
+}
+
+/* =========================================================
+   WORKSPACE AND CANVAS
+   ========================================================= */
+
+.form-builder .fb-workspace {
+  background:
+    linear-gradient(var(--fb-border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--fb-border) 1px, transparent 1px),
+    var(--fb-canvas);
+  background-size: 24px 24px;
+}
+
+.form-builder .fb-canvas-scroll {
+  background: var(--fb-canvas);
+}
+
+.form-builder .fb-ruler {
+  border-color: var(--fb-border);
+  background: #ffffff;
+  color: var(--fb-muted);
+}
+
+.form-builder .fb-form-page {
+  border: 1px solid var(--fb-border);
+  box-shadow: 0 18px 45px rgba(25, 55, 52, 0.12);
+}
+
+.form-builder .fb-free-canvas {
+  background:
+    linear-gradient(#e3ebeb 1px, transparent 1px),
+    linear-gradient(90deg, #e3ebeb 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+.form-builder .fb-workspace.is-dragging .fb-free-canvas {
+  border-color: var(--fb-green);
+  background-color: var(--fb-green-softer);
+  box-shadow: inset 0 0 0 3px rgba(18, 140, 120, 0.08);
+}
+
+.form-builder .fb-placement-ghost {
+  border-color: var(--fb-green);
+  background: rgba(234, 247, 244, 0.75);
+}
+
+.form-builder .fb-placement-ghost::before,
+.form-builder .fb-placement-ghost::after {
+  background: var(--fb-green);
+}
+
+.form-builder .fb-placement-ghost span {
+  background: var(--fb-green-dark);
+}
+
+/* =========================================================
+   CANVAS ELEMENTS
+   ========================================================= */
+
+.form-builder .fb-element {
+  border-color: transparent;
+  color: var(--fb-text);
+}
+
+.form-builder .fb-element:hover {
+  border-color: rgba(18, 140, 120, 0.35);
+  background: rgba(18, 140, 120, 0.03);
+}
+
+.form-builder .fb-element.selected {
+  border-color: var(--fb-green);
+  background: rgba(18, 140, 120, 0.04);
+  box-shadow: 0 0 0 2px rgba(18, 140, 120, 0.1);
+}
+
+.form-builder .fb-element .handle {
+  background: var(--fb-green);
+}
+
+.form-builder .fb-element label {
+  color: var(--fb-text-secondary);
+}
+
+.form-builder .fb-element label b {
+  color: var(--fb-green);
+}
+
+.form-builder .fb-element input,
+.form-builder .fb-element textarea,
+.form-builder .fb-element select,
+.form-builder .fb-select-faux {
+  border-color: #d6e0e2;
+  background: #ffffff;
+  color: var(--fb-text);
+}
+
+.form-builder .fb-element input::placeholder,
+.form-builder .fb-element textarea::placeholder {
+  color: var(--fb-muted-light);
+}
+
+.form-builder .fb-options label,
+.form-builder .fb-inline-checkbox {
+  color: var(--fb-text-secondary);
+}
+
+.form-builder .fb-options input,
+.form-builder .fb-inline-checkbox input {
+  accent-color: var(--fb-green);
+}
+
+/* =========================================================
+   ELEMENT TOOLBAR
+   ========================================================= */
+
+.form-builder .fb-element-toolbar {
+  background: var(--fb-green-dark);
+  box-shadow: 0 7px 20px rgba(25, 55, 52, 0.25);
+}
+
+.form-builder .fb-element-toolbar button {
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+}
+
+.form-builder .fb-element-toolbar button:hover {
+  background: var(--fb-green);
+}
+
+.form-builder .fb-element-toolbar button.delete {
+  color: #ffd3d6;
+}
+
+/* =========================================================
+   PROPERTIES PANEL
+   Compatible avec ton PropertiesPanel.tsx
+   ========================================================= */
+
+.form-builder .fb-properties {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.form-builder .fb-properties-scroll {
+  flex: 1 1 auto;
+  height: 0;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 6px 12px 28px;
+  scrollbar-width: thin;
+  scrollbar-color: #a7b5b3 transparent;
+}
+
+.form-builder .fb-properties-scroll::-webkit-scrollbar {
+  width: 7px;
+}
+
+.form-builder .fb-properties-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.form-builder .fb-properties-scroll::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: #a7b5b3;
+}
+
+.form-builder .fb-properties-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--fb-green);
+}
+
+.form-builder .fb-selected-summary {
+  display: grid;
+  grid-template-columns: 31px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  margin: 2px 12px 10px;
+  padding: 10px;
+  border: 1px solid var(--fb-border);
+  border-radius: 10px;
+  background: var(--fb-panel-2);
+}
+
+.form-builder .fb-selected-summary > span {
+  width: 29px;
+  height: 29px;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  background: var(--fb-green-soft);
+  color: var(--fb-green-dark);
+}
+
+.form-builder .fb-selected-summary small {
+  color: var(--fb-muted);
+  font-size: 7px;
+  letter-spacing: 0.13em;
+}
+
+.form-builder .fb-selected-summary b {
+  overflow: hidden;
+  color: var(--fb-text);
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.form-builder .fb-selected-summary em {
+  border-radius: 4px;
+  background: var(--fb-gray-100, #f2f4f5);
+  color: var(--fb-muted);
+  font-size: 7px;
+  font-style: normal;
+  padding: 3px 5px;
+}
+
+/* Onglets Content, Style, Validate, Logic */
+
+.form-builder .fb-property-tabs {
+  height: 40px;
+  display: flex;
+  padding: 0 10px;
+  border-bottom: 1px solid var(--fb-border);
+}
+
+.form-builder .fb-property-tabs button {
+  flex: 1;
+  height: 40px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--fb-muted);
+  cursor: pointer;
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  padding: 0 2px;
+  text-transform: uppercase;
+}
+
+.form-builder .fb-property-tabs button:hover {
+  background: var(--fb-green-softer);
+  color: var(--fb-green-dark);
+}
+
+.form-builder .fb-property-tabs button.active {
+  border-bottom-color: var(--fb-green);
+  background: var(--fb-green-softer);
+  color: var(--fb-green-dark);
+}
+
+/* Sections pliables */
+
+.form-builder .fb-property-section {
+  padding: 0 2px;
+  border-bottom: 1px solid var(--fb-border);
+}
+
+.form-builder .fb-property-section-header {
+  width: 100%;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border: 0;
+  background: transparent;
+  color: var(--fb-green);
+  cursor: pointer;
+  padding: 12px 2px;
+  text-align: left;
+}
+
+.form-builder .fb-property-section-header:hover {
+  color: var(--fb-green-dark);
+}
+
+.form-builder .fb-property-section-header h3 {
+  margin: 0;
+  color: inherit;
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.form-builder .fb-section-chevron {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  color: var(--fb-muted);
+  font-size: 16px;
+}
+
+.form-builder .fb-property-section-header:hover .fb-section-chevron {
+  background: var(--fb-green-soft);
+  color: var(--fb-green-dark);
+}
+
+.form-builder .fb-property-section-content {
+  padding: 0 0 14px;
+}
+
+/* Champs Content et Style */
+
+.form-builder .fb-property-field {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 12px;
+  color: var(--fb-muted);
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.form-builder .fb-property-field input,
+.form-builder .fb-property-field textarea,
+.form-builder .fb-property-field select {
+  width: 100%;
+  min-height: 35px;
+  border: 1px solid var(--fb-border);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--fb-text);
+  outline: 0;
+  padding: 7px 9px;
+  font-size: 10px;
+  resize: none;
+}
+
+.form-builder .fb-property-field textarea {
+  min-height: 70px;
+  resize: vertical;
+}
+
+.form-builder .fb-property-field input::placeholder,
+.form-builder .fb-property-field textarea::placeholder {
+  color: var(--fb-muted-light);
+}
+
+.form-builder .fb-property-field input:hover,
+.form-builder .fb-property-field textarea:hover,
+.form-builder .fb-property-field select:hover {
+  border-color: var(--fb-border-dark);
+}
+
+.form-builder .fb-property-field input:focus,
+.form-builder .fb-property-field textarea:focus,
+.form-builder .fb-property-field select:focus {
+  border-color: var(--fb-green);
+  box-shadow: 0 0 0 3px rgba(18, 140, 120, 0.1);
+}
+
+.form-builder .fb-property-field select option {
+  background: #ffffff;
+  color: var(--fb-text);
+}
+
+/* Input avec prÃ©fixe et suffixe */
+
+.form-builder .fb-prefix-input,
+.form-builder .fb-suffix-input {
+  display: flex;
+  overflow: hidden;
+  border: 1px solid var(--fb-border);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.form-builder .fb-prefix-input:focus-within,
+.form-builder .fb-suffix-input:focus-within {
+  border-color: var(--fb-green);
+  box-shadow: 0 0 0 3px rgba(18, 140, 120, 0.1);
+}
+
+.form-builder .fb-prefix-input span,
+.form-builder .fb-suffix-input span {
+  display: grid;
+  place-items: center;
+  min-width: 32px;
+  padding: 0 8px;
+  background: var(--fb-gray-100, #f2f4f5);
+  color: var(--fb-muted);
+}
+
+.form-builder .fb-prefix-input span {
+  border-right: 1px solid var(--fb-border);
+}
+
+.form-builder .fb-suffix-input span {
+  border-left: 1px solid var(--fb-border);
+}
+
+.form-builder .fb-prefix-input input,
+.form-builder .fb-suffix-input input {
+  min-width: 0;
+  flex: 1;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* Deux champs X/Y */
+
+.form-builder .fb-two-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+/* Boutons Width et Alignment */
+
+.form-builder .fb-segmented {
+  display: flex;
+  overflow: hidden;
+  border: 1px solid var(--fb-border);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.form-builder .fb-segmented button {
+  height: 31px;
+  flex: 1;
+  border: 0;
+  border-right: 1px solid var(--fb-border);
+  background: transparent;
+  color: var(--fb-muted);
+  cursor: pointer;
+  font-size: 9px;
+}
+
+.form-builder .fb-segmented button:last-child {
+  border-right: 0;
+}
+
+.form-builder .fb-segmented button:hover {
+  background: var(--fb-green-softer);
+  color: var(--fb-green-dark);
+}
+
+.form-builder .fb-segmented button.active {
+  background: var(--fb-green-soft);
+  color: var(--fb-green-dark);
+  font-weight: 700;
+}
+
+.form-builder .fb-segmented-icons button:first-child {
+  text-align: left;
+  padding-left: 14px;
+}
+
+.form-builder .fb-segmented-icons button:nth-child(2) {
+  text-align: center;
+}
+
+.form-builder .fb-segmented-icons button:last-child {
+  text-align: right;
+  padding-right: 14px;
+}
+
+/* =========================================================
+   OPTIONS RADIO / SELECT / CHECKBOX
+   ========================================================= */
+
+.form-builder .fb-option-editor {
+  display: grid;
+  gap: 6px;
+}
+
+.form-builder .fb-option-editor > div,
+.form-builder .fb-option-row {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) 24px;
+  align-items: center;
+  gap: 5px;
+}
+
+.form-builder .fb-option-editor i,
+.form-builder .fb-option-drag {
+  color: var(--fb-muted);
+  font-style: normal;
+  cursor: grab;
+}
+
+.form-builder .fb-option-editor input,
+.form-builder .fb-option-row input {
+  width: 100%;
+  min-width: 0;
+  height: 31px;
+  border: 1px solid var(--fb-border);
+  border-radius: 7px;
+  background: #ffffff;
+  color: var(--fb-text);
+  outline: none;
+  padding: 0 7px;
+  font-size: 9px;
+}
+
+.form-builder .fb-option-editor input:focus,
+.form-builder .fb-option-row input:focus {
+  border-color: var(--fb-green);
+  box-shadow: 0 0 0 3px rgba(18, 140, 120, 0.1);
+}
+
+.form-builder .fb-option-editor > div > button,
+.form-builder .fb-remove-option {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--fb-muted);
+  cursor: pointer;
+  font-size: 17px;
+  line-height: 1;
+}
+
+.form-builder .fb-option-editor > div > button:hover,
+.form-builder .fb-remove-option:hover:not(:disabled) {
+  background: var(--fb-danger-soft);
+  color: var(--fb-danger);
+}
+
+.form-builder .fb-remove-option:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.form-builder .fb-option-editor .fb-add-option,
+.form-builder .fb-add-option {
+  width: 100%;
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 3px;
+  border: 1px dashed var(--fb-green);
+  border-radius: 7px;
+  background: var(--fb-green-softer);
+  color: var(--fb-green-dark);
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.form-builder .fb-option-editor .fb-add-option:hover,
+.form-builder .fb-add-option:hover {
+  border-color: var(--fb-green-dark);
+  background: var(--fb-green-soft);
+}
+
+.form-builder .fb-add-option span {
+  font-size: 17px;
+  line-height: 1;
+}
+
+/* =========================================================
+   TOGGLE CHECKBOX
+   ========================================================= */
+
+.form-builder .fb-toggle-row,
+.form-builder .fb-setting-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 32px;
+  margin: 5px 0 14px;
+  color: var(--fb-text-secondary);
+  font-size: 10px;
+}
+
+.form-builder .fb-toggle-row button,
+.form-builder .fb-setting-toggle > button {
+  width: 34px;
+  height: 19px;
+  display: flex;
+  align-items: center;
+  border: 0;
+  border-radius: 10px;
+  background: #cbd5d7;
+  cursor: pointer;
+  padding: 2px;
+  transition: background 0.2s ease;
+}
+
+.form-builder .fb-toggle-row button i,
+.form-builder .fb-setting-toggle > button i {
+  display: block;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(20, 50, 48, 0.25);
+  transition: transform 0.2s ease;
+}
+
+.form-builder .fb-toggle-row button.on,
+.form-builder .fb-setting-toggle > button.on {
+  background: var(--fb-green);
+}
+
+.form-builder .fb-toggle-row button.on i,
+.form-builder .fb-setting-toggle > button.on i {
+  transform: translateX(15px);
+}
+
+/* =========================================================
+   TIPS ET LOGIC
+   ========================================================= */
+
+.form-builder .fb-tip {
+  display: grid;
+  grid-template-columns: 25px minmax(0, 1fr);
+  gap: 7px;
+  margin-top: 13px;
+  border: 1px solid #bfe5dc;
+  border-radius: 9px;
+  background: var(--fb-green-softer);
+  color: var(--fb-muted);
+  padding: 10px;
+}
+
+.form-builder .fb-tip > span {
+  color: var(--fb-green);
+}
+
+.form-builder .fb-tip p {
+  margin: 0;
+  font-size: 8px;
+  line-height: 1.5;
+}
+
+.form-builder .fb-tip p b {
+  display: block;
+  color: var(--fb-green-dark);
+  font-size: 9px;
+}
+
+.form-builder .fb-tip.logic {
+  border-color: #bfe5dc;
+  background: var(--fb-green-softer);
+}
+
+.form-builder .fb-tip.logic > span {
+  color: var(--fb-green);
+}
+
+.form-builder .fb-rule-lead {
+  display: grid;
+  gap: 3px;
+  margin-bottom: 13px;
+  border-left: 2px solid var(--fb-green);
+  padding-left: 9px;
+}
+
+.form-builder .fb-rule-lead span {
+  color: var(--fb-green-dark);
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.form-builder .fb-rule-lead small {
+  color: var(--fb-muted);
+  font-size: 8px;
+}
+
+.form-builder .fb-add-condition {
+  width: 100%;
+  height: 34px;
+  margin-top: 3px;
+  border: 1px dashed var(--fb-green);
+  border-radius: 7px;
+  background: var(--fb-green-softer);
+  color: var(--fb-green-dark);
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.form-builder .fb-add-condition:hover {
+  background: var(--fb-green-soft);
+}
+
+/* =========================================================
+   BUTTONS DU FORMULAIRE
+   ========================================================= */
+
+.form-builder .fb-nav-btn-next,
+.form-builder .fb-nav-btn-submit {
+  border: 0;
+  background: var(--fb-green);
+  color: #ffffff;
+}
+
+.form-builder .fb-nav-btn-next:hover,
+.form-builder .fb-nav-btn-submit:hover {
+  background: var(--fb-green-dark);
+}
+
+.form-builder .fb-nav-btn-back {
+  border: 1px solid var(--fb-border);
+  background: #ffffff;
+  color: var(--fb-text);
+}
+
+.form-builder .fb-nav-btn-custom {
+  background: var(--fb-green-dark);
+  color: #ffffff;
+}
+
+/* =========================================================
+   STEPS DOCK
+   ========================================================= */
+
+.form-builder .fb-steps-dock {
+  background: rgba(255, 255, 255, 0.96);
+  border-top: 1px solid var(--fb-border);
+  box-shadow: 0 -8px 25px rgba(25, 55, 52, 0.06);
+}
+
+.form-builder .fb-steps-label > span {
+  background: var(--fb-green-soft);
+  color: var(--fb-green-dark);
+}
+
+.form-builder .fb-step-tabs > div {
+  border-color: var(--fb-border);
+  background: var(--fb-panel-2);
+}
+
+.form-builder .fb-step-tabs > div.active {
+  border-color: var(--fb-green);
+  background: var(--fb-green-softer);
+}
+
+.form-builder .fb-step-tabs button i {
+  background: var(--fb-green-soft);
+  color: var(--fb-green-dark);
+}
+
+.form-builder .fb-add-step {
+  border-color: var(--fb-green);
+  color: var(--fb-green-dark);
+  background: var(--fb-green-softer);
+}
+
+/* =========================================================
+   STATUS BAR
+   ========================================================= */
+
+.form-builder .fb-statusbar {
+  border-top-color: var(--fb-border);
+  background: #ffffff;
+  color: var(--fb-muted);
+}
+
+.form-builder .fb-statusbar b {
+  color: var(--fb-green);
+}
+
+.form-builder .fb-statusbar i.online {
+  background: var(--fb-green-light);
+  box-shadow: 0 0 0 3px rgba(53, 183, 162, 0.15);
+}
+
+/* =========================================================
+   UPLOAD
+   ========================================================= */
+
+.form-builder .fb-upload-compact {
+  border-color: #b9d8d2;
+  background: var(--fb-green-softer);
+}
+
+.form-builder .fb-upload-compact-icon {
+  background: var(--fb-green-soft);
+  color: var(--fb-green-dark);
+}
+
+.form-builder .fb-upload-compact-info b {
+  color: var(--fb-text);
+}
+
+.form-builder .fb-upload-compact-info small {
+  color: var(--fb-muted);
+}
+
+.form-builder .fb-upload-compact-btn {
+  border-color: var(--fb-border);
+  background: #ffffff;
+  color: var(--fb-text-secondary);
+}
+
+.form-builder .fb-upload-compact.has-files {
+  border-color: var(--fb-green);
+  background: var(--fb-green-softer);
+}
+
+.form-builder .fb-upload-compact.has-files
+  .fb-upload-compact-info
+  b {
+  color: var(--fb-green-dark);
+}
+
+/* =========================================================
+   MODALES
+   ========================================================= */
+
+.form-builder .fb-modal-backdrop {
+  background: rgba(18, 43, 41, 0.45);
+}
+
+.form-builder .fb-modal {
+  border-color: var(--fb-border);
+  border-radius: 16px;
+  background: #ffffff;
+  color: var(--fb-text);
+  box-shadow: 0 30px 70px rgba(18, 43, 41, 0.22);
+}
+
+.form-builder .fb-modal-head small,
+.form-builder .fb-publish-modal > small {
+  color: var(--fb-green);
+}
+
+.form-builder .fb-modal-head h2,
+.form-builder .fb-publish-modal h2 {
+  color: var(--fb-text);
+}
+
+.form-builder .fb-modal-head p,
+.form-builder .fb-publish-modal > p {
+  color: var(--fb-muted);
+}
+
+.form-builder .fb-modal-head > button {
+  border-color: var(--fb-border);
+  background: #ffffff;
+  color: var(--fb-muted);
+}
+
+.form-builder .fb-modal-head > button:hover {
+  border-color: var(--fb-green);
+  background: var(--fb-green-soft);
+  color: var(--fb-green-dark);
+}
+
+.form-builder .fb-template-grid > button,
+.form-builder .fb-template-card {
+  border-color: var(--fb-border);
+  background: #ffffff;
+  color: var(--fb-text);
+}
+
+.form-builder .fb-template-grid > button:hover,
+.form-builder .fb-template-card:hover {
+  border-color: var(--fb-green);
+  box-shadow: 0 14px 28px rgba(18, 140, 120, 0.12);
+}
+
+.form-builder .fb-template-thumb span,
+.form-builder .fb-template-thumb.amber span,
+.form-builder .fb-template-thumb.violet span,
+.form-builder .fb-template-thumb.cyan span,
+.form-builder .fb-template-thumb.custom span {
+  background: var(--fb-green);
+}
+
+.form-builder .fb-template-thumb.custom {
+  background: var(--fb-green-softer);
+}
+
+.form-builder .fb-modal-actions button.primary {
+  border-color: var(--fb-green);
+  background: var(--fb-green);
+  color: #ffffff;
+}
+
+.form-builder .fb-modal-actions button.primary:hover {
+  background: var(--fb-green-dark);
+}
+
+.form-builder .fb-modal-actions button:not(.primary) {
+  border-color: var(--fb-border);
+  background: #ffffff;
+  color: var(--fb-text);
+}
+
+.form-builder .fb-settings-layout nav button.active {
+  background: var(--fb-green-soft);
+  color: var(--fb-green-dark);
+}
+
+/* =========================================================
+   PUBLISH MODAL
+   ========================================================= */
+
+.form-builder .fb-publish-modal {
+  border: 1px solid var(--fb-border) !important;
+  background: #ffffff !important;
+  color: var(--fb-text) !important;
+}
+
+.form-builder .fb-publish-modal .fb-modal-head h2 {
+  color: var(--fb-text) !important;
+}
+
+.form-builder .fb-publish-modal .fb-publish-summary {
+  border-color: var(--fb-border) !important;
+  background: var(--fb-panel-2) !important;
+}
+
+.form-builder .fb-publish-modal .fb-publish-info-row,
+.form-builder .fb-publish-modal .fb-publish-offer-field,
+.form-builder .fb-publish-modal .fb-publish-stat {
+  border-color: var(--fb-border) !important;
+}
+
+.form-builder .fb-publish-modal .fb-publish-info-row span,
+.form-builder .fb-publish-modal .fb-publish-offer-field label,
+.form-builder .fb-publish-modal .fb-publish-stat span {
+  color: var(--fb-muted) !important;
+}
+
+.form-builder .fb-publish-modal .fb-publish-info-row b,
+.form-builder .fb-publish-modal .fb-publish-stat b {
+  color: var(--fb-text) !important;
+}
+
+.form-builder .fb-publish-modal .fb-publish-select-wrapper select {
+  border-color: var(--fb-border) !important;
+  background: #ffffff !important;
+  color: var(--fb-text) !important;
+}
+
+.form-builder .fb-publish-modal .fb-publish-select-wrapper select:hover,
+.form-builder .fb-publish-modal .fb-publish-select-wrapper select:focus {
+  border-color: var(--fb-green) !important;
+  box-shadow: 0 0 0 3px rgba(18, 140, 120, 0.1) !important;
+}
+
+.form-builder .fb-publish-modal .fb-publish-select-wrapper > span {
+  color: var(--fb-muted) !important;
+}
+
+.form-builder .fb-publish-modal .fb-modal-button-primary {
+  border-color: var(--fb-green) !important;
+  background: var(--fb-green) !important;
+  color: #ffffff !important;
+}
+
+.form-builder .fb-publish-modal .fb-modal-button-primary:hover {
+  background: var(--fb-green-dark) !important;
+}
+
+.form-builder .fb-publish-modal .fb-modal-button-secondary {
+  border-color: var(--fb-border) !important;
+  background: #ffffff !important;
+  color: var(--fb-text) !important;
+}
+
+/* =========================================================
+   DARK MODE
+   ========================================================= */
+
+.form-builder.fb-dark {
+  --fb-bg: #0b191a;
+  --fb-panel: #102526;
+  --fb-panel-2: #153031;
+  --fb-border: #285050;
+  --fb-border-dark: #376765;
+  --fb-text: #edf8f5;
+  --fb-text-secondary: #c0d4d0;
+  --fb-muted: #95afaa;
+  --fb-muted-light: #6f8e88;
+  --fb-green-dark: #7de0cd;
+  --fb-green: #35b7a2;
+  --fb-green-light: #8ce7d6;
+  --fb-green-soft: #173c3a;
+  --fb-green-softer: #122f30;
+  --fb-canvas: #0d2021;
+  background: var(--fb-bg);
+  color: var(--fb-text);
+}
+
+.form-builder.fb-dark .fb-toolbar,
+.form-builder.fb-dark .fb-library,
+.form-builder.fb-dark .fb-properties,
+.form-builder.fb-dark .fb-statusbar {
+  border-color: var(--fb-border);
+  background: var(--fb-panel);
+  color: var(--fb-text);
+}
+
+.form-builder.fb-dark .fb-tool-cluster,
+.form-builder.fb-dark .fb-tool-cluster button,
+.form-builder.fb-dark .fb-tool-cluster select,
+.form-builder.fb-dark .fb-toolbar-actions > button,
+.form-builder.fb-dark .fb-search,
+.form-builder.fb-dark .fb-component,
+.form-builder.fb-dark .fb-selected-summary,
+.form-builder.fb-dark .fb-property-field input,
+.form-builder.fb-dark .fb-property-field textarea,
+.form-builder.fb-dark .fb-property-field select,
+.form-builder.fb-dark .fb-segmented,
+.form-builder.fb-dark .fb-prefix-input,
+.form-builder.fb-dark .fb-suffix-input,
+.form-builder.fb-dark .fb-option-editor input,
+.form-builder.fb-dark .fb-option-row input {
+  border-color: var(--fb-border);
+  background: var(--fb-panel-2);
+  color: var(--fb-text);
+}
+
+.form-builder.fb-dark .fb-workspace,
+.form-builder.fb-dark .fb-canvas-scroll {
+  background:
+    linear-gradient(#173737 1px, transparent 1px),
+    linear-gradient(90deg, #173737 1px, transparent 1px),
+    var(--fb-canvas);
+  background-size: 24px 24px;
+}
+
+.form-builder.fb-dark .fb-ruler {
+  border-color: var(--fb-border);
+  background: var(--fb-panel);
+  color: var(--fb-muted);
+}
+
+.form-builder.fb-dark .fb-steps-dock {
+  border-color: var(--fb-border);
+  background: var(--fb-panel);
+}
+
+.form-builder.fb-dark .fb-modal {
+  border-color: var(--fb-border);
+  background: var(--fb-panel);
+  color: var(--fb-text);
+}
+
+.form-builder.fb-dark .fb-modal-head h2,
+.form-builder.fb-dark .fb-publish-modal h2,
+.form-builder.fb-dark .fb-selected-summary b,
+.form-builder.fb-dark .fb-panel-head h2 {
+  color: var(--fb-text);
+}
+
+.form-builder.fb-dark .fb-property-field input,
+.form-builder.fb-dark .fb-property-field textarea,
+.form-builder.fb-dark .fb-property-field select,
+.form-builder.fb-dark .fb-option-editor input,
+.form-builder.fb-dark .fb-option-row input {
+  background: var(--fb-panel-2);
+  color: var(--fb-text);
+}
+
+.form-builder.fb-dark .fb-publish-modal {
+  background: var(--fb-panel) !important;
+  color: var(--fb-text) !important;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 920px) {
+  .form-builder .fb-library:not(.collapsed),
+  .form-builder .fb-properties:not(.collapsed) {
+    background: #ffffff;
+    box-shadow: 0 10px 35px rgba(18, 43, 41, 0.2);
+  }
+}
+
+@media (max-width: 620px) {
+  .form-builder .fb-two-fields {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .form-builder .fb-properties-scroll {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .form-builder .fb-publish-modal {
+    width: calc(100vw - 24px) !important;
+    max-width: calc(100vw - 24px) !important;
+    padding: 24px 18px 20px !important;
+  }
+
+  .form-builder .fb-publish-modal .fb-modal-head h2 {
+    font-size: 24px !important;
+    white-space: normal !important;
+  }
+}
+
+
+
+
+/* =========================================================
+   ALIGNEMENT DES TEXTES - START FORM TEMPLATE + SAVE TEMPLATE
+   À placer à la fin du fichier CSS principal.
+   ========================================================= */
+
+/* Police et alignement général */
+.form-builder,
+.form-builder button,
+.form-builder input,
+.form-builder textarea,
+.form-builder select {
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* =========================================================
+   1. MODAL "CHOOSE A STARTING POINT"
+   ========================================================= */
+
+.form-builder .fb-template-modal {
+  position: relative;
+  width: min(1100px, calc(100vw - 48px));
+  max-width: calc(100vw - 48px);
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 34px 32px 32px;
+  border: 1px solid #dfe6ee;
+  border-radius: 20px;
+  background: #ffffff;
+  color: #17243e;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.form-builder .fb-template-modal *,
+.form-builder .fb-template-modal *::before,
+.form-builder .fb-template-modal *::after {
+  box-sizing: border-box;
+}
+
+.form-builder .fb-template-modal .fb-modal-head {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+}
+
+.form-builder .fb-template-modal .fb-modal-head h2 {
+  display: block !important;
+  width: 100% !important;
+  margin: 0 !important;
+  text-align: left !important;
+}
+
+/* En-tête : petit titre à gauche, grand titre à gauche,
+   description à droite comme dans la référence */
+.form-builder .fb-template-modal .fb-modal-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 380px);
+  align-items: start;
+  column-gap: 36px;
+  width: 100%;
+  margin: 0 0 36px;
+  padding: 0;
+  text-align: left;
+}
+
+.form-builder .fb-template-modal .fb-modal-head > div:first-child {
+  min-width: 0;
+  text-align: left;
+}
+
+.form-builder .fb-template-modal .fb-modal-head small {
+  display: block;
+  margin: 0 0 8px;
+  color: #128c78;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  line-height: 1.2;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.form-builder .fb-template-modal .fb-modal-head h2 {
+  margin: 0;
+  color: #17243e;
+  font-family: Manrope, sans-serif;
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: -0.035em;
+  text-align: left;
+}
+
+.form-builder .fb-template-modal .fb-modal-head p {
+  align-self: start;
+  max-width: 380px;
+  margin: 0;
+  padding-top: 3px;
+  color: #718096;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: right;
+}
+
+/* Si la description est directement dans l'en-tête sans wrapper */
+.form-builder .fb-template-modal > .fb-modal-head > p {
+  color: #718096;
+  text-align: right;
+}
+
+/* Sections */
+.form-builder .fb-template-modal .fb-template-section {
+  display: grid;
+  gap: 13px;
+  width: 100%;
+  margin: 0 0 24px;
+  text-align: left;
+}
+
+.form-builder .fb-template-modal .fb-template-section h3 {
+  margin: 0;
+  color: #128c78;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  line-height: 1.25;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+/* Cartes */
+.form-builder .fb-template-modal .fb-template-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 16px;
+  width: 100%;
+}
+
+.form-builder .fb-template-modal .fb-template-grid > button,
+.form-builder .fb-template-modal .fb-template-card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  width: 100%;
+  min-width: 0;
+  min-height: 230px;
+  padding: 10px;
+  border: 1px solid #dfe6ee;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #17243e;
+  text-align: left;
+  box-shadow: none;
+  transform: none;
+}
+
+.form-builder .fb-template-modal .fb-template-grid > button:hover,
+.form-builder .fb-template-modal .fb-template-card:hover {
+  border-color: #128c78;
+  background: #ffffff;
+  box-shadow: 0 12px 24px rgba(16, 36, 61, 0.08);
+  transform: translateY(-2px);
+}
+
+.form-builder .fb-template-modal .fb-template-card > button:first-child {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+}
+
+.form-builder .fb-template-modal .fb-template-thumb {
+  flex: 0 0 auto;
+  width: 100%;
+  height: 128px;
+  margin: 0;
+  border-radius: 8px;
+}
+
+.form-builder .fb-template-modal .fb-template-grid b,
+.form-builder .fb-template-modal .fb-template-card b {
+  display: block;
+  width: 100%;
+  margin: 10px 0 0;
+  color: #17243e;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.3;
+  text-align: left;
+}
+
+.form-builder .fb-template-modal .fb-template-grid small,
+.form-builder .fb-template-modal .fb-template-card small {
+  display: block;
+  width: 100%;
+  margin: 5px 0 0;
+  color: #718096;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.45;
+  text-align: left;
+}
+
+/* Message "No saved template yet" */
+.form-builder .fb-template-modal .fb-template-empty {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 70px;
+  padding: 0 22px;
+  border: 1px dashed #cfdbe6;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #718096;
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: left;
+}
+
+/* Variante si le message utilise un simple div */
+.form-builder .fb-template-modal .fb-template-empty p {
+  margin: 0;
+  color: #718096;
+  font-size: 14px;
+  text-align: left;
+}
+
+/* =========================================================
+   2. MODAL "CREATE A REUSABLE TEMPLATE"
+   ========================================================= */
+
+.form-builder .fb-save-template-modal {
+  position: relative;
+  width: min(700px, calc(100vw - 48px));
+  max-width: calc(100vw - 48px);
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 38px 40px 32px;
+  border: 1px solid #dfe6ee;
+  border-radius: 20px;
+  background: #ffffff;
+  color: #17243e;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.form-builder .fb-save-template-modal *,
+.form-builder .fb-save-template-modal *::before,
+.form-builder .fb-save-template-modal *::after {
+  box-sizing: border-box;
+}
+
+.form-builder .fb-save-template-modal .fb-modal-head {
+  display: block;
+  width: 100%;
+  margin: 0 0 30px;
+  padding: 0;
+  text-align: left;
+}
+
+.form-builder .fb-save-template-modal .fb-modal-head small {
+  display: block;
+  margin: 0 0 12px;
+  color: #128c78;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+  line-height: 1.2;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.form-builder .fb-save-template-modal .fb-modal-head h2 {
+  margin: 0 0 12px;
+  color: #17243e;
+  font-family: Manrope, sans-serif;
+  font-size: 38px;
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+  text-align: left;
+}
+
+.form-builder .fb-save-template-modal .fb-modal-head p {
+  max-width: 560px;
+  margin: 0;
+  color: #718096;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.form-builder .fb-save-template-modal .fb-modal-close {
+  position: absolute;
+  top: 22px;
+  right: 24px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #718096;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.form-builder .fb-save-template-modal .fb-modal-close:hover,
+.form-builder .fb-save-template-modal .fb-modal-close:focus-visible {
+  border: 1px solid #dfe6ee;
+  background: #eaf7f4;
+  color: #128c78;
+}
+
+.form-builder .fb-save-template-modal .fb-settings-fields {
+  display: grid;
+  gap: 22px;
+  width: 100%;
+}
+
+.form-builder .fb-save-template-modal .fb-settings-fields > label {
+  display: grid;
+  gap: 9px;
+  width: 100%;
+  color: #17243e;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: left;
+}
+
+.form-builder .fb-save-template-modal .fb-settings-fields > label > span {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  color: #17243e;
+  text-align: left;
+}
+
+.form-builder .fb-save-template-modal .fb-settings-fields em {
+  color: #9aa4b2;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 500;
+}
+
+.form-builder .fb-save-template-modal .fb-settings-fields input,
+.form-builder .fb-save-template-modal .fb-settings-fields textarea {
+  display: block;
+  width: 100%;
+  min-height: 58px;
+  padding: 14px 18px;
+  border: 1px solid #d8e2ec;
+  border-radius: 10px;
+  outline: none;
+  background: #ffffff;
+  color: #17243e;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.form-builder .fb-save-template-modal .fb-settings-fields textarea {
+  min-height: 150px;
+  resize: vertical;
+  font-weight: 400;
+}
+
+.form-builder .fb-save-template-modal .fb-settings-fields input:focus,
+.form-builder .fb-save-template-modal .fb-settings-fields textarea:focus {
+  border-color: #128c78;
+  box-shadow: 0 0 0 3px rgba(18, 140, 120, 0.12);
+}
+
+.form-builder .fb-save-template-modal .fb-settings-fields input::placeholder,
+.form-builder .fb-save-template-modal .fb-settings-fields textarea::placeholder {
+  color: #a7afbd;
+  opacity: 1;
+  font-weight: 400;
+}
+
+.form-builder .fb-save-template-modal .fb-modal-actions-row,
+.form-builder .fb-save-template-modal .fb-modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  width: 100%;
+  margin-top: 30px;
+}
+
+.form-builder .fb-save-template-modal .fb-modal-button,
+.form-builder .fb-save-template-modal .fb-modal-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 56px;
+  min-width: 124px;
+  padding: 0 26px;
+  border-radius: 11px;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.form-builder .fb-save-template-modal .fb-modal-button-primary,
+.form-builder .fb-save-template-modal .fb-modal-actions button.primary {
+  min-width: 190px;
+  border: 1px solid #128c78;
+  background: #128c78;
+  color: #ffffff;
+}
+
+.form-builder .fb-save-template-modal .fb-modal-button-primary:hover,
+.form-builder .fb-save-template-modal .fb-modal-actions button.primary:hover {
+  border-color: #0d705f;
+  background: #0d705f;
+  color: #ffffff;
+}
+
+.form-builder .fb-save-template-modal .fb-modal-button-secondary,
+.form-builder .fb-save-template-modal .fb-modal-actions button:not(.primary) {
+  border: 1px solid #dce2ea;
+  background: #ffffff;
+  color: #17243e;
+}
+
+.form-builder .fb-save-template-modal .fb-modal-button-secondary:hover,
+.form-builder .fb-save-template-modal .fb-modal-actions button:not(.primary):hover {
+  border-color: #128c78;
+  background: #eaf7f4;
+  color: #128c78;
+}
+
+/* Responsive */
+@media (max-width: 760px) {
+  .form-builder .fb-template-modal .fb-modal-head {
+    grid-template-columns: 1fr;
+    row-gap: 12px;
+  }
+
+  .form-builder .fb-template-modal .fb-modal-head p,
+  .form-builder .fb-template-modal > .fb-modal-head > p {
+    max-width: none;
+    padding-top: 0;
+    text-align: left;
+  }
+
+  .form-builder .fb-template-modal .fb-template-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .form-builder .fb-save-template-modal .fb-modal-head h2 {
+    font-size: 32px;
+  }
+}
+
+@media (max-width: 560px) {
+  .form-builder .fb-template-modal,
+  .form-builder .fb-save-template-modal {
+    width: calc(100vw - 24px);
+    max-width: calc(100vw - 24px);
+    padding: 26px 20px 24px;
+  }
+
+  .form-builder .fb-template-modal .fb-template-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-builder .fb-save-template-modal .fb-modal-head h2 {
+    font-size: 27px;
+  }
+
+  .form-builder .fb-save-template-modal .fb-modal-actions-row,
+  .form-builder .fb-save-template-modal .fb-modal-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .form-builder .fb-save-template-modal .fb-modal-button,
+  .form-builder .fb-save-template-modal .fb-modal-actions button,
+  .form-builder .fb-save-template-modal .fb-modal-button-primary {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+
+.form-builder .fb-toolbar-actions .fb-publish:hover,
+.form-builder .fb-toolbar-actions .fb-publish:hover span {
+  background: #0d705f !important;
+  border-color: #0d705f !important;
+  color: #ffffff !important;
+}
+
+
+
+/* =========================================================
+   FORM SETTINGS - TEXTE À GAUCHE ET BOUTONS À DROITE
+   ========================================================= */
+
+.form-builder .fb-settings-modal {
+  text-align: left !important;
+}
+
+/* En-tête */
+.form-builder .fb-settings-modal .fb-modal-head {
+  display: block !important;
+  width: 100% !important;
+  margin: 0 0 24px !important;
+  padding: 0 !important;
+  text-align: left !important;
+}
+
+.form-builder .fb-settings-modal .fb-modal-head small,
+.form-builder .fb-settings-modal .fb-modal-head h2,
+.form-builder .fb-settings-modal .fb-modal-head p {
+  display: block !important;
+  width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  text-align: left !important;
+}
+
+/* Contenu du formulaire */
+.form-builder .fb-settings-modal .fb-settings-layout {
+  display: grid !important;
+  grid-template-columns: 185px minmax(0, 1fr) !important;
+  gap: 28px !important;
+  width: 100% !important;
+  align-items: start !important;
+  text-align: left !important;
+}
+
+/* Menu gauche */
+.form-builder .fb-settings-modal .fb-settings-layout nav {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  margin: 0 !important;
+  text-align: left !important;
+}
+
+.form-builder .fb-settings-modal .fb-settings-layout nav button {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  width: 100% !important;
+  min-height: 46px !important;
+  padding: 0 13px !important;
+  text-align: left !important;
+}
+
+/* Champs */
+.form-builder .fb-settings-modal .fb-settings-fields {
+  display: grid !important;
+  width: 100% !important;
+  text-align: left !important;
+}
+
+.form-builder .fb-settings-modal .fb-settings-fields > label {
+  display: grid !important;
+  justify-items: stretch !important;
+  width: 100% !important;
+  text-align: left !important;
+}
+
+.form-builder .fb-settings-modal .fb-settings-fields > label > span {
+  display: flex !important;
+  justify-content: flex-start !important;
+  width: 100% !important;
+  text-align: left !important;
+}
+
+.form-builder .fb-settings-modal .fb-settings-fields input,
+.form-builder .fb-settings-modal .fb-settings-fields textarea,
+.form-builder .fb-settings-modal .fb-settings-fields select {
+  display: block !important;
+  width: 100% !important;
+  text-align: left !important;
+}
+
+/* Toggles */
+.form-builder .fb-settings-modal .fb-setting-toggle {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  text-align: left !important;
+}
+
+.form-builder .fb-settings-modal .fb-setting-toggle > span {
+  display: grid !important;
+  justify-items: start !important;
+  text-align: left !important;
+}
+
+/* Zone des boutons à droite */
+.form-builder .fb-settings-modal .fb-modal-actions,
+.form-builder .fb-settings-modal .fb-modal-actions-row {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  width: 100% !important;
+  margin-top: 24px !important;
+}
+
+/* Boutons avec largeur automatique */
+.form-builder .fb-settings-modal .fb-modal-actions button,
+.form-builder .fb-settings-modal .fb-modal-actions-row button,
+.form-builder .fb-settings-modal .fb-modal-button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: auto !important;
+  min-width: 100px !important;
+  flex: 0 0 auto !important;
+}
+
+/* Bouton principal */
+.form-builder .fb-settings-modal .fb-modal-actions .primary,
+.form-builder .fb-settings-modal .fb-modal-actions-row .primary,
+.form-builder .fb-settings-modal .fb-modal-button-primary {
+  min-width: 160px !important;
+}
+
+/* Si les boutons sont directement dans le modal */
+.form-builder .fb-settings-modal > .fb-modal-actions,
+.form-builder .fb-settings-modal > .fb-modal-actions-row {
+  display: flex !important;
+  justify-content: flex-end !important;
+  width: 100% !important;
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+  .form-builder .fb-settings-modal .fb-settings-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  .form-builder .fb-settings-modal .fb-modal-actions,
+  .form-builder .fb-settings-modal .fb-modal-actions-row {
+    justify-content: flex-end !important;
+  }
+}
+
+/* Form settings : affichage complet sans barre de défilement */
+.form-builder .fb-settings-modal {
+  width: min(930px, calc(100vw - 48px)) !important;
+  max-width: calc(100vw - 48px) !important;
+  height: auto !important;
+  max-height: none !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+  box-sizing: border-box !important;
+}
+
+/* Le conteneur du modal ne doit pas créer de scrollbar */
+.form-builder .fb-modal-backdrop {
+  overflow: hidden !important;
+}
+
+/* Contenu du modal sans défilement interne */
+.form-builder .fb-settings-modal .fb-settings-layout,
+.form-builder .fb-settings-modal .fb-settings-fields {
+  overflow: visible !important;
+}
+
+/* Boutons toujours à droite */
+.form-builder .fb-settings-modal .fb-modal-actions,
+.form-builder .fb-settings-modal .fb-modal-actions-row {
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  width: 100% !important;
+  gap: 10px !important;
+  margin-top: 24px !important;
+}
+
+/* Évite que les boutons prennent toute la largeur */
+.form-builder .fb-settings-modal .fb-modal-actions button,
+.form-builder .fb-settings-modal .fb-modal-actions-row button {
+  width: auto !important;
+  flex: 0 0 auto !important;
+}
+
+/* Masquer les barres de défilement restantes */
+.form-builder .fb-settings-modal::-webkit-scrollbar,
+.form-builder .fb-settings-modal .fb-settings-layout::-webkit-scrollbar,
+.form-builder .fb-settings-modal .fb-settings-fields::-webkit-scrollbar {
+  display: none !important;
+}
+
+.form-builder .fb-settings-modal,
+.form-builder .fb-settings-modal .fb-settings-layout,
+.form-builder .fb-settings-modal .fb-settings-fields {
+  scrollbar-width: none !important;
+}
+
+/* Le modal devient le parent de référence du bouton X */
+.form-builder .fb-settings-modal {
+  position: relative !important;
+}
+
+/* X positionné dans le coin supérieur droit du modal */
+.form-builder .fb-settings-modal .fb-modal-close {
+  position: absolute !important;
+  top: 18px !important;
+  right: 20px !important;
+  left: auto !important;
+  bottom: auto !important;
+
+  z-index: 100 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  width: 32px !important;
+  height: 32px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border: 0 !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+
+  color: #718096 !important;
+  font-size: 24px !important;
+  line-height: 1 !important;
+
+  cursor: pointer !important;
+}
+
+.form-builder .fb-settings-modal .fb-modal-close:hover,
+.form-builder .fb-settings-modal .fb-modal-close:focus-visible {
+  border: 1px solid #dfe6ee !important;
+  background: #eaf7f4 !important;
+  color: #128c78 !important;
+  outline: none !important;
+}
+
+
+
+
+
+/* =========================================================
+   PROPERTIES PANEL - CONTENT / STYLE / OPTIONS
+   Ajoutez ce CSS à la fin du fichier CSS principal.
+   ========================================================= */
+
+/* Le panneau occupe toute sa hauteur et possède un seul scroll. */
+.form-builder .fb-properties {
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  overflow: hidden !important;
+}
+
+.form-builder .fb-properties .fb-panel-head {
+  flex: 0 0 68px !important;
+}
+
+.form-builder .fb-properties .fb-selected-summary {
+  flex: 0 0 auto !important;
+}
+
+/* Onglets toujours visibles et correctement alignés. */
+.form-builder .fb-properties .fb-property-tabs {
+  display: flex !important;
+  flex: 0 0 40px !important;
+  width: 100% !important;
+  min-height: 40px !important;
+  padding: 0 !important;
+  border-bottom: 1px solid #dfe6ee !important;
+  background: #ffffff !important;
+  overflow: hidden !important;
+}
+
+.form-builder .fb-properties .fb-property-tabs button {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 1 1 0 !important;
+  width: auto !important;
+  min-width: 0 !important;
+  height: 40px !important;
+  padding: 0 5px !important;
+  border: 0 !important;
+  border-bottom: 2px solid transparent !important;
+  background: transparent !important;
+  color: #718096 !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+}
+
+.form-builder .fb-properties .fb-property-tabs button:hover {
+  background: #f4fbf9 !important;
+  color: #128c78 !important;
+}
+
+.form-builder .fb-properties .fb-property-tabs button.active {
+  border-bottom-color: #128c78 !important;
+  background: #f4fbf9 !important;
+  color: #128c78 !important;
+}
+
+/* Une seule zone de défilement pour Content, Style, Validate et Logic. */
+.form-builder .fb-properties .fb-properties-scroll {
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  min-height: 0 !important;
+  height: auto !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  padding: 8px 12px 32px !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: #aebbc5 transparent !important;
+}
+
+.form-builder .fb-properties .fb-properties-scroll::-webkit-scrollbar {
+  width: 7px !important;
+}
+
+.form-builder .fb-properties .fb-properties-scroll::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+.form-builder .fb-properties .fb-properties-scroll::-webkit-scrollbar-thumb {
+  border-radius: 8px !important;
+  background: #aebbc5 !important;
+}
+
+/* Sections Content / Style */
+.form-builder .fb-properties .fb-property-section {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 8px 0 16px !important;
+  border-bottom: 1px solid #dfe6ee !important;
+}
+
+.form-builder .fb-properties .fb-property-section-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  min-height: 32px !important;
+  margin: 0 0 10px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #128c78 !important;
+  text-align: left !important;
+  cursor: pointer !important;
+}
+
+.form-builder .fb-properties .fb-property-section-header h3 {
+  margin: 0 !important;
+  color: #128c78 !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  letter-spacing: 1.3px !important;
+  line-height: 1.2 !important;
+  text-align: left !important;
+  text-transform: uppercase !important;
+}
+
+.form-builder .fb-properties .fb-section-chevron {
+  color: #718096 !important;
+  font-size: 13px !important;
+}
+
+.form-builder .fb-properties .fb-property-section-content {
+  width: 100% !important;
+}
+
+/* Alignement des champs */
+.form-builder .fb-properties .fb-property-field {
+  display: grid !important;
+  gap: 6px !important;
+  width: 100% !important;
+  margin: 0 0 13px !important;
+  color: #718096 !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  text-align: left !important;
+}
+
+.form-builder .fb-properties .fb-property-field > span {
+  display: block !important;
+  width: 100% !important;
+  color: #718096 !important;
+  text-align: left !important;
+}
+
+.form-builder .fb-properties .fb-property-field input,
+.form-builder .fb-properties .fb-property-field textarea,
+.form-builder .fb-properties .fb-property-field select {
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 36px !important;
+  padding: 8px 10px !important;
+  border: 1px solid #dfe6ee !important;
+  border-radius: 9px !important;
+  background: #ffffff !important;
+  color: #17243e !important;
+  font-size: 11px !important;
+  line-height: 1.35 !important;
+  text-align: left !important;
+}
+
+.form-builder .fb-properties .fb-property-field textarea {
+  min-height: 88px !important;
+  resize: vertical !important;
+}
+
+.form-builder .fb-properties .fb-property-field input:focus,
+.form-builder .fb-properties .fb-property-field textarea:focus,
+.form-builder .fb-properties .fb-property-field select:focus {
+  border-color: #128c78 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(18, 140, 120, 0.1) !important;
+}
+
+/* Prefix # et suffix MB. */
+.form-builder .fb-properties .fb-prefix-input,
+.form-builder .fb-properties .fb-suffix-input {
+  display: flex !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  border: 1px solid #dfe6ee !important;
+  border-radius: 9px !important;
+  background: #ffffff !important;
+}
+
+.form-builder .fb-properties .fb-prefix-input > span,
+.form-builder .fb-properties .fb-suffix-input > span {
+  display: grid !important;
+  flex: 0 0 38px !important;
+  place-items: center !important;
+  padding: 0 !important;
+  background: #f4f7fa !important;
+  color: #718096 !important;
+  font-size: 11px !important;
+}
+
+.form-builder .fb-properties .fb-prefix-input input,
+.form-builder .fb-properties .fb-suffix-input input {
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Deux champs sur une ligne dans Style/Validation. */
+.form-builder .fb-properties .fb-two-fields {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  width: 100% !important;
+}
+
+/* Segmented controls Width / Alignment. */
+.form-builder .fb-properties .fb-segmented {
+  display: flex !important;
+  width: 100% !important;
+  min-height: 34px !important;
+  overflow: hidden !important;
+  border: 1px solid #dfe6ee !important;
+  border-radius: 9px !important;
+  background: #ffffff !important;
+}
+
+.form-builder .fb-properties .fb-segmented button {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  height: 34px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-right: 1px solid #dfe6ee !important;
+  background: #ffffff !important;
+  color: #718096 !important;
+  font-size: 10px !important;
+}
+
+.form-builder .fb-properties .fb-segmented button:last-child {
+  border-right: 0 !important;
+}
+
+.form-builder .fb-properties .fb-segmented button.active,
+.form-builder .fb-properties .fb-segmented button:hover {
+  background: #eaf7f4 !important;
+  color: #128c78 !important;
+}
+
+/* Sliders Style. */
+.form-builder .fb-properties input[type='range'] {
+  width: 100% !important;
+  min-height: 18px !important;
+  padding: 0 !important;
+  accent-color: #128c78 !important;
+  cursor: pointer !important;
+}
+
+/* =========================================================
+   Options Radio / Checkbox
+   ========================================================= */
+
+.form-builder .fb-properties .fb-option-editor {
+  display: grid !important;
+  gap: 8px !important;
+  width: 100% !important;
+}
+
+.form-builder .fb-properties .fb-option-row {
+  display: grid !important;
+  grid-template-columns: 18px minmax(0, 1fr) 28px !important;
+  align-items: center !important;
+  gap: 6px !important;
+  width: 100% !important;
+}
+
+.form-builder .fb-properties .fb-option-drag {
+  display: grid !important;
+  place-items: center !important;
+  color: #718096 !important;
+  font-size: 15px !important;
+  line-height: 1 !important;
+  cursor: grab !important;
+}
+
+.form-builder .fb-properties .fb-option-row input {
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 36px !important;
+  padding: 0 9px !important;
+  border: 1px solid #dfe6ee !important;
+  border-radius: 8px !important;
+  background: #ffffff !important;
+  color: #17243e !important;
+  font-size: 11px !important;
+}
+
+.form-builder .fb-properties .fb-option-row input:focus {
+  border-color: #128c78 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(18, 140, 120, 0.1) !important;
+}
+
+.form-builder .fb-properties .fb-remove-option {
+  display: grid !important;
+  place-items: center !important;
+  width: 28px !important;
+  height: 30px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 7px !important;
+  background: transparent !important;
+  color: #b7c2cb !important;
+  font-size: 18px !important;
+  line-height: 1 !important;
+  cursor: pointer !important;
+}
+
+.form-builder .fb-properties .fb-remove-option:hover:not(:disabled) {
+  background: #fff1f3 !important;
+  color: #b42334 !important;
+}
+
+.form-builder .fb-properties .fb-remove-option:disabled {
+  opacity: 0.45 !important;
+  cursor: not-allowed !important;
+}
+
+.form-builder .fb-properties .fb-add-option {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  width: 100% !important;
+  min-height: 36px !important;
+  margin-top: 2px !important;
+  padding: 0 10px !important;
+  border: 1px dashed #128c78 !important;
+  border-radius: 8px !important;
+  background: #f4fbf9 !important;
+  color: #128c78 !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+}
+
+.form-builder .fb-properties .fb-add-option:hover {
+  background: #eaf7f4 !important;
+}
+
+/* Toggle */
+.form-builder .fb-properties .fb-toggle-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  margin: 6px 0 14px !important;
+  color: #536273 !important;
+  font-size: 11px !important;
+}
+
+.form-builder .fb-properties .fb-toggle-row button {
+  flex: 0 0 auto !important;
+}
+
+@media (max-width: 500px) {
+  .form-builder .fb-properties .fb-two-fields {
+    grid-template-columns: 1fr !important;
+  }
 }
 
