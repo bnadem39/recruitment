@@ -116,13 +116,13 @@ export function HrDashboard({ session, logout }: { session: Session; logout: () 
             className={view === 'evaluations' ? 'active' : ''}
             onClick={() => setView('evaluations')}
           >
-            📊 Candidate Evaluations
+            % Candidate
           </button>
           <button
             className={view === 'talentPool' ? 'active' : ''}
             onClick={() => setView('talentPool')}
           >
-            ⭐ Talent Pool
+            $ Talent Pool
           </button>
           <button className={view === 'complaints' ? 'active' : ''} onClick={() => setView('complaints')}>⚑ Complaints</button>
         </nav>
