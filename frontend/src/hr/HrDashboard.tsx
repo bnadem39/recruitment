@@ -94,37 +94,41 @@ export function HrDashboard({ session, logout }: { session: Session; logout: () 
         </div>
         <nav>
           <b>HUMAN RESOURCES</b>
+
           <button className={view === 'home' ? 'active' : ''} onClick={() => setView('home')}>
-            ⌂ Dashboard
+            <span aria-hidden="true">⌂</span>
+            Dashboard
           </button>
-          <button
-            className={view === 'jobOffers' ? 'active' : ''}
-            onClick={() => setView('jobOffers')}
-          >
-            ◫ Job Offers
+
+          <button className={view === 'jobOffers' ? 'active' : ''} onClick={() => setView('jobOffers')}>
+            <span aria-hidden="true">◫</span>
+            Job Offers
           </button>
+
           <button className={view === 'forms' ? 'active' : ''} onClick={() => setView('forms')}>
-            ▦ Forms
+            <span aria-hidden="true">▦</span>
+            Forms
           </button>
-          <button
-            className={view === 'evaluators' ? 'active' : ''}
-            onClick={() => setView('evaluators')}
-          >
-            ◇ Evaluators
+
+          <button className={view === 'evaluators' ? 'active' : ''} onClick={() => setView('evaluators')}>
+            <span aria-hidden="true">◇</span>
+            Evaluators
           </button>
-          <button
-            className={view === 'evaluations' ? 'active' : ''}
-            onClick={() => setView('evaluations')}
-          >
-            % Candidate
+
+          <button className={view === 'evaluations' ? 'active' : ''} onClick={() => setView('evaluations')}>
+            <span aria-hidden="true">◈</span>
+            Candidate Evaluations
           </button>
-          <button
-            className={view === 'talentPool' ? 'active' : ''}
-            onClick={() => setView('talentPool')}
-          >
-            $ Talent Pool
+
+          <button className={view === 'talentPool' ? 'active' : ''} onClick={() => setView('talentPool')}>
+            <span aria-hidden="true">★</span>
+            Talent Pool
           </button>
-          <button className={view === 'complaints' ? 'active' : ''} onClick={() => setView('complaints')}>⚑ Complaints</button>
+
+          <button className={view === 'complaints' ? 'active' : ''} onClick={() => setView('complaints')}>
+            <span aria-hidden="true">⚑</span>
+            Complaints
+          </button>
         </nav>
         <div
           className="profile"

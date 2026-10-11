@@ -121,15 +121,33 @@ export function CandidateDashboard({ session, logout, initialOfferId }: { sessio
   return <div className="candidate-shell">
     <aside className="candidate-side">
       <div className="side-logo">BFPME<span>Recruit</span></div>
-            <nav>
-        <b>CANDIDATE</b>
-        <button className={view === 'dashboard' ? 'active' : ''} onClick={() => navigate('dashboard')}>Dashboard</button>
-        <button className={view === 'jobs' || view === 'offer' || view === 'apply' ? 'active' : ''} onClick={() => navigate('jobs')}>Job Offers</button>
-        <button className={view === 'applications' || view === 'application' ? 'active' : ''} onClick={() => navigate('applications')}>My Applications</button>
-        <button className={view === 'interviews' || view === 'interview-room' ? 'active' : ''} onClick={() => navigate('interviews')}>Interviews & Results</button>
-        <button className={view === 'profile' ? 'active' : ''} onClick={() => navigate('profile')}>My Profile</button>
-        <button className={view === 'complaints' ? 'active' : ''} onClick={() => navigate('complaints')}>Complaints</button>
-      </nav>
+        <nav>
+          <b>CANDIDATE</b>
+          <button className={view === 'dashboard' ? 'active' : ''} onClick={() => navigate('dashboard')}>
+            <span aria-hidden="true">⌂</span>
+            Dashboard
+          </button>
+          <button className={view === 'jobs' || view === 'offer' || view === 'apply' ? 'active' : ''} onClick={() => navigate('jobs')}>
+            <span aria-hidden="true">◫</span>
+            Job Offers
+          </button>
+          <button className={view === 'applications' || view === 'application' ? 'active' : ''} onClick={() => navigate('applications')}>
+            <span aria-hidden="true">▦</span>
+            My Applications
+          </button>
+          <button className={view === 'interviews' || view === 'interview-room' ? 'active' : ''} onClick={() => navigate('interviews')}>
+            <span aria-hidden="true">◇</span>
+            Interviews & Results
+          </button>
+          <button className={view === 'profile' ? 'active' : ''} onClick={() => navigate('profile')}>
+            <span aria-hidden="true">◎</span>
+            My Profile
+          </button>
+          <button className={view === 'complaints' ? 'active' : ''} onClick={() => navigate('complaints')}>
+            <span aria-hidden="true">⚑</span>
+            Complaints
+          </button>
+        </nav>
       <div className="profile" style={{ '--role-color': ROLE_THEME.USER.color } as React.CSSProperties}>
         <span>{session.firstName[0]}{session.lastName[0]}</span>
         <div><b>{session.firstName} {session.lastName}</b><small>{session.email}</small></div>

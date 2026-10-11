@@ -36,26 +36,41 @@ nav b {
   padding: 0 13px 10px;
 }
 
+/* ===== Boutons navigation (arrondis) ===== */
 nav button {
+  display: flex;
+  align-items: center;
+  gap: 11px;
   border: 0;
   background: none;
   color: #9fb0c0;
   text-align: left;
-  padding: 13px;
-  border-radius: 8px;
+  padding: 11px 16px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.18s ease;
+  width: 100%;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+nav button span {
+  width: 22px;
+  text-align: center;
+  color: #55d1bb;
+  font-size: 18px;
 }
 
 nav button:hover {
-  background: #183a50;
+  background: #17364c;
   color: #fff;
 }
 
 nav button.active {
-  background: #183a50;
+  background: #17364c;
   color: #fff;
-  border-left: 3px solid #35ccb1;
+  border-radius: 10px;
+  border-left: 3px solid #35ccb1;   /* ← bande verte à gauche */
 }
 
 .profile {
