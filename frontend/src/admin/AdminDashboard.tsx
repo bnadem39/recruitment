@@ -62,11 +62,26 @@ export function AdminDashboard({ session, logout }: { session: Session; logout: 
         <div className="side-logo">BFPME <span>Recruit</span></div>
         <nav>
           <b>ADMIN</b>
-          <button className={view === 'users' ? 'active' : ''} onClick={() => setView('users')}>▦ User management</button>
-          <button className={view === 'recruitment' ? 'active' : ''} onClick={() => setView('recruitment')}>◫ Recruitment</button>
-          <button className={view === 'evaluations' ? 'active' : ''} onClick={() => setView('evaluations')}>◇ Evaluations</button>
-          <button className={view === 'reports' ? 'active' : ''} onClick={() => setView('reports')}>◌ Reports</button>
-          <button className={view === 'complaints' ? 'active' : ''} onClick={() => setView('complaints')}>⚑ Complaints</button>
+          <button className={view === 'users' ? 'active' : ''} onClick={() => setView('users')}>
+            <span aria-hidden="true">▦</span>
+            User management
+          </button>
+          <button className={view === 'recruitment' ? 'active' : ''} onClick={() => setView('recruitment')}>
+            <span aria-hidden="true">◫</span>
+            Recruitment
+          </button>
+          <button className={view === 'evaluations' ? 'active' : ''} onClick={() => setView('evaluations')}>
+            <span aria-hidden="true">◇</span>
+            Evaluations
+          </button>
+          <button className={view === 'reports' ? 'active' : ''} onClick={() => setView('reports')}>
+            <span aria-hidden="true">◌</span>
+            Reports
+          </button>
+          <button className={view === 'complaints' ? 'active' : ''} onClick={() => setView('complaints')}>
+            <span aria-hidden="true">⚑</span>
+            Complaints
+          </button>
         </nav>
         <div className="profile" style={{ '--role-color': ROLE_THEME.ADMIN.color } as React.CSSProperties}>
           <span>{session.firstName[0]}{session.lastName[0]}</span>

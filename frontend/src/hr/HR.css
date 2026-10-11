@@ -995,3 +995,41 @@ aside {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* ===== Sidebar HR = même design que Evaluator ===== */
+
+aside nav button {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  transition: 0.18s ease;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: #d9e2eb;
+  width: 100%;
+  padding: 11px 16px;
+  border-radius: 10px;          /* ← arrondi */
+  text-align: left;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+aside nav button span {
+  width: 22px;
+  text-align: center;
+  color: #55d1bb;
+  font-size: 18px;
+}
+
+aside nav button:hover {
+  background: #17364c;
+  color: #fff;
+}
+
+aside nav button.active {
+  background: #17364c;
+  color: #fff;
+  border-radius: 10px;          /* ← arrondi sur l’actif aussi */
+  /* on enlève la border-left pour un rendu plus doux */
+}
