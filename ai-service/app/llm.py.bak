@@ -1,0 +1,19 @@
+﻿import os
+
+
+def get_llm():
+    """Retourne une fonction prompt(str) -> str (LangChain + Claude)."""
+    from langchain_anthropic import ChatAnthropic
+
+    chat = ChatAnthropic(
+        model=os.getenv("LLM_MODEL", "claude-sonnet-5-5"),
+        max_tokens=800,
+    )
+
+    def call(prompt: str) -> str:
+        content = chat.invoke(prompt).content
+        if isinstance(content, list):
+            return "".join(b.get("text", "") for b in content if isinstance(b, dict))
+        return content
+
+    return call
