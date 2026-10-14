@@ -3,18 +3,14 @@ services:
     image: postgres:17
     container_name: postgres-recruitment
     restart: unless-stopped
-
     environment:
       POSTGRES_DB: recruitment
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admin123
-
     ports:
       - "5432:5432"
-
     volumes:
       - postgres_recruitment_data:/var/lib/postgresql/data
-
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d recruitment"]
       interval: 5s
@@ -22,5 +18,46 @@ services:
       retries: 20
       start_period: 10s
 
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: qdrant-recruitment
+    restart: unless-stopped
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_recruitment_data:/qdrant/storage
+
+  ai-service:
+    build: ./ai-service
+    container_name: ai-service-recruitment
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    env_file:
+      - ./ai-service/.env
+    depends_on:
+      - qdrant
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      # garde le modèle bge-m3 téléchargé entre deux redémarrages
+      - hf_cache:/root/.cache/huggingface
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 120s
+    # Décommente seulement si tu as une carte NVIDIA + NVIDIA Container Toolkit :
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
 volumes:
   postgres_recruitment_data:
+  qdrant_recruitment_data:
+  hf_cache:

@@ -3,3 +3,8 @@ frontend/node_modules/
 node_modules/
 .tmp-vite-cache/
 frontend/vite.candidate.tmp.mjs
+
+# Environment variables
+.env
+*.env
+

@@ -3,3 +3,7 @@ dist/
 .env
 .env.local
 *.tsbuildinfo
+
+# Environment variables
+.env
+*.env

@@ -1,0 +1,6 @@
+ai-service/.env
+ai-service/.env.example
+
+# Environment variables
+.env
+*.env

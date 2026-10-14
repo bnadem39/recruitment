@@ -11,8 +11,9 @@ import { HrCandidateEvaluationsPage } from './HrCandidateEvaluationsPage';
 import { ROLE_THEME } from '../shared/roleTheme';
 import { ComplaintsPage } from '../shared/ComplaintsPage';
 import './HR.css';
+import { AiAssistantPanel } from './AiAssistantPage';
 
-type View = 'home' | 'jobOffers' | 'forms' | 'evaluators' | 'builder' | 'complaints' | 'talentPool' | 'evaluations';
+type View = 'home' | 'jobOffers' | 'forms' | 'evaluators' | 'builder' | 'complaints' | 'talentPool' | 'evaluations' | 'aiAssistant';
 
 async function request<T>(path: string, token: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API}${path}`, {
@@ -125,6 +126,11 @@ export function HrDashboard({ session, logout }: { session: Session; logout: () 
             Talent Pool
           </button>
 
+          <button className={view === 'aiAssistant' ? 'active' : ''} onClick={() => setView('aiAssistant')}>
+            <span aria-hidden="true">✦</span>
+            AI Assistant
+          </button>
+
           <button className={view === 'complaints' ? 'active' : ''} onClick={() => setView('complaints')}>
             <span aria-hidden="true">⚑</span>
             Complaints
@@ -217,6 +223,7 @@ export function HrDashboard({ session, logout }: { session: Session; logout: () 
         )}
         {view === 'evaluations' && <HrCandidateEvaluationsPage session={session} />}
         {view === 'talentPool' && <TalentPoolPage session={session} />}
+        {view === 'aiAssistant' && <AiAssistantPanel session={session} />}
         {view === 'complaints' && <ComplaintsPage session={session} logout={logout} />}
       </main>
     </div>
